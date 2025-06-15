@@ -1,0 +1,453 @@
+{
+  "info": {
+    "name": "River Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Company Auth",
+      "item": [
+        {
+          "name": "Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mobileNumber\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/send-otp",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "send-otp"]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mobileNumber\": \"9876543210\",\n    \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "verify-otp"]
+            }
+          }
+        },
+        {
+          "name": "Company Signup",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "companyName",
+                  "value": "Test Company",
+                  "type": "text"
+                },
+                {
+                  "key": "companyType",
+                  "value": "Private Limited",
+                  "type": "text"
+                },
+                {
+                  "key": "registrationNumber",
+                  "value": "REG123456",
+                  "type": "text"
+                },
+                {
+                  "key": "mobileNumber",
+                  "value": "9876543210",
+                  "type": "text"
+                },
+                {
+                  "key": "address",
+                  "value": "123 Test Street",
+                  "type": "text"
+                },
+                {
+                  "key": "city",
+                  "value": "Test City",
+                  "type": "text"
+                },
+                {
+                  "key": "state",
+                  "value": "Test State",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "test123",
+                  "type": "text"
+                },
+                {
+                  "key": "verifyPassword",
+                  "value": "test123",
+                  "type": "text"
+                },
+                {
+                  "key": "profilePicture",
+                  "type": "file",
+                  "src": "/path/to/profile/picture.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/signup",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "signup"]
+            }
+          }
+        },
+        {
+          "name": "Company Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mobileNumber\": \"9876543210\",\n    \"password\": \"test123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile Picture",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/profile-picture/:id",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "profile-picture", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Security Auth",
+      "item": [
+        {
+          "name": "Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mobileNumber\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/security/send-otp",
+              "host": ["{{base_url}}"],
+              "path": ["security", "send-otp"]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mobileNumber\": \"9876543210\",\n    \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/security/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["security", "verify-otp"]
+            }
+          }
+        },
+        {
+          "name": "Security Signup",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "securityName",
+                  "value": "John Doe",
+                  "type": "text"
+                },
+                {
+                  "key": "phaseName",
+                  "value": "Phase 1",
+                  "type": "text"
+                },
+                {
+                  "key": "mobileNumber",
+                  "value": "9876543210",
+                  "type": "text"
+                },
+                {
+                  "key": "aadharNumber",
+                  "value": "123456789012",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "Gate 1",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "test123",
+                  "type": "text"
+                },
+                {
+                  "key": "verifyPassword",
+                  "value": "test123",
+                  "type": "text"
+                },
+                {
+                  "key": "profilePicture",
+                  "type": "file",
+                  "src": "/path/to/profile/picture.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/security/signup",
+              "host": ["{{base_url}}"],
+              "path": ["security", "signup"]
+            }
+          }
+        },
+        {
+          "name": "Security Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mobileNumber\": \"9876543210\",\n    \"password\": \"test123\",\n    \"phaseName\": \"Phase 1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/security/login",
+              "host": ["{{base_url}}"],
+              "path": ["security", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile Picture",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/security/profile-picture/:id",
+              "host": ["{{base_url}}"],
+              "path": ["security", "profile-picture", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Manager Auth",
+      "item": [
+        {
+          "name": "Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mobileNumber\": \"9876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/manager/send-otp",
+              "host": ["{{base_url}}"],
+              "path": ["manager", "send-otp"]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mobileNumber\": \"9876543210\",\n    \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/manager/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["manager", "verify-otp"]
+            }
+          }
+        },
+        {
+          "name": "Manager Signup",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "managerName",
+                  "value": "John Doe",
+                  "type": "text"
+                },
+                {
+                  "key": "phaseName",
+                  "value": "Phase 1",
+                  "type": "text"
+                },
+                {
+                  "key": "mobileNumber",
+                  "value": "9876543210",
+                  "type": "text"
+                },
+                {
+                  "key": "aadharNumber",
+                  "value": "123456789012",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "Block A",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "test123",
+                  "type": "text"
+                },
+                {
+                  "key": "verifyPassword",
+                  "value": "test123",
+                  "type": "text"
+                },
+                {
+                  "key": "profilePicture",
+                  "type": "file",
+                  "src": "/path/to/profile/picture.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/manager/signup",
+              "host": ["{{base_url}}"],
+              "path": ["manager", "signup"]
+            }
+          }
+        },
+        {
+          "name": "Manager Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mobileNumber\": \"9876543210\",\n    \"password\": \"test123\",\n    \"phaseName\": \"Phase 1\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/manager/login",
+              "host": ["{{base_url}}"],
+              "path": ["manager", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile Picture",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/manager/profile-picture/:id",
+              "host": ["{{base_url}}"],
+              "path": ["manager", "profile-picture", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "user_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api"
+    }
+  ]
+} 

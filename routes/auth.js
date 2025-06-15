@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const CompanyUser = require('../models/CompanyUser');
 const authController = require('../controllers/authController');
+const upload = require('../middleware/upload');
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
@@ -33,8 +34,91 @@ router.get('/validate-token', auth, async (req, res) => {
   }
 });
 
+// POST /send-otp
+router.post('/send-otp', async (req, res) => {
+  const { mobileNumber } = req.body;
+  
+  if (!mobileNumber) {
+    return res.status(400).json({ message: 'Mobile number is required' });
+  }
+
+  // Validate mobile number format (10 digits)
+  if (!/^\d{10}$/.test(mobileNumber)) {
+    return res.status(400).json({ message: 'Mobile number must be 10 digits' });
+  }
+
+  try {
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Check if user exists
+    let user = await CompanyUser.findOne({ mobileNumber });
+    
+    if (user) {
+      // Update existing user's OTP
+      user.otp = {
+        code: otp,
+        expires: otpExpiry,
+        verified: false
+      };
+    } else {
+      // Create temporary user with OTP
+      user = new CompanyUser({
+        mobileNumber,
+        otp: {
+          code: otp,
+          expires: otpExpiry,
+          verified: false
+        }
+      });
+    }
+
+    await user.save();
+
+    // TODO: Integrate with SMS service to send OTP
+    // For development, we'll return the OTP in response
+    return res.json({ 
+      message: 'OTP sent successfully',
+      otp // Remove this in production
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error sending OTP' });
+  }
+});
+
+// POST /verify-otp
+router.post('/verify-otp', async (req, res) => {
+  const { mobileNumber, otp } = req.body;
+
+  if (!mobileNumber || !otp) {
+    return res.status(400).json({ message: 'Mobile number and OTP are required' });
+  }
+
+  try {
+    const user = await CompanyUser.findOne({ 
+      mobileNumber,
+      'otp.code': otp,
+      'otp.expires': { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    user.otp.verified = true;
+    await user.save();
+
+    return res.json({ message: 'OTP verified successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error verifying OTP' });
+  }
+});
+
 // POST /signup
-router.post('/signup', async (req, res) => {
+router.post('/signup', upload.single('profilePicture'), async (req, res) => {
   const {
     companyName,
     companyType,
@@ -57,29 +141,38 @@ router.post('/signup', async (req, res) => {
   }
 
   try {
-    const existingUser = await CompanyUser.findOne({ 
-      $or: [
-        { registrationNumber },
-        { mobileNumber }
-      ]
-    });
+    const user = await CompanyUser.findOne({ mobileNumber });
     
-    if (existingUser) {
-      return res.status(400).json({ 
-        message: 'Company with this registration number or mobile number already exists' 
-      });
+    if (!user || !user.otp?.verified) {
+      return res.status(400).json({ message: 'Please verify your mobile number with OTP first' });
     }
 
-    const user = new CompanyUser({
-      companyName,
-      companyType,
-      registrationNumber,
-      mobileNumber,
-      address,
-      city,
-      state,
-      password
-    });
+    if (user.companyName) {
+      return res.status(400).json({ message: 'Company already registered' });
+    }
+
+    const existingUser = await CompanyUser.findOne({ registrationNumber });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Registration number already exists' });
+    }
+
+    // Update user with registration details
+    user.companyName = companyName;
+    user.companyType = companyType;
+    user.registrationNumber = registrationNumber;
+    user.address = address;
+    user.city = city;
+    user.state = state;
+    user.password = password;
+    user.otp = undefined; // Clear OTP after successful registration
+
+    // Add profile picture if uploaded
+    if (req.file) {
+      user.profilePicture = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype
+      };
+    }
     
     await user.save();
 
@@ -99,7 +192,8 @@ router.post('/signup', async (req, res) => {
         mobileNumber,
         address,
         city,
-        state
+        state,
+        hasProfilePicture: !!user.profilePicture
       }
     });
   } catch (err) {
@@ -227,6 +321,22 @@ router.put('/update-profile', auth, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error updating profile' });
+  }
+});
+
+// GET /profile-picture/:id
+router.get('/profile-picture/:id', async (req, res) => {
+  try {
+    const user = await CompanyUser.findById(req.params.id).select('profilePicture');
+    if (!user || !user.profilePicture) {
+      return res.status(404).json({ message: 'Profile picture not found' });
+    }
+
+    res.set('Content-Type', user.profilePicture.contentType);
+    res.send(user.profilePicture.data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching profile picture' });
   }
 });
 

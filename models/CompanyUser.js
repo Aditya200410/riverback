@@ -36,8 +36,20 @@ const companyUserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  profilePicture: {
+    data: Buffer,
+    contentType: String
+  },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  otp: {
+    code: String,
+    expires: Date,
+    verified: {
+      type: Boolean,
+      default: false
+    }
+  }
 }, {
   timestamps: true,
 });

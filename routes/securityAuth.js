@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const SecurityUser = require('../models/SecurityUser');
+const upload = require('../middleware/upload');
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
@@ -32,8 +33,91 @@ router.get('/validate-token', auth, async (req, res) => {
   }
 });
 
+// POST /send-otp
+router.post('/send-otp', async (req, res) => {
+  const { mobileNumber } = req.body;
+  
+  if (!mobileNumber) {
+    return res.status(400).json({ message: 'Mobile number is required' });
+  }
+
+  // Validate mobile number format (10 digits)
+  if (!/^\d{10}$/.test(mobileNumber)) {
+    return res.status(400).json({ message: 'Mobile number must be 10 digits' });
+  }
+
+  try {
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Check if user exists
+    let securityUser = await SecurityUser.findOne({ mobileNumber });
+    
+    if (securityUser) {
+      // Update existing user's OTP
+      securityUser.otp = {
+        code: otp,
+        expires: otpExpiry,
+        verified: false
+      };
+    } else {
+      // Create temporary user with OTP
+      securityUser = new SecurityUser({
+        mobileNumber,
+        otp: {
+          code: otp,
+          expires: otpExpiry,
+          verified: false
+        }
+      });
+    }
+
+    await securityUser.save();
+
+    // TODO: Integrate with SMS service to send OTP
+    // For development, we'll return the OTP in response
+    return res.json({ 
+      message: 'OTP sent successfully',
+      otp // Remove this in production
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error sending OTP' });
+  }
+});
+
+// POST /verify-otp
+router.post('/verify-otp', async (req, res) => {
+  const { mobileNumber, otp } = req.body;
+
+  if (!mobileNumber || !otp) {
+    return res.status(400).json({ message: 'Mobile number and OTP are required' });
+  }
+
+  try {
+    const securityUser = await SecurityUser.findOne({ 
+      mobileNumber,
+      'otp.code': otp,
+      'otp.expires': { $gt: Date.now() }
+    });
+
+    if (!securityUser) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    securityUser.otp.verified = true;
+    await securityUser.save();
+
+    return res.json({ message: 'OTP verified successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error verifying OTP' });
+  }
+});
+
 // POST /signup
-router.post('/signup', async (req, res) => {
+router.post('/signup', upload.single('profilePicture'), async (req, res) => {
   const {
     securityName,
     phaseName,
@@ -76,30 +160,36 @@ router.post('/signup', async (req, res) => {
   }
 
   try {
-    const existingSecurityUser = await SecurityUser.findOne({ 
-      $or: [
-        { mobileNumber },
-        { aadharNumber }
-      ]
-    });
+    const securityUser = await SecurityUser.findOne({ mobileNumber });
     
-    if (existingSecurityUser) {
-      if (existingSecurityUser.mobileNumber === mobileNumber) {
-        return res.status(400).json({ message: 'Mobile number already registered' });
-      }
-      if (existingSecurityUser.aadharNumber === aadharNumber) {
-        return res.status(400).json({ message: 'Aadhar number already registered' });
-      }
+    if (!securityUser || !securityUser.otp?.verified) {
+      return res.status(400).json({ message: 'Please verify your mobile number with OTP first' });
     }
 
-    const securityUser = new SecurityUser({
-      securityName,
-      phaseName,
-      mobileNumber,
-      aadharNumber,
-      location,
-      password
-    });
+    if (securityUser.securityName) {
+      return res.status(400).json({ message: 'Security user already registered' });
+    }
+
+    const existingUser = await SecurityUser.findOne({ aadharNumber });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Aadhar number already registered' });
+    }
+
+    // Update user with registration details
+    securityUser.securityName = securityName;
+    securityUser.phaseName = phaseName;
+    securityUser.aadharNumber = aadharNumber;
+    securityUser.location = location;
+    securityUser.password = password;
+    securityUser.otp = undefined; // Clear OTP after successful registration
+
+    // Add profile picture if uploaded
+    if (req.file) {
+      securityUser.profilePicture = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype
+      };
+    }
     
     await securityUser.save();
 
@@ -121,7 +211,8 @@ router.post('/signup', async (req, res) => {
         securityName,
         phaseName,
         mobileNumber,
-        location
+        location,
+        hasProfilePicture: !!securityUser.profilePicture
       }
     });
   } catch (err) {
@@ -265,6 +356,22 @@ router.put('/update-profile', auth, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error updating profile' });
+  }
+});
+
+// GET /profile-picture/:id
+router.get('/profile-picture/:id', async (req, res) => {
+  try {
+    const securityUser = await SecurityUser.findById(req.params.id).select('profilePicture');
+    if (!securityUser || !securityUser.profilePicture) {
+      return res.status(404).json({ message: 'Profile picture not found' });
+    }
+
+    res.set('Content-Type', securityUser.profilePicture.contentType);
+    res.send(securityUser.profilePicture.data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching profile picture' });
   }
 });
 

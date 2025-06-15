@@ -32,6 +32,89 @@ router.get('/validate-token', auth, async (req, res) => {
   }
 });
 
+// POST /send-otp
+router.post('/send-otp', async (req, res) => {
+  const { mobileNumber } = req.body;
+  
+  if (!mobileNumber) {
+    return res.status(400).json({ message: 'Mobile number is required' });
+  }
+
+  // Validate mobile number format (10 digits)
+  if (!/^\d{10}$/.test(mobileNumber)) {
+    return res.status(400).json({ message: 'Mobile number must be 10 digits' });
+  }
+
+  try {
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Check if user exists
+    let manager = await Manager.findOne({ mobileNumber });
+    
+    if (manager) {
+      // Update existing user's OTP
+      manager.otp = {
+        code: otp,
+        expires: otpExpiry,
+        verified: false
+      };
+    } else {
+      // Create temporary user with OTP
+      manager = new Manager({
+        mobileNumber,
+        otp: {
+          code: otp,
+          expires: otpExpiry,
+          verified: false
+        }
+      });
+    }
+
+    await manager.save();
+
+    // TODO: Integrate with SMS service to send OTP
+    // For development, we'll return the OTP in response
+    return res.json({ 
+      message: 'OTP sent successfully',
+      otp // Remove this in production
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error sending OTP' });
+  }
+});
+
+// POST /verify-otp
+router.post('/verify-otp', async (req, res) => {
+  const { mobileNumber, otp } = req.body;
+
+  if (!mobileNumber || !otp) {
+    return res.status(400).json({ message: 'Mobile number and OTP are required' });
+  }
+
+  try {
+    const manager = await Manager.findOne({ 
+      mobileNumber,
+      'otp.code': otp,
+      'otp.expires': { $gt: Date.now() }
+    });
+
+    if (!manager) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    manager.otp.verified = true;
+    await manager.save();
+
+    return res.json({ message: 'OTP verified successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error verifying OTP' });
+  }
+});
+
 // POST /signup
 router.post('/signup', async (req, res) => {
   const {
@@ -76,35 +159,37 @@ router.post('/signup', async (req, res) => {
   }
 
   try {
-    const existingManager = await Manager.findOne({ 
-      $or: [
-        { mobileNumber },
-        { aadharNumber }
-      ]
-    });
+    const manager = await Manager.findOne({ mobileNumber });
     
-    if (existingManager) {
-      if (existingManager.mobileNumber === mobileNumber) {
-        return res.status(400).json({ message: 'Mobile number already registered' });
-      }
-      if (existingManager.aadharNumber === aadharNumber) {
-        return res.status(400).json({ message: 'Aadhar number already registered' });
-      }
+    if (!manager || !manager.otp?.verified) {
+      return res.status(400).json({ message: 'Please verify your mobile number with OTP first' });
     }
 
-    const manager = new Manager({
-      managerName,
-      phaseName,
-      mobileNumber,
-      aadharNumber,
-      location,
-      password
-    });
+    if (manager.managerName) {
+      return res.status(400).json({ message: 'Manager already registered' });
+    }
+
+    const existingUser = await Manager.findOne({ aadharNumber });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Aadhar number already registered' });
+    }
+
+    // Update user with registration details
+    manager.managerName = managerName;
+    manager.phaseName = phaseName;
+    manager.aadharNumber = aadharNumber;
+    manager.location = location;
+    manager.password = password;
+    manager.otp = undefined; // Clear OTP after successful registration
     
     await manager.save();
 
     const token = jwt.sign(
-      { id: manager._id, mobileNumber: manager.mobileNumber }, 
+      { 
+        id: manager._id, 
+        mobileNumber: manager.mobileNumber,
+        phaseName: manager.phaseName 
+      }, 
       JWT_SECRET, 
       { expiresIn: '7d' }
     );
@@ -261,6 +346,22 @@ router.put('/update-profile', auth, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error updating profile' });
+  }
+});
+
+// GET /profile-picture/:id
+router.get('/profile-picture/:id', async (req, res) => {
+  try {
+    const manager = await Manager.findById(req.params.id).select('profilePicture');
+    if (!manager || !manager.profilePicture) {
+      return res.status(404).json({ message: 'Profile picture not found' });
+    }
+
+    res.set('Content-Type', manager.profilePicture.contentType);
+    res.send(manager.profilePicture.data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching profile picture' });
   }
 });
 
