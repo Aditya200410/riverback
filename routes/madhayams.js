@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const sikariController = require('../controllers/sikariController');
+const madhayamController = require('../controllers/madhayamController');
 const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');
@@ -10,7 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/sikaris')
+    cb(null, 'uploads/madhayams')
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname)
@@ -48,20 +48,20 @@ const auth = (req, res, next) => {
 };
 
 // Routes
-router.get('/', auth, sikariController.getAllSikaris);
-router.get('/:id', auth, sikariController.getSikariById);
+router.get('/', auth, madhayamController.getAllMadhayams);
+router.get('/:id', auth, madhayamController.getMadhayamById);
 router.post('/add', auth, upload.fields([
   { name: 'profilePhoto', maxCount: 1 },
   { name: 'bannerPhoto', maxCount: 1 },
   { name: 'adharCardPhoto', maxCount: 1 },
   { name: 'bankPassbookPhoto', maxCount: 1 }
-]), sikariController.createSikari);
+]), madhayamController.createMadhayam);
 router.put('/update/:id', auth, upload.fields([
   { name: 'profilePhoto', maxCount: 1 },
   { name: 'bannerPhoto', maxCount: 1 },
   { name: 'adharCardPhoto', maxCount: 1 },
   { name: 'bankPassbookPhoto', maxCount: 1 }
-]), sikariController.updateSikari);
-router.delete('/delete/:id', auth, sikariController.deleteSikari);
+]), madhayamController.updateMadhayam);
+router.delete('/delete/:id', auth, madhayamController.deleteMadhayam);
 
 module.exports = router; 

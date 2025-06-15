@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const CompanyUser = require('../models/CompanyUser');
+const authController = require('../controllers/authController');
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
@@ -228,5 +229,9 @@ router.put('/update-profile', auth, async (req, res) => {
     res.status(500).json({ message: 'Error updating profile' });
   }
 });
+
+// Routes
+router.post('/register', authController.register);
+router.post('/logout', authController.logout);
 
 module.exports = router;
