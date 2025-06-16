@@ -1,14 +1,144 @@
 const Report = require('../models/Report');
+const MoneyHandle = require('../models/MoneyHandle');
+const Boat = require('../models/Boat');
+const Sikari = require('../models/Sikari');
+const Madhayam = require('../models/Madhayam');
 
-// Get all reports
-exports.getAllReports = async (req, res) => {
-    try {
-        const reports = await Report.find({ status: 'active' })
-            .sort({ createdAt: -1 });
-        res.status(200).json(reports);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+// Get all reports for a company
+exports.getAllReports = async (companyId) => {
+  try {
+    return await Report.find({ companyId, status: 'active' })
+      .sort({ createdAt: -1 })
+      .populate('generatedBy', 'name email');
+  } catch (err) {
+    console.error('Error in getAllReports:', err);
+    throw err;
+  }
+};
+
+// Get report by ID
+exports.getReportById = async (id) => {
+  try {
+    return await Report.findOne({ _id: id, status: 'active' })
+      .populate('generatedBy', 'name email');
+  } catch (err) {
+    console.error('Error in getReportById:', err);
+    throw err;
+  }
+};
+
+// Generate report
+exports.generateReport = async (reportData) => {
+  try {
+    const {
+      reportType,
+      startDate,
+      endDate,
+      generatedBy,
+      companyId
+    } = reportData;
+
+    // Calculate report data based on type
+    let reportData = {};
+    
+    switch (reportType) {
+      case 'daily':
+      case 'weekly':
+      case 'monthly':
+      case 'yearly':
+      case 'custom':
+        // Get financial data
+        const financialData = await MoneyHandle.find({
+          companyId,
+          createdAt: { $gte: startDate, $lte: endDate },
+          status: 'active'
+        });
+
+        // Get boat data
+        const boatData = await Boat.find({
+          companyId,
+          createdAt: { $gte: startDate, $lte: endDate },
+          status: 'active'
+        });
+
+        // Get sikari data
+        const sikariData = await Sikari.find({
+          companyId,
+          createdAt: { $gte: startDate, $lte: endDate },
+          status: 'active'
+        });
+
+        // Get madhayam data
+        const madhayamData = await Madhayam.find({
+          companyId,
+          createdAt: { $gte: startDate, $lte: endDate },
+          status: 'active'
+        });
+
+        // Calculate totals
+        const totalIncome = financialData
+          .filter(transaction => transaction.type === 'income')
+          .reduce((sum, transaction) => sum + transaction.amount, 0);
+
+        const totalExpense = financialData
+          .filter(transaction => transaction.type === 'expense')
+          .reduce((sum, transaction) => sum + transaction.amount, 0);
+
+        reportData = {
+          financial: {
+            totalIncome,
+            totalExpense,
+            netProfit: totalIncome - totalExpense,
+            transactions: financialData
+          },
+          boats: {
+            total: boatData.length,
+            details: boatData
+          },
+          sikaris: {
+            total: sikariData.length,
+            details: sikariData
+          },
+          madhayams: {
+            total: madhayamData.length,
+            details: madhayamData
+          }
+        };
+        break;
+
+      default:
+        throw new Error('Invalid report type');
     }
+
+    // Create and save report
+    const report = new Report({
+      reportType,
+      startDate,
+      endDate,
+      reportData,
+      generatedBy,
+      companyId
+    });
+
+    return await report.save();
+  } catch (err) {
+    console.error('Error in generateReport:', err);
+    throw err;
+  }
+};
+
+// Archive report
+exports.archiveReport = async (id) => {
+  try {
+    return await Report.findByIdAndUpdate(
+      id,
+      { $set: { status: 'archived' } },
+      { new: true }
+    );
+  } catch (err) {
+    console.error('Error in archiveReport:', err);
+    throw err;
+  }
 };
 
 // Get reports by shop name

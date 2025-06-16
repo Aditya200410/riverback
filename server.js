@@ -2,16 +2,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const path = require('path');
-const fs = require('fs');
-const { errorHandler } = require('./middleware/errorHandler');
-const { handleUploadError } = require('./middleware/upload');
+require('dotenv').config();
 
-// Load environment variables
-dotenv.config();
-
-// Create Express app
 const app = express();
 
 // Middleware
@@ -19,46 +12,53 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir);
-}
-
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/security', require('./routes/securityAuth'));
-app.use('/api/manager', require('./routes/managerAuth'));
 app.use('/api/boats', require('./routes/boats'));
 app.use('/api/company-papers', require('./routes/companyPapers'));
 app.use('/api/money-handles', require('./routes/moneyHandles'));
+app.use('/api/madhayams', require('./routes/madhayams'));
+app.use('/api/fish-types', require('./routes/fishTypes'));
+app.use('/api/reports', require('./routes/reports'));
 
 // Handle upload errors
-app.use(handleUploadError);
+app.use((err, req, res, next) => {
+  if (err.name === 'MulterError') {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'UPLOAD_ERROR',
+        message: err.message
+      }
+    });
+  }
+  next(err);
+});
 
 // Error handling middleware
-app.use(errorHandler);
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    error: {
+      code: 'SERVER_ERROR',
+      message: 'Something went wrong!'
+    }
+  });
+});
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/river', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => {
-    console.log('Connected to MongoDB');
-    
-    // Start server
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-})
-.catch((error) => {
-    console.error('MongoDB connection error:', error);
-    process.exit(1);
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/riverbackend')
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 // Handle unhandled promise rejections

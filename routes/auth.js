@@ -172,13 +172,21 @@ router.post('/signup', upload.single('profilePicture'), validationRules.companyS
     const { name, mobile, password, email, companyName, companyAddress } = req.body;
 
     // Check if user exists
-    const existingUser = await CompanyUser.findOne({ mobile });
-    if (existingUser && existingUser.isVerified) {
+    const existingUser = await CompanyUser.findOne({ 
+      $or: [
+        { mobile },
+        { email }
+      ]
+    });
+    
+    if (existingUser) {
       return res.status(400).json({
         success: false,
         error: {
           code: 'USER_EXISTS',
-          message: 'User already exists'
+          message: existingUser.mobile === mobile ? 
+            'Mobile number already registered' : 
+            'Email already registered'
         }
       });
     }
@@ -215,6 +223,33 @@ router.post('/signup', upload.single('profilePicture'), validationRules.companyS
     });
   } catch (error) {
     console.error('Error in signup:', error);
+    
+    // Handle specific MongoDB errors
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_FIELD',
+          message: 'Mobile number or email already registered'
+        }
+      });
+    }
+
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Validation failed',
+          details: Object.values(error.errors).map(err => ({
+            field: err.path,
+            message: err.message
+          }))
+        }
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: {

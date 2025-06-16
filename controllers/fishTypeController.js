@@ -1,69 +1,63 @@
 const FishType = require('../models/FishType');
 
-// Get all fish types
-exports.getAllFishTypes = async (req, res) => {
+// Get all active fish types
+exports.getAllFishTypes = async () => {
   try {
-    const fishTypes = await FishType.find({ status: 'active' });
-    res.status(200).json(fishTypes);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    return await FishType.find({ status: 'active' });
+  } catch (err) {
+    console.error('Error in getAllFishTypes:', err);
+    throw err;
   }
 };
 
-// Get single fish type by ID
-exports.getFishTypeById = async (req, res) => {
+// Get fish type by ID
+exports.getFishTypeById = async (id) => {
   try {
-    const fishType = await FishType.findOne({ _id: req.params.id, status: 'active' });
-    if (!fishType) {
-      return res.status(404).json({ message: 'Fish type not found' });
-    }
-    res.status(200).json(fishType);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    return await FishType.findOne({ _id: id, status: 'active' });
+  } catch (err) {
+    console.error('Error in getFishTypeById:', err);
+    throw err;
   }
 };
 
 // Create new fish type
-exports.createFishType = async (req, res) => {
+exports.createFishType = async (fishTypeData) => {
   try {
-    const fishType = new FishType(req.body);
-    const newFishType = await fishType.save();
-    res.status(201).json(newFishType);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    const fishType = new FishType({
+      ...fishTypeData,
+      status: 'active'
+    });
+    return await fishType.save();
+  } catch (err) {
+    console.error('Error in createFishType:', err);
+    throw err;
   }
 };
 
 // Update fish type
-exports.updateFishType = async (req, res) => {
+exports.updateFishType = async (id, updateData) => {
   try {
-    const fishType = await FishType.findOneAndUpdate(
-      { _id: req.params.id, status: 'active' },
-      req.body,
+    return await FishType.findByIdAndUpdate(
+      id,
+      { $set: updateData },
       { new: true, runValidators: true }
     );
-    if (!fishType) {
-      return res.status(404).json({ message: 'Fish type not found' });
-    }
-    res.status(200).json(fishType);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    console.error('Error in updateFishType:', err);
+    throw err;
   }
 };
 
 // Delete fish type (soft delete)
-exports.deleteFishType = async (req, res) => {
+exports.deleteFishType = async (id) => {
   try {
-    const fishType = await FishType.findOneAndUpdate(
-      { _id: req.params.id, status: 'active' },
-      { status: 'deleted' },
+    return await FishType.findByIdAndUpdate(
+      id,
+      { $set: { status: 'inactive' } },
       { new: true }
     );
-    if (!fishType) {
-      return res.status(404).json({ message: 'Fish type not found' });
-    }
-    res.status(200).json({ message: 'Fish type deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    console.error('Error in deleteFishType:', err);
+    throw err;
   }
 }; 

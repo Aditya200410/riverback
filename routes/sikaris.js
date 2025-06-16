@@ -3,17 +3,22 @@ const router = express.Router();
 const sikariController = require('../controllers/sikariController');
 const multer = require('multer');
 const path = require('path');
-const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const fs = require('fs');
+const { auth } = require('../middleware/auth');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/sikaris')
+    const uploadDir = 'uploads/sikaris';
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname)
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'sikari-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
 
@@ -34,34 +39,421 @@ const upload = multer({
   }
 });
 
-// Middleware to protect routes
-const auth = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    return res.status(401).json({ message: 'Invalid token' });
-  }
-};
-
 // Routes
-router.get('/', auth, sikariController.getAllSikaris);
-router.get('/:id', auth, sikariController.getSikariById);
-router.post('/add', auth, upload.fields([
+router.get('/', auth(['company']), async (req, res) => {
+  try {
+    const sikaris = await sikariController.getAllSikaris();
+    res.json({
+      success: true,
+      data: sikaris.map(sikari => ({
+        id: sikari._id,
+        sikariId: sikari.sikariId,
+        sikariName: sikari.sikariName,
+        mobileNumber: sikari.mobileNumber,
+        location: sikari.location,
+        dateOfJoining: sikari.dateOfJoining,
+        smargId: sikari.smargId,
+        boatNumber: sikari.boatNumber,
+        boatId: sikari.boatId,
+        boatType: sikari.boatType,
+        position: sikari.position,
+        profilePhoto: sikari.profilePhoto,
+        bannerPhoto: sikari.bannerPhoto
+      }))
+    });
+  } catch (err) {
+    console.error('Error fetching sikaris:', err);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error fetching sikaris'
+      }
+    });
+  }
+});
+
+router.get('/:id', auth(['company']), async (req, res) => {
+  try {
+    const sikari = await sikariController.getSikariById(req.params.id);
+    if (!sikari) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'SIKARI_NOT_FOUND',
+          message: 'Sikari not found'
+        }
+      });
+    }
+    res.json({
+      success: true,
+      data: {
+        id: sikari._id,
+        sikariId: sikari.sikariId,
+        sikariName: sikari.sikariName,
+        mobileNumber: sikari.mobileNumber,
+        location: sikari.location,
+        dateOfJoining: sikari.dateOfJoining,
+        smargId: sikari.smargId,
+        adharCardNumber: sikari.adharCardNumber,
+        bankAccountNumber: sikari.bankAccountNumber,
+        ifscCode: sikari.ifscCode,
+        madhayamName: sikari.madhayamName,
+        madhayamMobileNumber: sikari.madhayamMobileNumber,
+        madhayamAddress: sikari.madhayamAddress,
+        boatNumber: sikari.boatNumber,
+        boatId: sikari.boatId,
+        boatType: sikari.boatType,
+        position: sikari.position,
+        profilePhoto: sikari.profilePhoto,
+        bannerPhoto: sikari.bannerPhoto,
+        adharCardPhoto: sikari.adharCardPhoto,
+        bankPassbookPhoto: sikari.bankPassbookPhoto
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching sikari details:', err);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error fetching sikari details'
+      }
+    });
+  }
+});
+
+router.post('/add', auth(['company']), upload.fields([
   { name: 'profilePhoto', maxCount: 1 },
   { name: 'bannerPhoto', maxCount: 1 },
   { name: 'adharCardPhoto', maxCount: 1 },
   { name: 'bankPassbookPhoto', maxCount: 1 }
-]), sikariController.createSikari);
-router.put('/update/:id', auth, upload.fields([
+]), async (req, res) => {
+  try {
+    const {
+      sikariId,
+      sikariName,
+      mobileNumber,
+      location,
+      dateOfJoining,
+      smargId,
+      adharCardNumber,
+      bankAccountNumber,
+      ifscCode,
+      madhayamName,
+      madhayamMobileNumber,
+      madhayamAddress,
+      boatNumber,
+      boatId,
+      boatType,
+      position
+    } = req.body;
+
+    // Validate required fields
+    const requiredFields = [
+      'sikariId', 'sikariName', 'mobileNumber', 'location', 'dateOfJoining',
+      'smargId', 'adharCardNumber', 'bankAccountNumber', 'ifscCode',
+      'madhayamName', 'madhayamMobileNumber', 'madhayamAddress',
+      'boatNumber', 'boatId', 'boatType', 'position'
+    ];
+
+    const missingFields = requiredFields.filter(field => !req.body[field]);
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_FIELDS',
+          message: `Missing required fields: ${missingFields.join(', ')}`
+        }
+      });
+    }
+
+    // Validate required photos
+    if (!req.files?.profilePhoto?.[0] || !req.files?.bannerPhoto?.[0] ||
+        !req.files?.adharCardPhoto?.[0] || !req.files?.bankPassbookPhoto?.[0]) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_PHOTOS',
+          message: 'All photos (profile, banner, Aadhar card, bank passbook) are required'
+        }
+      });
+    }
+
+    // Validate boat type
+    if (!['company boat', 'self boat'].includes(boatType)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_BOAT_TYPE',
+          message: 'Boat type must be either "company boat" or "self boat"'
+        }
+      });
+    }
+
+    // Validate position
+    if (!['personal duty', 'government register fisherman', 'illegal'].includes(position)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_POSITION',
+          message: 'Position must be one of: personal duty, government register fisherman, illegal'
+        }
+      });
+    }
+
+    const sikari = await sikariController.createSikari({
+      sikariId,
+      sikariName,
+      mobileNumber,
+      location,
+      dateOfJoining: new Date(dateOfJoining),
+      smargId,
+      adharCardNumber,
+      bankAccountNumber,
+      ifscCode,
+      madhayamName,
+      madhayamMobileNumber,
+      madhayamAddress,
+      boatNumber,
+      boatId,
+      boatType,
+      position,
+      profilePhoto: req.files.profilePhoto[0].filename,
+      bannerPhoto: req.files.bannerPhoto[0].filename,
+      adharCardPhoto: req.files.adharCardPhoto[0].filename,
+      bankPassbookPhoto: req.files.bankPassbookPhoto[0].filename
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Sikari added successfully',
+      data: {
+        id: sikari._id,
+        sikariId: sikari.sikariId,
+        sikariName: sikari.sikariName,
+        mobileNumber: sikari.mobileNumber,
+        location: sikari.location,
+        dateOfJoining: sikari.dateOfJoining,
+        smargId: sikari.smargId,
+        boatNumber: sikari.boatNumber,
+        boatId: sikari.boatId,
+        boatType: sikari.boatType,
+        position: sikari.position,
+        profilePhoto: sikari.profilePhoto,
+        bannerPhoto: sikari.bannerPhoto
+      }
+    });
+  } catch (err) {
+    console.error('Error adding sikari:', err);
+    
+    // Clean up uploaded files if there's an error
+    if (req.files) {
+      Object.values(req.files).forEach(files => {
+        files.forEach(file => {
+          const filePath = path.join('uploads/sikaris', file.filename);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        });
+      });
+    }
+
+    // Handle duplicate field errors
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern)[0];
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_FIELD',
+          message: `A sikari with this ${field} already exists`
+        }
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error adding sikari'
+      }
+    });
+  }
+});
+
+router.put('/update/:id', auth(['company']), upload.fields([
   { name: 'profilePhoto', maxCount: 1 },
   { name: 'bannerPhoto', maxCount: 1 },
   { name: 'adharCardPhoto', maxCount: 1 },
   { name: 'bankPassbookPhoto', maxCount: 1 }
-]), sikariController.updateSikari);
-router.delete('/delete/:id', auth, sikariController.deleteSikari);
+]), async (req, res) => {
+  try {
+    const updateData = {};
+    const {
+      sikariName,
+      mobileNumber,
+      location,
+      dateOfJoining,
+      smargId,
+      adharCardNumber,
+      bankAccountNumber,
+      ifscCode,
+      madhayamName,
+      madhayamMobileNumber,
+      madhayamAddress,
+      boatNumber,
+      boatId,
+      boatType,
+      position
+    } = req.body;
+
+    // Add fields to update if provided
+    if (sikariName) updateData.sikariName = sikariName;
+    if (mobileNumber) updateData.mobileNumber = mobileNumber;
+    if (location) updateData.location = location;
+    if (dateOfJoining) updateData.dateOfJoining = new Date(dateOfJoining);
+    if (smargId) updateData.smargId = smargId;
+    if (adharCardNumber) updateData.adharCardNumber = adharCardNumber;
+    if (bankAccountNumber) updateData.bankAccountNumber = bankAccountNumber;
+    if (ifscCode) updateData.ifscCode = ifscCode;
+    if (madhayamName) updateData.madhayamName = madhayamName;
+    if (madhayamMobileNumber) updateData.madhayamMobileNumber = madhayamMobileNumber;
+    if (madhayamAddress) updateData.madhayamAddress = madhayamAddress;
+    if (boatNumber) updateData.boatNumber = boatNumber;
+    if (boatId) updateData.boatId = boatId;
+    if (boatType) {
+      if (!['company boat', 'self boat'].includes(boatType)) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_BOAT_TYPE',
+            message: 'Boat type must be either "company boat" or "self boat"'
+          }
+        });
+      }
+      updateData.boatType = boatType;
+    }
+    if (position) {
+      if (!['personal duty', 'government register fisherman', 'illegal'].includes(position)) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_POSITION',
+            message: 'Position must be one of: personal duty, government register fisherman, illegal'
+          }
+        });
+      }
+      updateData.position = position;
+    }
+
+    // Add photo updates if provided
+    if (req.files?.profilePhoto?.[0]) updateData.profilePhoto = req.files.profilePhoto[0].filename;
+    if (req.files?.bannerPhoto?.[0]) updateData.bannerPhoto = req.files.bannerPhoto[0].filename;
+    if (req.files?.adharCardPhoto?.[0]) updateData.adharCardPhoto = req.files.adharCardPhoto[0].filename;
+    if (req.files?.bankPassbookPhoto?.[0]) updateData.bankPassbookPhoto = req.files.bankPassbookPhoto[0].filename;
+
+    const sikari = await sikariController.updateSikari(req.params.id, updateData);
+
+    if (!sikari) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'SIKARI_NOT_FOUND',
+          message: 'Sikari not found'
+        }
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Sikari updated successfully',
+      data: {
+        id: sikari._id,
+        sikariId: sikari.sikariId,
+        sikariName: sikari.sikariName,
+        mobileNumber: sikari.mobileNumber,
+        location: sikari.location,
+        dateOfJoining: sikari.dateOfJoining,
+        smargId: sikari.smargId,
+        boatNumber: sikari.boatNumber,
+        boatId: sikari.boatId,
+        boatType: sikari.boatType,
+        position: sikari.position,
+        profilePhoto: sikari.profilePhoto,
+        bannerPhoto: sikari.bannerPhoto
+      }
+    });
+  } catch (err) {
+    console.error('Error updating sikari:', err);
+    
+    // Clean up uploaded files if there's an error
+    if (req.files) {
+      Object.values(req.files).forEach(files => {
+        files.forEach(file => {
+          const filePath = path.join('uploads/sikaris', file.filename);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        });
+      });
+    }
+
+    // Handle duplicate field errors
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern)[0];
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_FIELD',
+          message: `A sikari with this ${field} already exists`
+        }
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error updating sikari'
+      }
+    });
+  }
+});
+
+router.delete('/delete/:id', auth(['company']), async (req, res) => {
+  try {
+    const sikari = await sikariController.deleteSikari(req.params.id);
+    if (!sikari) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'SIKARI_NOT_FOUND',
+          message: 'Sikari not found'
+        }
+      });
+    }
+
+    // Delete associated files
+    const uploadDir = 'uploads/sikaris';
+    if (sikari.profilePhoto) fs.unlinkSync(path.join(uploadDir, sikari.profilePhoto));
+    if (sikari.bannerPhoto) fs.unlinkSync(path.join(uploadDir, sikari.bannerPhoto));
+    if (sikari.adharCardPhoto) fs.unlinkSync(path.join(uploadDir, sikari.adharCardPhoto));
+    if (sikari.bankPassbookPhoto) fs.unlinkSync(path.join(uploadDir, sikari.bankPassbookPhoto));
+
+    res.json({
+      success: true,
+      message: 'Sikari deleted successfully'
+    });
+  } catch (err) {
+    console.error('Error deleting sikari:', err);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error deleting sikari'
+      }
+    });
+  }
+});
 
 module.exports = router; 
