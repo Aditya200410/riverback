@@ -3,10 +3,8 @@ const router = express.Router();
 const boatController = require('../controllers/boatController');
 const multer = require('multer');
 const path = require('path');
-const jwt = require('jsonwebtoken');
 const fs = require('fs');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const { auth } = require('../middleware/auth');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -41,38 +39,13 @@ const upload = multer({
   }
 });
 
-// Middleware to protect routes
-const auth = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ 
-    success: false,
-    error: {
-      code: 'NO_TOKEN',
-      message: 'No token, authorization denied'
-    }
-  });
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    return res.status(401).json({ 
-      success: false,
-      error: {
-        code: 'INVALID_TOKEN',
-        message: 'Invalid token'
-      }
-    });
-  }
-};
-
 // Routes
-router.get('/', auth, async (req, res) => {
+router.get('/', auth(['company']), async (req, res) => {
   try {
     const boats = await boatController.getAllBoats(req.user.id);
     res.json({
       success: true,
-      boats: boats.map(boat => ({
+      data: boats.map(boat => ({
         id: boat._id,
         name: boat.name,
         registrationNumber: boat.registrationNumber,
@@ -84,7 +57,7 @@ router.get('/', auth, async (req, res) => {
       }))
     });
   } catch (err) {
-    console.error(err);
+    console.error('Error fetching boats:', err);
     res.status(500).json({
       success: false,
       error: {
@@ -95,7 +68,7 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', auth(['company']), async (req, res) => {
   try {
     const boat = await boatController.getBoatById(req.params.id, req.user.id);
     if (!boat) {
@@ -109,7 +82,7 @@ router.get('/:id', auth, async (req, res) => {
     }
     res.json({
       success: true,
-      boat: {
+      data: {
         id: boat._id,
         name: boat.name,
         registrationNumber: boat.registrationNumber,
@@ -121,7 +94,7 @@ router.get('/:id', auth, async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err);
+    console.error('Error fetching boat details:', err);
     res.status(500).json({
       success: false,
       error: {
@@ -132,7 +105,7 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
-router.post('/add', auth, upload.fields([
+router.post('/add', auth(['company']), upload.fields([
   { name: 'boatPhoto', maxCount: 1 },
   { name: 'registrationPhoto', maxCount: 1 },
   { name: 'insurancePhoto', maxCount: 1 }
@@ -140,6 +113,7 @@ router.post('/add', auth, upload.fields([
   try {
     const { name, registrationNumber, capacity } = req.body;
     
+    // Validate required fields
     if (!name || !registrationNumber || !capacity) {
       return res.status(400).json({
         success: false,
@@ -150,20 +124,43 @@ router.post('/add', auth, upload.fields([
       });
     }
 
+    // Validate required photos
+    if (!req.files?.boatPhoto?.[0] || !req.files?.registrationPhoto?.[0] || !req.files?.insurancePhoto?.[0]) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_PHOTOS',
+          message: 'Boat photo, registration photo, and insurance photo are required'
+        }
+      });
+    }
+
+    // Validate capacity is a positive number
+    const capacityNum = Number(capacity);
+    if (isNaN(capacityNum) || capacityNum <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_CAPACITY',
+          message: 'Capacity must be a positive number'
+        }
+      });
+    }
+
     const boat = await boatController.createBoat({
       name,
       registrationNumber,
-      capacity,
-      boatPhoto: req.files?.boatPhoto?.[0]?.filename,
-      registrationPhoto: req.files?.registrationPhoto?.[0]?.filename,
-      insurancePhoto: req.files?.insurancePhoto?.[0]?.filename,
+      capacity: capacityNum,
+      boatPhoto: req.files.boatPhoto[0].filename,
+      registrationPhoto: req.files.registrationPhoto[0].filename,
+      insurancePhoto: req.files.insurancePhoto[0].filename,
       companyId: req.user.id
     });
 
     res.status(201).json({
       success: true,
       message: 'Boat added successfully',
-      boat: {
+      data: {
         id: boat._id,
         name: boat.name,
         registrationNumber: boat.registrationNumber,
@@ -175,7 +172,31 @@ router.post('/add', auth, upload.fields([
       }
     });
   } catch (err) {
-    console.error(err);
+    console.error('Error adding boat:', err);
+    
+    // Clean up uploaded files if there's an error
+    if (req.files) {
+      Object.values(req.files).forEach(files => {
+        files.forEach(file => {
+          const filePath = path.join('uploads/boats', file.filename);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        });
+      });
+    }
+
+    // Handle duplicate registration number error
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_REGISTRATION',
+          message: 'A boat with this registration number already exists'
+        }
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: {
@@ -186,21 +207,37 @@ router.post('/add', auth, upload.fields([
   }
 });
 
-router.put('/update/:id', auth, upload.fields([
+router.put('/update/:id', auth(['company']), upload.fields([
   { name: 'boatPhoto', maxCount: 1 },
   { name: 'registrationPhoto', maxCount: 1 },
   { name: 'insurancePhoto', maxCount: 1 }
 ]), async (req, res) => {
   try {
     const { name, registrationNumber, capacity } = req.body;
-    const boat = await boatController.updateBoat(req.params.id, {
-      name,
-      registrationNumber,
-      capacity,
-      boatPhoto: req.files?.boatPhoto?.[0]?.filename,
-      registrationPhoto: req.files?.registrationPhoto?.[0]?.filename,
-      insurancePhoto: req.files?.insurancePhoto?.[0]?.filename
-    }, req.user.id);
+    const updateData = {};
+
+    if (name) updateData.name = name;
+    if (registrationNumber) updateData.registrationNumber = registrationNumber;
+    if (capacity) {
+      const capacityNum = Number(capacity);
+      if (isNaN(capacityNum) || capacityNum <= 0) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_CAPACITY',
+            message: 'Capacity must be a positive number'
+          }
+        });
+      }
+      updateData.capacity = capacityNum;
+    }
+
+    // Add photo updates if provided
+    if (req.files?.boatPhoto?.[0]) updateData.boatPhoto = req.files.boatPhoto[0].filename;
+    if (req.files?.registrationPhoto?.[0]) updateData.registrationPhoto = req.files.registrationPhoto[0].filename;
+    if (req.files?.insurancePhoto?.[0]) updateData.insurancePhoto = req.files.insurancePhoto[0].filename;
+
+    const boat = await boatController.updateBoat(req.params.id, updateData, req.user.id);
 
     if (!boat) {
       return res.status(404).json({
@@ -215,7 +252,7 @@ router.put('/update/:id', auth, upload.fields([
     res.json({
       success: true,
       message: 'Boat updated successfully',
-      boat: {
+      data: {
         id: boat._id,
         name: boat.name,
         registrationNumber: boat.registrationNumber,
@@ -227,7 +264,31 @@ router.put('/update/:id', auth, upload.fields([
       }
     });
   } catch (err) {
-    console.error(err);
+    console.error('Error updating boat:', err);
+    
+    // Clean up uploaded files if there's an error
+    if (req.files) {
+      Object.values(req.files).forEach(files => {
+        files.forEach(file => {
+          const filePath = path.join('uploads/boats', file.filename);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        });
+      });
+    }
+
+    // Handle duplicate registration number error
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_REGISTRATION',
+          message: 'A boat with this registration number already exists'
+        }
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: {
@@ -238,7 +299,7 @@ router.put('/update/:id', auth, upload.fields([
   }
 });
 
-router.delete('/delete/:id', auth, async (req, res) => {
+router.delete('/delete/:id', auth(['company']), async (req, res) => {
   try {
     const boat = await boatController.deleteBoat(req.params.id, req.user.id);
     if (!boat) {
@@ -262,7 +323,7 @@ router.delete('/delete/:id', auth, async (req, res) => {
       message: 'Boat deleted successfully'
     });
   } catch (err) {
-    console.error(err);
+    console.error('Error deleting boat:', err);
     res.status(500).json({
       success: false,
       error: {
