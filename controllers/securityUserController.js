@@ -1,13 +1,23 @@
 const SecurityUser = require('../models/SecurityUser');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 // Get all security users
 exports.getAllSecurityUsers = async (req, res) => {
   try {
     const securityUsers = await SecurityUser.find().select('-password -resetPasswordToken -resetPasswordExpires');
-    res.status(200).json(securityUsers);
+    res.status(200).json({
+      success: true,
+      data: securityUsers
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message
+      }
+    });
   }
 };
 
@@ -17,11 +27,26 @@ exports.getSecurityUserById = async (req, res) => {
     const securityUser = await SecurityUser.findById(req.params.id)
       .select('-password -resetPasswordToken -resetPasswordExpires');
     if (!securityUser) {
-      return res.status(404).json({ message: 'Security user not found' });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'USER_NOT_FOUND',
+          message: 'Security user not found'
+        }
+      });
     }
-    res.status(200).json(securityUser);
+    res.status(200).json({
+      success: true,
+      data: securityUser
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message
+      }
+    });
   }
 };
 
@@ -34,9 +59,18 @@ exports.createSecurityUser = async (req, res) => {
     delete userResponse.password;
     delete userResponse.resetPasswordToken;
     delete userResponse.resetPasswordExpires;
-    res.status(201).json(userResponse);
+    res.status(201).json({
+      success: true,
+      data: userResponse
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: error.message
+      }
+    });
   }
 };
 
@@ -50,11 +84,26 @@ exports.updateSecurityUser = async (req, res) => {
     ).select('-password -resetPasswordToken -resetPasswordExpires');
     
     if (!securityUser) {
-      return res.status(404).json({ message: 'Security user not found' });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'USER_NOT_FOUND',
+          message: 'Security user not found'
+        }
+      });
     }
-    res.status(200).json(securityUser);
+    res.status(200).json({
+      success: true,
+      data: securityUser
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: error.message
+      }
+    });
   }
 };
 
@@ -63,29 +112,56 @@ exports.deleteSecurityUser = async (req, res) => {
   try {
     const securityUser = await SecurityUser.findByIdAndDelete(req.params.id);
     if (!securityUser) {
-      return res.status(404).json({ message: 'Security user not found' });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'USER_NOT_FOUND',
+          message: 'Security user not found'
+        }
+      });
     }
-    res.status(200).json({ message: 'Security user deleted successfully' });
+    res.status(200).json({
+      success: true,
+      message: 'Security user deleted successfully'
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message
+      }
+    });
   }
 };
 
 // Login security user
 exports.login = async (req, res) => {
   try {
-    const { mobileNumber, password } = req.body;
+    const { mobile, password } = req.body;
     
     // Find user by mobile number
-    const securityUser = await SecurityUser.findOne({ mobileNumber });
+    const securityUser = await SecurityUser.findOne({ mobile });
     if (!securityUser) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'INVALID_CREDENTIALS',
+          message: 'Invalid credentials'
+        }
+      });
     }
 
     // Compare password
     const isMatch = await securityUser.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'INVALID_CREDENTIALS',
+          message: 'Invalid credentials'
+        }
+      });
     }
 
     // Generate JWT token
@@ -96,15 +172,37 @@ exports.login = async (req, res) => {
     );
 
     res.status(200).json({
-      token,
-      user: {
-        id: securityUser._id,
-        securityName: securityUser.securityName,
-        phaseName: securityUser.phaseName,
-        mobileNumber: securityUser.mobileNumber
+      success: true,
+      data: {
+        token,
+        user: {
+          id: securityUser._id,
+          name: securityUser.name,
+          mobile: securityUser.mobile,
+          aadhar: securityUser.aadhar,
+          securityCompany: securityUser.securityCompany,
+          hasProfilePicture: !!securityUser.profilePicture
+        }
       }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message
+      }
+    });
   }
-}; 
+};
+
+// Example error handling
+if (error.response.data.field) {
+  // Show error message next to the specific field
+  setFieldError(error.response.data.field, error.response.data.message);
+} else if (error.response.data.fields) {
+  // Show errors for multiple fields
+  error.response.data.fields.forEach(field => {
+    setFieldError(field, `${field} is required`);
+  });
+} 

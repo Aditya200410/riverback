@@ -1,57 +1,80 @@
 // File: admin/backend/server.js
-require('dotenv').config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
+const { errorHandler } = require('./middleware/errorHandler');
+const { handleUploadError } = require('./middleware/upload');
 
-const authRoutes = require('./routes/auth'); // Assuming your auth routes are here
-const managerAuthRoutes = require('./routes/managerAuth');
-const securityAuthRoutes = require('./routes/securityAuth');
-const companyPapersRoutes = require('./routes/companyPapers');
-const fetchCompanyPapersRoutes = require('./routes/fetchCompanyPapers');
-const fishTypesRoutes = require('./routes/fishTypes');
-const fetchFishTypesRoutes = require('./routes/fetchFishTypes');
-const moneyHandlesRoutes = require('./routes/moneyHandles');
-const fetchMoneyHandlesRoutes = require('./routes/fetchMoneyHandles');
-const sikarisRoutes = require('./routes/sikaris');
-const fetchSikarisRoutes = require('./routes/fetchSikaris');
+// Load environment variables
+dotenv.config();
+
+// Create Express app
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
+
+// Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// MongoDB Connection URL from environment variable
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/river";
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/security', require('./routes/securityAuth'));
+app.use('/api/manager', require('./routes/managerAuth'));
+
+// Handle upload errors
+app.use(handleUploadError);
+
+// Error handling middleware
+app.use(errorHandler);
 
 // Connect to MongoDB
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log("MongoDB connected to:", MONGODB_URI))
-  .catch(err => console.error("MongoDB connection error:", err));
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/river', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => {
+    console.log('Connected to MongoDB');
+    
+    // Start server
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+})
+.catch((error) => {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+});
 
-// API Routes
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (error) => {
+    console.error('Unhandled Promise Rejection:', error);
+    // Don't exit the process in development
+    if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+    }
+});
 
-app.use('/api/auth', authRoutes);
-app.use('/api/manager', managerAuthRoutes);
-app.use('/api/security', securityAuthRoutes);
-app.use('/api/company-papers', companyPapersRoutes);
-app.use('/api/fetch-company-papers', fetchCompanyPapersRoutes);
-app.use('/api/fish-types', fishTypesRoutes);
-app.use('/api/fetch-fish-types', fetchFishTypesRoutes);
-app.use('/api/money-handles', moneyHandlesRoutes);
-app.use('/api/fetch-money-handles', fetchMoneyHandlesRoutes);
-app.use('/api/sikaris', sikarisRoutes);
-app.use('/api/fetch-sikaris', fetchSikarisRoutes);
-
-// Port from environment variable
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    // Don't exit the process in development
+    if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+    }
+});
 
 
 

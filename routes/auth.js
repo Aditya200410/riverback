@@ -5,246 +5,313 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const CompanyUser = require('../models/CompanyUser');
-const authController = require('../controllers/authController');
-const upload = require('../middleware/upload');
+const {
+    sendOTP,
+    verifyOTP,
+    signup,
+    login,
+    getProfilePicture
+} = require('../controllers/authController');
+const { upload } = require('../middleware/upload');
+const { otpLimiter, loginLimiter } = require('../middleware/rateLimiter');
+const validatePassword = require('../middleware/passwordValidation');
+const { validate, validationRules } = require('../middleware/validator');
+const path = require('path');
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
 // Middleware to protect routes
 const auth = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
+  if (!token) return res.status(401).json({ 
+    success: false,
+    error: {
+      code: 'NO_TOKEN',
+      message: 'No token, authorization denied'
+    }
+  });
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
   } catch {
-    return res.status(401).json({ message: 'Invalid token' });
+    return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Invalid token'
+      }
+    });
   }
 };
 
+// Validate Token
 router.get('/validate-token', auth, async (req, res) => {
   try {
     const user = await CompanyUser.findById(req.user.id).select('-password');
-    if (!user) return res.status(401).json({ message: 'Invalid user' });
+    if (!user) return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'USER_NOT_FOUND',
+        message: 'Invalid user'
+      }
+    });
 
-    res.json({ user });
+    res.json({ 
+      success: true,
+      data: { user }
+    });
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ 
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Server error'
+      }
+    });
   }
 });
 
-// POST /send-otp
-router.post('/send-otp', async (req, res) => {
-  const { mobileNumber } = req.body;
-  
-  if (!mobileNumber) {
-    return res.status(400).json({ message: 'Mobile number is required' });
-  }
+// Send OTP
+router.post('/send-otp', otpLimiter, validationRules.sendOTP, validate, sendOTP);
 
-  // Validate mobile number format (10 digits)
-  if (!/^\d{10}$/.test(mobileNumber)) {
-    return res.status(400).json({ message: 'Mobile number must be 10 digits' });
-  }
-
+// Verify OTP
+router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res) => {
   try {
-    // Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const { mobile, otp } = req.body;
 
-    // Check if user exists
-    let user = await CompanyUser.findOne({ mobileNumber });
-    
-    if (user) {
-      // Update existing user's OTP
-      user.otp = {
-        code: otp,
-        expires: otpExpiry,
-        verified: false
-      };
-    } else {
-      // Create temporary user with OTP
-      user = new CompanyUser({
-        mobileNumber,
-        otp: {
-          code: otp,
-          expires: otpExpiry,
-          verified: false
+    const user = await CompanyUser.findOne({ mobile });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'USER_NOT_FOUND',
+          message: 'User not found'
         }
       });
     }
 
+    if (!user.otp || !user.otpExpiry) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'OTP_NOT_REQUESTED',
+          message: 'OTP not requested'
+        }
+      });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_OTP',
+          message: 'Invalid OTP'
+        }
+      });
+    }
+
+    if (user.otpExpiry < new Date()) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'OTP_EXPIRED',
+          message: 'OTP has expired'
+        }
+      });
+    }
+
+    // Clear OTP and mark user as verified
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    user.isVerified = true;
     await user.save();
+
+    // Generate JWT token after successful verification
+    const token = jwt.sign(
+      { 
+        id: user._id,
+        role: 'company',
+        mobile: user.mobile
+      },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      success: true,
+      message: 'OTP verified successfully',
+      data: {
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          mobile: user.mobile,
+          email: user.email,
+          companyName: user.companyName,
+          companyAddress: user.companyAddress,
+          hasProfilePicture: !!user.profilePicture
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error verifying OTP'
+      }
+    });
+  }
+});
+
+// Signup
+router.post('/signup', upload.single('profilePicture'), validationRules.companySignup, validate, async (req, res) => {
+  try {
+    const { name, mobile, password, email, companyName, companyAddress } = req.body;
+
+    // Check if user exists
+    const existingUser = await CompanyUser.findOne({ mobile });
+    if (existingUser && existingUser.isVerified) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'USER_EXISTS',
+          message: 'User already exists'
+        }
+      });
+    }
+
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Create new user with OTP
+    const newUser = new CompanyUser({
+      name,
+      mobile,
+      password,
+      email,
+      companyName,
+      companyAddress,
+      otp,
+      otpExpiry,
+      profilePicture: req.file ? req.file.filename : undefined
+    });
+
+    await newUser.save();
 
     // TODO: Integrate with SMS service to send OTP
-    // For development, we'll return the OTP in response
-    return res.json({ 
-      message: 'OTP sent successfully',
-      otp // Remove this in production
+    console.log(`OTP for ${mobile}: ${otp}`);
+
+    res.status(201).json({
+      success: true,
+      message: 'OTP sent successfully. Please verify your mobile number.',
+      data: {
+        mobile,
+        otpExpiry
+      }
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error sending OTP' });
+  } catch (error) {
+    console.error('Error in signup:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error in signup process'
+      }
+    });
   }
 });
 
-// POST /verify-otp
-router.post('/verify-otp', async (req, res) => {
-  const { mobileNumber, otp } = req.body;
-
-  if (!mobileNumber || !otp) {
-    return res.status(400).json({ message: 'Mobile number and OTP are required' });
-  }
-
+// Login
+router.post('/login', loginLimiter, validationRules.login, validate, async (req, res) => {
   try {
-    const user = await CompanyUser.findOne({ 
-      mobileNumber,
-      'otp.code': otp,
-      'otp.expires': { $gt: Date.now() }
-    });
+    const { mobile, password } = req.body;
 
+    // Find user
+    const user = await CompanyUser.findOne({ mobile });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'INVALID_CREDENTIALS',
+          message: 'Invalid credentials'
+        }
+      });
     }
 
-    user.otp.verified = true;
-    await user.save();
-
-    return res.json({ message: 'OTP verified successfully' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error verifying OTP' });
-  }
-});
-
-// POST /signup
-router.post('/signup', upload.single('profilePicture'), async (req, res) => {
-  const {
-    companyName,
-    companyType,
-    registrationNumber,
-    mobileNumber,
-    address,
-    city,
-    state,
-    password,
-    verifyPassword
-  } = req.body;
-  
-  if (!companyName || !companyType || !registrationNumber || !mobileNumber || 
-      !address || !city || !state || !password || !verifyPassword) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
-
-  if (password !== verifyPassword) {
-    return res.status(400).json({ message: 'Passwords do not match' });
-  }
-
-  try {
-    const user = await CompanyUser.findOne({ mobileNumber });
-    
-    if (!user || !user.otp?.verified) {
-      return res.status(400).json({ message: 'Please verify your mobile number with OTP first' });
+    // Check if user is verified
+    if (!user.isVerified) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNVERIFIED_USER',
+          message: 'Please verify your mobile number first'
+        }
+      });
     }
 
-    if (user.companyName) {
-      return res.status(400).json({ message: 'Company already registered' });
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'INVALID_CREDENTIALS',
+          message: 'Invalid credentials'
+        }
+      });
     }
 
-    const existingUser = await CompanyUser.findOne({ registrationNumber });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Registration number already exists' });
-    }
-
-    // Update user with registration details
-    user.companyName = companyName;
-    user.companyType = companyType;
-    user.registrationNumber = registrationNumber;
-    user.address = address;
-    user.city = city;
-    user.state = state;
-    user.password = password;
-    user.otp = undefined; // Clear OTP after successful registration
-
-    // Add profile picture if uploaded
-    if (req.file) {
-      user.profilePicture = {
-        data: req.file.buffer,
-        contentType: req.file.mimetype
-      };
-    }
-    
-    await user.save();
-
+    // Generate JWT token
     const token = jwt.sign(
-      { id: user._id, registrationNumber: user.registrationNumber }, 
-      JWT_SECRET, 
-      { expiresIn: '7d' }
+      { 
+        id: user._id,
+        role: 'company',
+        mobile: user.mobile
+      },
+      JWT_SECRET,
+      { expiresIn: '24h' }
     );
 
-    return res.status(201).json({
-      token,
-      user: {
-        id: user._id,
-        companyName,
-        companyType,
-        registrationNumber,
-        mobileNumber,
-        address,
-        city,
-        state,
-        hasProfilePicture: !!user.profilePicture
+    res.json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          mobile: user.mobile,
+          email: user.email,
+          companyName: user.companyName,
+          companyAddress: user.companyAddress,
+          hasProfilePicture: !!user.profilePicture
+        }
       }
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Company registration error' });
+  } catch (error) {
+    console.error('Error in login:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error logging in'
+      }
+    });
   }
 });
 
-// POST /login
-router.post('/login', async (req, res) => {
-  const { mobileNumber, password } = req.body;
-  if (!mobileNumber || !password) {
-    return res.status(400).json({ message: 'Mobile number and password required' });
-  }
+// Get Profile Picture
+router.get('/profile-picture/:id', getProfilePicture);
 
-  try {
-    const user = await CompanyUser.findOne({ mobileNumber });
-    if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign(
-      { id: user._id, registrationNumber: user.registrationNumber }, 
-      JWT_SECRET, 
-      { expiresIn: '7d' }
-    );
-
-    return res.json({
-      token,
-      user: {
-        id: user._id,
-        companyName: user.companyName,
-        companyType: user.companyType,
-        registrationNumber: user.registrationNumber,
-        mobileNumber: user.mobileNumber,
-        address: user.address,
-        city: user.city,
-        state: user.state
-      }
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Login error' });
-  }
-});
-
-// POST /forgot-password
+// Forgot Password
 router.post('/forgot-password', async (req, res) => {
-  const { mobileNumber } = req.body;
+  const { mobile } = req.body;
   try {
-    const user = await CompanyUser.findOne({ mobileNumber });
+    const user = await CompanyUser.findOne({ mobile });
     if (user) {
       const resetToken = crypto.randomBytes(32).toString('hex');
       user.resetPasswordToken = await bcrypt.hash(resetToken, 10);
@@ -252,19 +319,34 @@ router.post('/forgot-password', async (req, res) => {
       await user.save();
       // Send SMS here with resetToken (not shown)
     }
-    return res.json({ message: 'If company exists, reset link sent' });
+    return res.json({ 
+      success: true,
+      message: 'If company exists, reset link sent'
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error sending reset link' });
+    res.status(500).json({ 
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error sending reset link'
+      }
+    });
   }
 });
 
-// POST /reset-password/:token
+// Reset Password
 router.post('/reset-password/:token', async (req, res) => {
   const { password } = req.body;
   const { token } = req.params;
 
-  if (!password) return res.status(400).json({ message: 'New password required' });
+  if (!password) return res.status(400).json({ 
+    success: false,
+    error: {
+      code: 'PASSWORD_REQUIRED',
+      message: 'New password required'
+    }
+  });
 
   try {
     const users = await CompanyUser.find({ resetPasswordExpires: { $gt: Date.now() } });
@@ -275,73 +357,80 @@ router.post('/reset-password/:token', async (req, res) => {
         break;
       }
     }
-    if (!matchedUser) return res.status(400).json({ message: 'Invalid or expired token' });
+    if (!matchedUser) return res.status(400).json({ 
+      success: false,
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Invalid or expired token'
+      }
+    });
 
     matchedUser.password = password;
     matchedUser.resetPasswordToken = undefined;
     matchedUser.resetPasswordExpires = undefined;
     await matchedUser.save();
 
-    return res.json({ message: 'Password reset successful' });
+    return res.json({ 
+      success: true,
+      message: 'Password reset successful'
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error resetting password' });
+    res.status(500).json({ 
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error resetting password'
+      }
+    });
   }
 });
 
-// PUT /update-profile (Protected)
+// Update Profile
 router.put('/update-profile', auth, async (req, res) => {
-  const { companyName, companyType, address, city, state, password } = req.body;
+  const { name, email, companyName, companyAddress } = req.body;
   try {
     const user = await CompanyUser.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: 'Company not found' });
+    if (!user) return res.status(404).json({ 
+      success: false,
+      error: {
+        code: 'USER_NOT_FOUND',
+        message: 'Company not found'
+      }
+    });
 
+    if (name) user.name = name;
+    if (email) user.email = email;
     if (companyName) user.companyName = companyName;
-    if (companyType) user.companyType = companyType;
-    if (address) user.address = address;
-    if (city) user.city = city;
-    if (state) user.state = state;
-    if (password) user.password = password;
+    if (companyAddress) user.companyAddress = companyAddress;
     
     await user.save();
 
     return res.json({ 
-      message: 'Profile updated', 
-      user: { 
-        id: user._id, 
-        companyName: user.companyName,
-        companyType: user.companyType,
-        registrationNumber: user.registrationNumber,
-        mobileNumber: user.mobileNumber,
-        address: user.address,
-        city: user.city,
-        state: user.state
-      } 
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        user: { 
+          id: user._id, 
+          name: user.name,
+          email: user.email,
+          companyName: user.companyName,
+          companyAddress: user.companyAddress,
+          mobile: user.mobile,
+          hasProfilePicture: !!user.profilePicture
+        }
+      }
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error updating profile' });
+    res.status(500).json({ 
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error updating profile'
+      }
+    });
   }
 });
-
-// GET /profile-picture/:id
-router.get('/profile-picture/:id', async (req, res) => {
-  try {
-    const user = await CompanyUser.findById(req.params.id).select('profilePicture');
-    if (!user || !user.profilePicture) {
-      return res.status(404).json({ message: 'Profile picture not found' });
-    }
-
-    res.set('Content-Type', user.profilePicture.contentType);
-    res.send(user.profilePicture.data);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error fetching profile picture' });
-  }
-});
-
-// Routes
-router.post('/register', authController.register);
-router.post('/logout', authController.logout);
 
 module.exports = router;
