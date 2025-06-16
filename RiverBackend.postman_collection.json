@@ -259,6 +259,43 @@
 			"name": "Company Papers",
 			"item": [
 				{
+					"name": "Upload Paper",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "pdf",
+									"type": "file",
+									"src": "/path/to/pdf/file"
+								},
+								{
+									"key": "description",
+									"value": "Paper description",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "legal",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/company-papers/upload",
+							"host": ["{{base_url}}"],
+							"path": ["api", "company-papers", "upload"]
+						}
+					}
+				},
+				{
 					"name": "Get All Papers",
 					"request": {
 						"method": "GET",
@@ -269,9 +306,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/company-papers",
+							"raw": "{{base_url}}/api/company-papers/papers",
 							"host": ["{{base_url}}"],
-							"path": ["api", "company-papers"]
+							"path": ["api", "company-papers", "papers"]
 						}
 					}
 				},
@@ -286,9 +323,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/company-papers/:id",
+							"raw": "{{base_url}}/api/company-papers/papers/:id",
 							"host": ["{{base_url}}"],
-							"path": ["api", "company-papers", ":id"],
+							"path": ["api", "company-papers", "papers", ":id"],
 							"variable": [
 								{
 									"key": "id",
@@ -296,43 +333,6 @@
 									"description": "Paper ID"
 								}
 							]
-						}
-					}
-				},
-				{
-					"name": "Add Paper",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "title",
-									"value": "Company Registration",
-									"type": "text"
-								},
-								{
-									"key": "description",
-									"value": "Company registration document",
-									"type": "text"
-								},
-								{
-									"key": "document",
-									"type": "file",
-									"src": "/path/to/document.pdf"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{base_url}}/api/company-papers/add",
-							"host": ["{{base_url}}"],
-							"path": ["api", "company-papers", "add"]
 						}
 					}
 				},
@@ -347,29 +347,18 @@
 							}
 						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "title",
-									"value": "Updated Title",
-									"type": "text"
-								},
-								{
-									"key": "description",
-									"value": "Updated description",
-									"type": "text"
-								},
-								{
-									"key": "document",
-									"type": "file",
-									"src": "/path/to/document.pdf"
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Updated description\",\n    \"category\": \"financial\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
 						"url": {
-							"raw": "{{base_url}}/api/company-papers/update/:id",
+							"raw": "{{base_url}}/api/company-papers/papers/:id",
 							"host": ["{{base_url}}"],
-							"path": ["api", "company-papers", "update", ":id"],
+							"path": ["api", "company-papers", "papers", ":id"],
 							"variable": [
 								{
 									"key": "id",
@@ -391,14 +380,38 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/company-papers/delete/:id",
+							"raw": "{{base_url}}/api/company-papers/papers/:id",
 							"host": ["{{base_url}}"],
-							"path": ["api", "company-papers", "delete", ":id"],
+							"path": ["api", "company-papers", "papers", ":id"],
 							"variable": [
 								{
 									"key": "id",
 									"value": "",
 									"description": "Paper ID"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Papers by Category",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/company-papers/papers/category/:category",
+							"host": ["{{base_url}}"],
+							"path": ["api", "company-papers", "papers", "category", ":category"],
+							"variable": [
+								{
+									"key": "category",
+									"value": "legal",
+									"description": "Category (legal, financial, contract, other)"
 								}
 							]
 						}

@@ -4,26 +4,14 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const CompanyPaper = require('../models/CompanyPaper');
-const CompanyUser = require('../models/CompanyUser');
-const jwt = require('jsonwebtoken');
+const { auth } = require('../middleware/auth');
+const pdf = require('pdf-lib');
+const { promisify } = require('util');
+const writeFileAsync = promisify(fs.writeFile);
+const unlinkAsync = promisify(fs.unlink);
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
-// Configure multer for PDF storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = 'uploads/company-papers';
-    // Create directory if it doesn't exist
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'paper-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Configure multer for PDF storage with memory storage for better performance
+const storage = multer.memoryStorage();
 
 // File filter to only allow PDFs
 const fileFilter = (req, file, cb) => {
@@ -42,33 +30,25 @@ const upload = multer({
   }
 });
 
-// Middleware to protect routes
-const auth = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ 
-    success: false,
-    error: {
-      code: 'NO_TOKEN',
-      message: 'No token, authorization denied'
-    }
-  });
+// Function to compress PDF
+async function compressPDF(buffer) {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    return res.status(401).json({ 
-      success: false,
-      error: {
-        code: 'INVALID_TOKEN',
-        message: 'Invalid token'
-      }
+    const pdfDoc = await pdf.PDFDocument.load(buffer);
+    const compressedPdfBytes = await pdfDoc.save({
+      useObjectStreams: true,
+      addDefaultPage: false
     });
+    return compressedPdfBytes;
+  } catch (error) {
+    console.error('Error compressing PDF:', error);
+    return buffer; // Return original buffer if compression fails
   }
-};
+}
 
 // Upload a new company paper
-router.post('/upload', auth, upload.single('pdf'), async (req, res) => {
+router.post('/upload', auth(['company']), upload.single('pdf'), async (req, res) => {
+  let tempFilePath = null;
+  
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -92,22 +72,28 @@ router.post('/upload', auth, upload.single('pdf'), async (req, res) => {
       });
     }
 
-    const companyUser = await CompanyUser.findById(req.user.id);
-    if (!companyUser) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'COMPANY_NOT_FOUND',
-          message: 'Company not found'
-        }
-      });
+    // Create uploads directory if it doesn't exist
+    const uploadDir = path.join(__dirname, '..', 'uploads', 'company-papers');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
     }
 
+    // Generate unique filename
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const filename = 'paper-' + uniqueSuffix + '.pdf';
+    tempFilePath = path.join(uploadDir, filename);
+
+    // Compress PDF
+    const compressedBuffer = await compressPDF(req.file.buffer);
+
+    // Write compressed file
+    await writeFileAsync(tempFilePath, compressedBuffer);
+
     const paper = new CompanyPaper({
-      fileName: req.file.filename,
+      fileName: filename,
       originalName: req.file.originalname,
       fileType: req.file.mimetype,
-      fileSize: req.file.size,
+      fileSize: compressedBuffer.length,
       uploadedBy: req.user.id,
       companyId: req.user.id,
       description: description || '',
@@ -119,7 +105,7 @@ router.post('/upload', auth, upload.single('pdf'), async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Paper uploaded successfully',
-      paper: {
+      data: {
         id: paper._id,
         fileName: paper.fileName,
         originalName: paper.originalName,
@@ -130,7 +116,17 @@ router.post('/upload', auth, upload.single('pdf'), async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err);
+    console.error('Error uploading paper:', err);
+    
+    // Clean up temporary file if it exists
+    if (tempFilePath && fs.existsSync(tempFilePath)) {
+      try {
+        await unlinkAsync(tempFilePath);
+      } catch (unlinkError) {
+        console.error('Error deleting temporary file:', unlinkError);
+      }
+    }
+
     res.status(500).json({
       success: false,
       error: {
@@ -142,7 +138,7 @@ router.post('/upload', auth, upload.single('pdf'), async (req, res) => {
 });
 
 // Get all papers for a company
-router.get('/papers', auth, async (req, res) => {
+router.get('/papers', auth(['company']), async (req, res) => {
   try {
     const papers = await CompanyPaper.find({ 
       companyId: req.user.id,
@@ -151,7 +147,7 @@ router.get('/papers', auth, async (req, res) => {
 
     res.json({
       success: true,
-      papers: papers.map(paper => ({
+      data: papers.map(paper => ({
         id: paper._id,
         fileName: paper.fileName,
         originalName: paper.originalName,
@@ -174,7 +170,7 @@ router.get('/papers', auth, async (req, res) => {
 });
 
 // Get a specific paper
-router.get('/papers/:id', auth, async (req, res) => {
+router.get('/papers/:id', auth(['company']), async (req, res) => {
   try {
     const paper = await CompanyPaper.findOne({
       _id: req.params.id,
@@ -218,7 +214,7 @@ router.get('/papers/:id', auth, async (req, res) => {
 });
 
 // Update paper details
-router.put('/papers/:id', auth, async (req, res) => {
+router.put('/papers/:id', auth(['company']), async (req, res) => {
   try {
     const { description, category } = req.body;
     
@@ -246,7 +242,7 @@ router.put('/papers/:id', auth, async (req, res) => {
     res.json({
       success: true,
       message: 'Paper updated successfully',
-      paper: {
+      data: {
         id: paper._id,
         fileName: paper.fileName,
         originalName: paper.originalName,
@@ -269,7 +265,7 @@ router.put('/papers/:id', auth, async (req, res) => {
 });
 
 // Delete a paper (soft delete)
-router.delete('/papers/:id', auth, async (req, res) => {
+router.delete('/papers/:id', auth(['company']), async (req, res) => {
   try {
     const paper = await CompanyPaper.findOne({
       _id: req.params.id,
@@ -293,7 +289,7 @@ router.delete('/papers/:id', auth, async (req, res) => {
     // Delete the actual file
     const filePath = path.join(__dirname, '..', 'uploads', 'company-papers', paper.fileName);
     if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+      await unlinkAsync(filePath);
     }
 
     res.json({
@@ -313,7 +309,7 @@ router.delete('/papers/:id', auth, async (req, res) => {
 });
 
 // Get papers by category
-router.get('/papers/category/:category', auth, async (req, res) => {
+router.get('/papers/category/:category', auth(['company']), async (req, res) => {
   try {
     const papers = await CompanyPaper.find({
       companyId: req.user.id,
@@ -323,7 +319,7 @@ router.get('/papers/category/:category', auth, async (req, res) => {
 
     res.json({
       success: true,
-      papers: papers.map(paper => ({
+      data: papers.map(paper => ({
         id: paper._id,
         fileName: paper.fileName,
         originalName: paper.originalName,
