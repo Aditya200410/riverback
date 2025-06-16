@@ -32,6 +32,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/security', require('./routes/securityAuth'));
 app.use('/api/manager', require('./routes/managerAuth'));
+app.use('/api/boats', require('./routes/boats'));
+app.use('/api/company-papers', require('./routes/companyPapers'));
+app.use('/api/money-handles', require('./routes/moneyHandles'));
 
 // Handle upload errors
 app.use(handleUploadError);

@@ -16,7 +16,7 @@ const auth = (roles = []) => {
           success: false,
           error: {
             code: 'NO_TOKEN',
-            message: 'No token provided'
+            message: 'No token, authorization denied'
           }
         });
       }
@@ -46,7 +46,10 @@ const auth = (roles = []) => {
       }
 
       // Add user to request
-      req.user = user;
+      req.user = {
+        id: user._id,
+        companyId: user._id // For company users, their ID is their company ID
+      };
       req.token = token;
       next();
     } catch (error) {
@@ -61,4 +64,4 @@ const auth = (roles = []) => {
   };
 };
 
-module.exports = auth; 
+module.exports = { auth }; 

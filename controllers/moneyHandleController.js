@@ -1,69 +1,158 @@
 const MoneyHandle = require('../models/MoneyHandle');
 
-// Get all money transactions
+// Get all transactions for a company
 exports.getAllTransactions = async (req, res) => {
-  try {
-    const transactions = await MoneyHandle.find({ status: 'active' });
-    res.status(200).json(transactions);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    try {
+        const transactions = await MoneyHandle.find({
+            companyId: req.user.companyId,
+            status: 'active'
+        }).sort({ date: -1 });
+
+        res.json({
+            success: true,
+            data: transactions
+        });
+    } catch (error) {
+        console.error('Error getting transactions:', error);
+        res.status(500).json({
+            success: false,
+            error: 'SERVER_ERROR',
+            message: 'Error getting transactions'
+        });
+    }
 };
 
-// Get single transaction by ID
+// Get transaction by ID
 exports.getTransactionById = async (req, res) => {
-  try {
-    const transaction = await MoneyHandle.findOne({ _id: req.params.id, status: 'active' });
-    if (!transaction) {
-      return res.status(404).json({ message: 'Transaction not found' });
+    try {
+        const transaction = await MoneyHandle.findOne({
+            _id: req.params.id,
+            companyId: req.user.companyId,
+            status: 'active'
+        });
+
+        if (!transaction) {
+            return res.status(404).json({
+                success: false,
+                error: 'NOT_FOUND',
+                message: 'Transaction not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: transaction
+        });
+    } catch (error) {
+        console.error('Error getting transaction:', error);
+        res.status(500).json({
+            success: false,
+            error: 'SERVER_ERROR',
+            message: 'Error getting transaction'
+        });
     }
-    res.status(200).json(transaction);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
 };
 
 // Create new transaction
 exports.createTransaction = async (req, res) => {
-  try {
-    const transaction = new MoneyHandle(req.body);
-    const newTransaction = await transaction.save();
-    res.status(201).json(newTransaction);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
+    try {
+        const { amount, type, description } = req.body;
+
+        const transaction = new MoneyHandle({
+            amount,
+            type,
+            description,
+            companyId: req.user.companyId
+        });
+
+        await transaction.save();
+
+        res.status(201).json({
+            success: true,
+            data: transaction
+        });
+    } catch (error) {
+        console.error('Error creating transaction:', error);
+        res.status(500).json({
+            success: false,
+            error: 'SERVER_ERROR',
+            message: 'Error creating transaction'
+        });
+    }
 };
 
 // Update transaction
 exports.updateTransaction = async (req, res) => {
-  try {
-    const transaction = await MoneyHandle.findOneAndUpdate(
-      { _id: req.params.id, status: 'active' },
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!transaction) {
-      return res.status(404).json({ message: 'Transaction not found' });
+    try {
+        const { amount, type, description } = req.body;
+
+        const transaction = await MoneyHandle.findOneAndUpdate(
+            {
+                _id: req.params.id,
+                companyId: req.user.companyId,
+                status: 'active'
+            },
+            {
+                amount,
+                type,
+                description
+            },
+            { new: true }
+        );
+
+        if (!transaction) {
+            return res.status(404).json({
+                success: false,
+                error: 'NOT_FOUND',
+                message: 'Transaction not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: transaction
+        });
+    } catch (error) {
+        console.error('Error updating transaction:', error);
+        res.status(500).json({
+            success: false,
+            error: 'SERVER_ERROR',
+            message: 'Error updating transaction'
+        });
     }
-    res.status(200).json(transaction);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
 };
 
 // Delete transaction (soft delete)
 exports.deleteTransaction = async (req, res) => {
-  try {
-    const transaction = await MoneyHandle.findOneAndUpdate(
-      { _id: req.params.id, status: 'active' },
-      { status: 'deleted' },
-      { new: true }
-    );
-    if (!transaction) {
-      return res.status(404).json({ message: 'Transaction not found' });
+    try {
+        const transaction = await MoneyHandle.findOneAndUpdate(
+            {
+                _id: req.params.id,
+                companyId: req.user.companyId,
+                status: 'active'
+            },
+            { status: 'deleted' },
+            { new: true }
+        );
+
+        if (!transaction) {
+            return res.status(404).json({
+                success: false,
+                error: 'NOT_FOUND',
+                message: 'Transaction not found'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: transaction
+        });
+    } catch (error) {
+        console.error('Error deleting transaction:', error);
+        res.status(500).json({
+            success: false,
+            error: 'SERVER_ERROR',
+            message: 'Error deleting transaction'
+        });
     }
-    res.status(200).json({ message: 'Transaction deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
 }; 

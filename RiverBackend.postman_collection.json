@@ -1,0 +1,536 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "River Backend",
+		"description": "API collection for River Backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Company Signup",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test Company\",\n    \"mobile\": \"1234567890\",\n    \"password\": \"Test@123\",\n    \"email\": \"test@company.com\",\n    \"companyName\": \"Test Company Ltd\",\n    \"companyAddress\": \"123 Test Street, Test City\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/signup",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "signup"]
+						}
+					}
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mobile\": \"1234567890\",\n    \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/verify-otp",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "verify-otp"]
+						}
+					}
+				},
+				{
+					"name": "Company Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"mobile\": \"1234567890\",\n    \"password\": \"Test@123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Boats",
+			"item": [
+				{
+					"name": "Get All Boats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/boats",
+							"host": ["{{base_url}}"],
+							"path": ["api", "boats"]
+						}
+					}
+				},
+				{
+					"name": "Get Boat by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/boats/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "boats", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Boat ID"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Boat",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Boat Name",
+									"type": "text"
+								},
+								{
+									"key": "registrationNumber",
+									"value": "REG123",
+									"type": "text"
+								},
+								{
+									"key": "capacity",
+									"value": "100",
+									"type": "text"
+								},
+								{
+									"key": "boatPhoto",
+									"type": "file",
+									"src": "/path/to/boat/photo"
+								},
+								{
+									"key": "registrationPhoto",
+									"type": "file",
+									"src": "/path/to/registration/photo"
+								},
+								{
+									"key": "insurancePhoto",
+									"type": "file",
+									"src": "/path/to/insurance/photo"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/boats/add",
+							"host": ["{{base_url}}"],
+							"path": ["api", "boats", "add"]
+						}
+					}
+				},
+				{
+					"name": "Update Boat",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Updated Boat Name",
+									"type": "text"
+								},
+								{
+									"key": "registrationNumber",
+									"value": "REG456",
+									"type": "text"
+								},
+								{
+									"key": "capacity",
+									"value": "150",
+									"type": "text"
+								},
+								{
+									"key": "boatPhoto",
+									"type": "file",
+									"src": "/path/to/boat/photo"
+								},
+								{
+									"key": "registrationPhoto",
+									"type": "file",
+									"src": "/path/to/registration/photo"
+								},
+								{
+									"key": "insurancePhoto",
+									"type": "file",
+									"src": "/path/to/insurance/photo"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/boats/update/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "boats", "update", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Boat ID"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Boat",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/boats/delete/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "boats", "delete", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Boat ID"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Company Papers",
+			"item": [
+				{
+					"name": "Get All Papers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/company-papers",
+							"host": ["{{base_url}}"],
+							"path": ["api", "company-papers"]
+						}
+					}
+				},
+				{
+					"name": "Get Paper by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/company-papers/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "company-papers", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Paper ID"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Paper",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Company Registration",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Company registration document",
+									"type": "text"
+								},
+								{
+									"key": "document",
+									"type": "file",
+									"src": "/path/to/document.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/company-papers/add",
+							"host": ["{{base_url}}"],
+							"path": ["api", "company-papers", "add"]
+						}
+					}
+				},
+				{
+					"name": "Update Paper",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Updated Title",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Updated description",
+									"type": "text"
+								},
+								{
+									"key": "document",
+									"type": "file",
+									"src": "/path/to/document.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/company-papers/update/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "company-papers", "update", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Paper ID"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Paper",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/company-papers/delete/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "company-papers", "delete", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Paper ID"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Money Handles",
+			"item": [
+				{
+					"name": "Get All Money Handles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/money-handles",
+							"host": ["{{base_url}}"],
+							"path": ["api", "money-handles"]
+						}
+					}
+				},
+				{
+					"name": "Get Money Handle by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/money-handles/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "money-handles", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Money Handle ID"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Money Handle",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 1000,\n    \"type\": \"income\",\n    \"description\": \"Payment received\",\n    \"date\": \"2024-03-10\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/money-handles/add",
+							"host": ["{{base_url}}"],
+							"path": ["api", "money-handles", "add"]
+						}
+					}
+				},
+				{
+					"name": "Update Money Handle",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 1500,\n    \"type\": \"expense\",\n    \"description\": \"Updated payment\",\n    \"date\": \"2024-03-11\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/money-handles/update/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "money-handles", "update", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Money Handle ID"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Money Handle",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/money-handles/delete/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "money-handles", "delete", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "Money Handle ID"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	]
+} 

@@ -5,6 +5,9 @@ const path = require('path');
 const fs = require('fs');
 const CompanyPaper = require('../models/CompanyPaper');
 const CompanyUser = require('../models/CompanyUser');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 // Configure multer for PDF storage
 const storage = multer.diskStorage({
@@ -17,7 +20,6 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    // Create unique filename with timestamp
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, 'paper-' + uniqueSuffix + path.extname(file.originalname));
   }
@@ -43,13 +45,25 @@ const upload = multer({
 // Middleware to protect routes
 const auth = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
+  if (!token) return res.status(401).json({ 
+    success: false,
+    error: {
+      code: 'NO_TOKEN',
+      message: 'No token, authorization denied'
+    }
+  });
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
   } catch {
-    return res.status(401).json({ message: 'Invalid token' });
+    return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Invalid token'
+      }
+    });
   }
 };
 
@@ -57,18 +71,36 @@ const auth = (req, res, next) => {
 router.post('/upload', auth, upload.single('pdf'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'NO_FILE',
+          message: 'No file uploaded'
+        }
+      });
     }
 
     const { description, category } = req.body;
     
     if (!category) {
-      return res.status(400).json({ message: 'Category is required' });
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_CATEGORY',
+          message: 'Category is required'
+        }
+      });
     }
 
     const companyUser = await CompanyUser.findById(req.user.id);
     if (!companyUser) {
-      return res.status(404).json({ message: 'Company not found' });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'COMPANY_NOT_FOUND',
+          message: 'Company not found'
+        }
+      });
     }
 
     const paper = new CompanyPaper({
@@ -85,6 +117,7 @@ router.post('/upload', auth, upload.single('pdf'), async (req, res) => {
     await paper.save();
 
     res.status(201).json({
+      success: true,
       message: 'Paper uploaded successfully',
       paper: {
         id: paper._id,
@@ -92,12 +125,19 @@ router.post('/upload', auth, upload.single('pdf'), async (req, res) => {
         originalName: paper.originalName,
         uploadDate: paper.uploadDate,
         category: paper.category,
-        description: paper.description
+        description: paper.description,
+        fileSize: paper.fileSize
       }
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error uploading paper' });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error uploading paper'
+      }
+    });
   }
 });
 
@@ -110,6 +150,7 @@ router.get('/papers', auth, async (req, res) => {
     }).sort({ uploadDate: -1 });
 
     res.json({
+      success: true,
       papers: papers.map(paper => ({
         id: paper._id,
         fileName: paper.fileName,
@@ -122,7 +163,13 @@ router.get('/papers', auth, async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error fetching papers' });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error fetching papers'
+      }
+    });
   }
 });
 
@@ -136,19 +183,37 @@ router.get('/papers/:id', auth, async (req, res) => {
     });
 
     if (!paper) {
-      return res.status(404).json({ message: 'Paper not found' });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'PAPER_NOT_FOUND',
+          message: 'Paper not found'
+        }
+      });
     }
 
     const filePath = path.join(__dirname, '..', 'uploads', 'company-papers', paper.fileName);
     
     if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ message: 'File not found' });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'FILE_NOT_FOUND',
+          message: 'File not found'
+        }
+      });
     }
 
     res.download(filePath, paper.originalName);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error downloading paper' });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error downloading paper'
+      }
+    });
   }
 });
 
@@ -164,7 +229,13 @@ router.put('/papers/:id', auth, async (req, res) => {
     });
 
     if (!paper) {
-      return res.status(404).json({ message: 'Paper not found' });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'PAPER_NOT_FOUND',
+          message: 'Paper not found'
+        }
+      });
     }
 
     if (description) paper.description = description;
@@ -173,6 +244,7 @@ router.put('/papers/:id', auth, async (req, res) => {
     await paper.save();
 
     res.json({
+      success: true,
       message: 'Paper updated successfully',
       paper: {
         id: paper._id,
@@ -180,12 +252,19 @@ router.put('/papers/:id', auth, async (req, res) => {
         originalName: paper.originalName,
         uploadDate: paper.uploadDate,
         category: paper.category,
-        description: paper.description
+        description: paper.description,
+        fileSize: paper.fileSize
       }
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error updating paper' });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error updating paper'
+      }
+    });
   }
 });
 
@@ -199,16 +278,37 @@ router.delete('/papers/:id', auth, async (req, res) => {
     });
 
     if (!paper) {
-      return res.status(404).json({ message: 'Paper not found' });
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'PAPER_NOT_FOUND',
+          message: 'Paper not found'
+        }
+      });
     }
 
     paper.status = 'deleted';
     await paper.save();
 
-    res.json({ message: 'Paper deleted successfully' });
+    // Delete the actual file
+    const filePath = path.join(__dirname, '..', 'uploads', 'company-papers', paper.fileName);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    res.json({
+      success: true,
+      message: 'Paper deleted successfully'
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error deleting paper' });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error deleting paper'
+      }
+    });
   }
 });
 
@@ -222,6 +322,7 @@ router.get('/papers/category/:category', auth, async (req, res) => {
     }).sort({ uploadDate: -1 });
 
     res.json({
+      success: true,
       papers: papers.map(paper => ({
         id: paper._id,
         fileName: paper.fileName,
@@ -234,7 +335,13 @@ router.get('/papers/category/:category', auth, async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error fetching papers by category' });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error fetching papers by category'
+      }
+    });
   }
 });
 

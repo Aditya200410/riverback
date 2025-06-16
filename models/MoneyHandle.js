@@ -1,25 +1,29 @@
 const mongoose = require('mongoose');
 
 const moneyHandleSchema = new mongoose.Schema({
-  moneytaker: {
-    type: String,
-    required: true,
-    enum: ['manager', 'vendor']
-  },
-  transactionType: {
-    type: String,
-    required: true,
-    enum: ['pay', 'take']
-  },
-  price: {
+  amount: {
     type: Number,
     required: true,
     min: 0
   },
-  reason: {
+  type: {
+    type: String,
+    required: true,
+    enum: ['pay', 'take']
+  },
+  description: {
     type: String,
     required: true,
     trim: true
+  },
+  companyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true
+  },
+  date: {
+    type: Date,
+    default: Date.now
   },
   status: {
     type: String,
@@ -29,5 +33,9 @@ const moneyHandleSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+// Create index for faster queries
+moneyHandleSchema.index({ companyId: 1, status: 1 });
+moneyHandleSchema.index({ date: -1 });
 
 module.exports = mongoose.model('MoneyHandle', moneyHandleSchema); 
