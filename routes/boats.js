@@ -79,7 +79,7 @@ router.get('/:id', auth(['company']), async (req, res) => {
           message: 'Boat not found'
         }
       });
-    }
+  }
     res.json({
       success: true,
       data: {
