@@ -167,29 +167,9 @@ router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res)
 });
 
 // Signup
-router.post('/signup', upload.single('profilePicture'), validationRules.companySignup, validate, async (req, res) => {
+router.post('/signup', upload.single('profilePicture'), async (req, res) => {
   try {
     const { name, mobile, password, email, companyName, companyAddress } = req.body;
-
-    // Check if user exists
-    const existingUser = await CompanyUser.findOne({ 
-      $or: [
-        { mobile },
-        { email }
-      ]
-    });
-    
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'USER_EXISTS',
-          message: existingUser.mobile === mobile ? 
-            'Mobile number already registered' : 
-            'Email already registered'
-        }
-      });
-    }
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -210,6 +190,13 @@ router.post('/signup', upload.single('profilePicture'), validationRules.companyS
 
     await newUser.save();
 
+    // Generate token
+    const token = jwt.sign(
+      { userId: newUser._id, role: 'company' },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
     // TODO: Integrate with SMS service to send OTP
     console.log(`OTP for ${mobile}: ${otp}`);
 
@@ -218,38 +205,24 @@ router.post('/signup', upload.single('profilePicture'), validationRules.companyS
       message: 'OTP sent successfully. Please verify your mobile number.',
       data: {
         mobile,
-        otpExpiry
+        otpExpiry,
+        token,
+        user: {
+          _id: newUser._id,
+          name: newUser.name,
+          mobile: newUser.mobile,
+          email: newUser.email,
+          companyName: newUser.companyName,
+          companyAddress: newUser.companyAddress,
+          profilePicture: newUser.profilePicture,
+          isVerified: newUser.isVerified,
+          createdAt: newUser.createdAt,
+          updatedAt: newUser.updatedAt
+        }
       }
     });
   } catch (error) {
     console.error('Error in signup:', error);
-    
-    // Handle specific MongoDB errors
-    if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'DUPLICATE_FIELD',
-          message: 'Mobile number or email already registered'
-        }
-      });
-    }
-
-    // Handle validation errors
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'VALIDATION_ERROR',
-          message: 'Validation failed',
-          details: Object.values(error.errors).map(err => ({
-            field: err.path,
-            message: err.message
-          }))
-        }
-      });
-    }
-
     res.status(500).json({
       success: false,
       error: {
@@ -261,7 +234,7 @@ router.post('/signup', upload.single('profilePicture'), validationRules.companyS
 });
 
 // Login
-router.post('/login', loginLimiter, validationRules.login, validate, async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { mobile, password } = req.body;
 
@@ -272,42 +245,27 @@ router.post('/login', loginLimiter, validationRules.login, validate, async (req,
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid credentials'
-        }
-      });
-    }
-
-    // Check if user is verified
-    if (!user.isVerified) {
-      return res.status(401).json({
-        success: false,
-        error: {
-          code: 'UNVERIFIED_USER',
-          message: 'Please verify your mobile number first'
+          message: 'Invalid mobile number or password'
         }
       });
     }
 
     // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid credentials'
+          message: 'Invalid mobile number or password'
         }
       });
     }
 
-    // Generate JWT token
+    // Generate token
     const token = jwt.sign(
-      { 
-        id: user._id,
-        role: 'company',
-        mobile: user.mobile
-      },
-      JWT_SECRET,
+      { userId: user._id, role: 'company' },
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
@@ -317,13 +275,16 @@ router.post('/login', loginLimiter, validationRules.login, validate, async (req,
       data: {
         token,
         user: {
-          id: user._id,
+          _id: user._id,
           name: user.name,
           mobile: user.mobile,
           email: user.email,
           companyName: user.companyName,
           companyAddress: user.companyAddress,
-          hasProfilePicture: !!user.profilePicture
+          profilePicture: user.profilePicture,
+          isVerified: user.isVerified,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
         }
       }
     });
@@ -333,7 +294,7 @@ router.post('/login', loginLimiter, validationRules.login, validate, async (req,
       success: false,
       error: {
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'Error logging in'
+        message: 'Error in login process'
       }
     });
   }

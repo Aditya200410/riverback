@@ -293,6 +293,44 @@
       ]
     },
     {
+      "name": "Phases",
+      "item": [
+        {
+          "name": "Add Phase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/phases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Phase Name\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Phases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/phases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases"]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Boats",
       "item": [
         {

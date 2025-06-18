@@ -64,32 +64,9 @@ router.get('/validate-token', auth, async (req, res) => {
 });
 
 // Signup
-router.post('/signup', upload.single('profilePicture'), validationRules.managerSignup, validate, async (req, res) => {
+router.post('/signup', upload.single('profilePicture'), async (req, res) => {
   try {
-    const {
-      name,
-      mobile,
-      password,
-      aadhar
-    } = req.body;
-
-    // Check if user already exists
-    const existingUser = await Manager.findOne({ 
-      $or: [
-        { mobile },
-        { aadhar }
-      ]
-    });
-    
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'USER_EXISTS',
-          message: 'User already registered'
-        }
-      });
-    }
+    const { name, mobile, password, aadhar } = req.body;
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -108,6 +85,13 @@ router.post('/signup', upload.single('profilePicture'), validationRules.managerS
 
     await newUser.save();
 
+    // Generate token
+    const token = jwt.sign(
+      { userId: newUser._id, role: 'manager' },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
     // TODO: Integrate with SMS service to send OTP
     console.log(`OTP for ${mobile}: ${otp}`);
 
@@ -116,7 +100,18 @@ router.post('/signup', upload.single('profilePicture'), validationRules.managerS
       message: 'OTP sent successfully. Please verify your mobile number.',
       data: {
         mobile,
-        otpExpiry
+        otpExpiry,
+        token,
+        user: {
+          _id: newUser._id,
+          name: newUser.name,
+          mobile: newUser.mobile,
+          aadhar: newUser.aadhar,
+          profilePicture: newUser.profilePicture,
+          isVerified: newUser.isVerified,
+          createdAt: newUser.createdAt,
+          updatedAt: newUser.updatedAt
+        }
       }
     });
   } catch (error) {
@@ -200,49 +195,38 @@ router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res)
 });
 
 // Login
-router.post('/login', loginLimiter, validationRules.login, validate, async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { mobile, password } = req.body;
 
     // Find user
     const user = await Manager.findOne({ mobile });
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
-
-    // Check if user is verified
-    if (!user.isVerified) {
       return res.status(401).json({
         success: false,
         error: {
-          code: 'UNVERIFIED_USER',
-          message: 'Please verify your mobile number first'
+          code: 'INVALID_CREDENTIALS',
+          message: 'Invalid mobile number or password'
         }
       });
     }
 
     // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid credentials'
+          message: 'Invalid mobile number or password'
         }
       });
     }
 
-    // Generate JWT token
+    // Generate token
     const token = jwt.sign(
-      { id: user._id, role: 'manager' },
-      JWT_SECRET,
+      { userId: user._id, role: 'manager' },
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
@@ -252,11 +236,14 @@ router.post('/login', loginLimiter, validationRules.login, validate, async (req,
       data: {
         token,
         user: {
-          id: user._id,
+          _id: user._id,
           name: user.name,
           mobile: user.mobile,
           aadhar: user.aadhar,
-          hasProfilePicture: !!user.profilePicture
+          profilePicture: user.profilePicture,
+          isVerified: user.isVerified,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
         }
       }
     });
@@ -266,7 +253,7 @@ router.post('/login', loginLimiter, validationRules.login, validate, async (req,
       success: false,
       error: {
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'Error logging in'
+        message: 'Error in login process'
       }
     });
   }
