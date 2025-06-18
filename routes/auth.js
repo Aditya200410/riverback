@@ -76,11 +76,22 @@ router.get('/validate-token', auth, async (req, res) => {
 router.post('/send-otp', otpLimiter, validationRules.sendOTP, validate, sendOTP);
 
 // Verify OTP
-router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res) => {
+router.post('/verify-otp', async (req, res) => {
   try {
     const { mobile, otp } = req.body;
 
+    if (!mobile || !otp) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_FIELDS',
+          message: 'Mobile number and OTP are required'
+        }
+      });
+    }
+
     const user = await CompanyUser.findOne({ mobile });
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -91,7 +102,7 @@ router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res)
       });
     }
 
-    if (!user.otp || !user.otpExpiry) {
+    if (!user.otp) {
       return res.status(400).json({
         success: false,
         error: {
@@ -111,46 +122,21 @@ router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res)
       });
     }
 
-    if (user.otpExpiry < new Date()) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'OTP_EXPIRED',
-          message: 'OTP has expired'
-        }
-      });
-    }
-
-    // Clear OTP and mark user as verified
-    user.otp = undefined;
-    user.otpExpiry = undefined;
+    // Update user verification status and clear OTP
     user.isVerified = true;
+    user.otp = undefined;
     await user.save();
 
-    // Generate JWT token after successful verification
-    const token = jwt.sign(
-      { 
-        id: user._id,
-        role: 'company',
-        mobile: user.mobile
-      },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    res.json({
+    res.status(200).json({
       success: true,
       message: 'OTP verified successfully',
       data: {
-        token,
         user: {
-          id: user._id,
+          _id: user._id,
+          userId: user.userId,
           name: user.name,
           mobile: user.mobile,
-          email: user.email,
-          companyName: user.companyName,
-          companyAddress: user.companyAddress,
-          hasProfilePicture: !!user.profilePicture
+          isVerified: user.isVerified
         }
       }
     });
@@ -198,6 +184,10 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       });
     }
 
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log('Company Signup OTP:', otp); // Added OTP logging
+
     // Generate companyId
     const count = await CompanyUser.countDocuments();
     const companyId = `CPM${(count + 1).toString().padStart(3, '0')}`;
@@ -212,7 +202,8 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       companyName,
       companyAddress,
       aadhar_no,
-      profilePicture: req.file ? req.file.path : undefined
+      profilePicture: req.file ? req.file.path : undefined,
+      otp
     });
 
     await user.save();

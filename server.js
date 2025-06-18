@@ -3,6 +3,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const securityAuthRoutes = require('./routes/securityAuth');
+const securityMemberRoutes = require('./routes/securityMember');
+const phaseRoutes = require('./routes/phases');
 require('dotenv').config();
 
 const app = express();
@@ -18,9 +21,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/manager-auth', require('./routes/managerAuth'));
-app.use('/api/security-auth', require('./routes/securityAuth'));
+app.use('/api/security-auth', securityAuthRoutes);
+app.use('/api/security-members', securityMemberRoutes);
 app.use('/api/boats', require('./routes/boats'));
-app.use('/api/phases', require('./routes/phases'));
+app.use('/api/phases', phaseRoutes);
 app.use('/api/company-papers', require('./routes/companyPapers'));
 app.use('/api/money-handles', require('./routes/moneyHandles'));
 app.use('/api/madhayams', require('./routes/madhayams'));
@@ -47,16 +51,19 @@ app.use((err, req, res, next) => {
   res.status(500).json({
     success: false,
     error: {
-      code: 'SERVER_ERROR',
+      code: 'INTERNAL_SERVER_ERROR',
       message: 'Something went wrong!'
     }
   });
 });
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/riverbackend')
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/river-backend', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('MongoDB connection error:', err));
     
     // Start server
     const PORT = process.env.PORT || 5000;

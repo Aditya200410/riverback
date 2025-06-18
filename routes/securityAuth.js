@@ -103,11 +103,22 @@ router.post('/send-otp', otpLimiter, validationRules.sendOTP, validate, async (r
 });
 
 // Verify OTP
-router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res) => {
+router.post('/verify-otp', async (req, res) => {
   try {
     const { mobile, otp } = req.body;
 
+    if (!mobile || !otp) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_FIELDS',
+          message: 'Mobile number and OTP are required'
+        }
+      });
+    }
+
     const user = await SecurityUser.findOne({ mobile });
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -118,7 +129,7 @@ router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res)
       });
     }
 
-    if (!user.otp || !user.otpExpiry) {
+    if (!user.otp) {
       return res.status(400).json({
         success: false,
         error: {
@@ -138,25 +149,23 @@ router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res)
       });
     }
 
-    if (user.otpExpiry < new Date()) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'OTP_EXPIRED',
-          message: 'OTP has expired'
-        }
-      });
-    }
-
-    // Clear OTP after successful verification
-    user.otp = undefined;
-    user.otpExpiry = undefined;
+    // Update user verification status and clear OTP
     user.isVerified = true;
+    user.otp = undefined;
     await user.save();
 
-    res.json({
+    res.status(200).json({
       success: true,
-      message: 'OTP verified successfully'
+      message: 'OTP verified successfully',
+      data: {
+        user: {
+          _id: user._id,
+          securityId: user.securityId,
+          name: user.name,
+          mobile: user.mobile,
+          isVerified: user.isVerified
+        }
+      }
     });
   } catch (error) {
     console.error('Error verifying OTP:', error);
@@ -200,6 +209,10 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       });
     }
 
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log('Security Signup OTP:', otp); // Added OTP logging
+
     // Generate securityId
     const count = await SecurityUser.countDocuments();
     const securityId = `SCU${(count + 1).toString().padStart(3, '0')}`;
@@ -213,7 +226,8 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       aadhar,
       address,
       phase,
-      profilePicture: req.file ? req.file.path : undefined
+      profilePicture: req.file ? req.file.path : undefined,
+      otp
     });
 
     await user.save();
