@@ -173,55 +173,75 @@ router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res)
 // Signup
 router.post('/signup', upload.single('profilePicture'), async (req, res) => {
   try {
-    const { name, mobile, password, aadhar, securityCompany, phase } = req.body;
-
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-    // Create new user with OTP
-    const newUser = new SecurityUser({
+    const {
       name,
       mobile,
       password,
       aadhar,
-      securityCompany,
-      phase,
-      otp,
-      otpExpiry,
-      profilePicture: req.file ? req.file.filename : undefined
+      address,
+      phase
+    } = req.body;
+
+    // Check if user already exists
+    const existingUser = await SecurityUser.findOne({
+      $or: [
+        { mobile },
+        { aadhar }
+      ]
     });
 
-    await newUser.save();
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'USER_EXISTS',
+          message: 'User with this mobile or aadhar number already exists'
+        }
+      });
+    }
+
+    // Generate securityId
+    const count = await SecurityUser.countDocuments();
+    const securityId = `SCU${(count + 1).toString().padStart(3, '0')}`;
+
+    // Create new user
+    const user = new SecurityUser({
+      securityId,
+      name,
+      mobile,
+      password,
+      aadhar,
+      address,
+      phase,
+      profilePicture: req.file ? req.file.path : undefined
+    });
+
+    await user.save();
 
     // Generate token
     const token = jwt.sign(
-      { userId: newUser._id, role: 'security' },
+      { userId: user._id, role: 'security' },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    // TODO: Integrate with SMS service to send OTP
-    console.log(`OTP for ${mobile}: ${otp}`);
-
     res.status(201).json({
       success: true,
-      message: 'OTP sent successfully. Please verify your mobile number.',
+      message: 'User registered successfully',
       data: {
-        mobile,
-        otpExpiry,
         token,
         user: {
-          _id: newUser._id,
-          name: newUser.name,
-          mobile: newUser.mobile,
-          aadhar: newUser.aadhar,
-          securityCompany: newUser.securityCompany,
-          phase: newUser.phase,
-          profilePicture: newUser.profilePicture,
-          isVerified: newUser.isVerified,
-          createdAt: newUser.createdAt,
-          updatedAt: newUser.updatedAt
+          _id: user._id,
+          securityId: user.securityId,
+          name: user.name,
+          mobile: user.mobile,
+          aadhar: user.aadhar,
+          address: user.address,
+          phase: user.phase,
+          profilePicture: user.profilePicture,
+          isVerified: user.isVerified,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
         }
       }
     });

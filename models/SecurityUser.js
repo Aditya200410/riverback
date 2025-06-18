@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const securityUserSchema = new mongoose.Schema({
+  securityId: {
+    type: String,
+    required: true,
+    unique: true
+  },
   name: {
     type: String,
     required: true,
@@ -25,12 +30,10 @@ const securityUserSchema = new mongoose.Schema({
     minlength: 12,
     maxlength: 12
   },
-  securityCompany: {
+  address: {
     type: String,
     required: true,
-    trim: true,
-    minlength: 2,
-    maxlength: 100
+    trim: true
   },
   password: {
     type: String,

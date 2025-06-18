@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const managerSchema = new mongoose.Schema({
+  managerId: {
+    type: String,
+    required: true,
+    unique: true
+  },
   name: {
     type: String,
     required: true,
@@ -29,6 +34,11 @@ const managerSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 8
+  },
+  address: {
+    type: String,
+    required: true,
+    trim: true
   },
   profilePicture: {
     type: String

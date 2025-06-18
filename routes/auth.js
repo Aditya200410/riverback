@@ -169,57 +169,79 @@ router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res)
 // Signup
 router.post('/signup', upload.single('profilePicture'), async (req, res) => {
   try {
-    const { name, mobile, password, email, companyName, companyAddress, phase } = req.body;
-
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-    // Create new user with OTP
-    const newUser = new CompanyUser({
+    const {
       name,
       mobile,
       password,
       email,
       companyName,
       companyAddress,
-      phase,
-      otp,
-      otpExpiry,
-      profilePicture: req.file ? req.file.filename : undefined
+      aadhar_no
+    } = req.body;
+
+    // Check if user already exists
+    const existingUser = await CompanyUser.findOne({
+      $or: [
+        { mobile },
+        { email },
+        { aadhar_no }
+      ]
     });
 
-    await newUser.save();
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'USER_EXISTS',
+          message: 'User with this mobile, email or aadhar number already exists'
+        }
+      });
+    }
+
+    // Generate companyId
+    const count = await CompanyUser.countDocuments();
+    const companyId = `CPM${(count + 1).toString().padStart(3, '0')}`;
+
+    // Create new user
+    const user = new CompanyUser({
+      companyId,
+      name,
+      mobile,
+      password,
+      email,
+      companyName,
+      companyAddress,
+      aadhar_no,
+      profilePicture: req.file ? req.file.path : undefined
+    });
+
+    await user.save();
 
     // Generate token
     const token = jwt.sign(
-      { userId: newUser._id, role: 'company' },
+      { userId: user._id, role: 'company' },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    // TODO: Integrate with SMS service to send OTP
-    console.log(`OTP for ${mobile}: ${otp}`);
-
     res.status(201).json({
       success: true,
-      message: 'OTP sent successfully. Please verify your mobile number.',
+      message: 'User registered successfully',
       data: {
-        mobile,
-        otpExpiry,
         token,
         user: {
-          _id: newUser._id,
-          name: newUser.name,
-          mobile: newUser.mobile,
-          email: newUser.email,
-          companyName: newUser.companyName,
-          companyAddress: newUser.companyAddress,
-          phase: newUser.phase,
-          profilePicture: newUser.profilePicture,
-          isVerified: newUser.isVerified,
-          createdAt: newUser.createdAt,
-          updatedAt: newUser.updatedAt
+          _id: user._id,
+          companyId: user.companyId,
+          name: user.name,
+          mobile: user.mobile,
+          email: user.email,
+          companyName: user.companyName,
+          companyAddress: user.companyAddress,
+          aadhar_no: user.aadhar_no,
+          profilePicture: user.profilePicture,
+          isVerified: user.isVerified,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
         }
       }
     });

@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const companyUserSchema = new mongoose.Schema({
+  companyId: {
+    type: String,
+    required: true,
+    unique: true
+  },
   name: {
     type: String,
     required: true,
@@ -42,12 +47,13 @@ const companyUserSchema = new mongoose.Schema({
     minlength: 5,
     maxlength: 200
   },
+  aadhar_no: {
+    type: String,
+    required: true,
+    unique: true
+  },
   profilePicture: {
     type: String
-  },
-  phase: {
-    type: String,
-    trim: true
   },
   isVerified: {
     type: Boolean,

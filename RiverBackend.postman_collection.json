@@ -57,8 +57,8 @@
                   "type": "text"
                 },
                 {
-                  "key": "phase",
-                  "value": "Phase 1",
+                  "key": "aadhar_no",
+                  "value": "123456789012",
                   "type": "text"
                 },
                 {
@@ -151,8 +151,8 @@
                   "type": "text"
                 },
                 {
-                  "key": "securityCompany",
-                  "value": "Test Security Company",
+                  "key": "address",
+                  "value": "123 Test Street, Test City",
                   "type": "text"
                 },
                 {
@@ -247,6 +247,11 @@
                 {
                   "key": "aadhar",
                   "value": "123456789012",
+                  "type": "text"
+                },
+                {
+                  "key": "address",
+                  "value": "123 Test Street, Test City",
                   "type": "text"
                 },
                 {
