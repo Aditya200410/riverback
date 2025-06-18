@@ -113,103 +113,198 @@
           }
         },
         {
-          "name": "Security Signup",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "multipart/form-data"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/security-auth/signup",
-              "host": ["{{base_url}}"],
-              "path": ["api", "security-auth", "signup"]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "name",
-                  "value": "Test Security",
-                  "type": "text"
+          "name": "Security Auth",
+          "item": [
+            {
+              "name": "Security Signup",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "multipart/form-data"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/security-auth/signup",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "security-auth", "signup"]
                 },
-                {
-                  "key": "mobile",
-                  "value": "1234567890",
-                  "type": "text"
-                },
-                {
-                  "key": "password",
-                  "value": "Test@123",
-                  "type": "text"
-                },
-                {
-                  "key": "aadhar",
-                  "value": "123456789012",
-                  "type": "text"
-                },
-                {
-                  "key": "address",
-                  "value": "123 Test Street, Test City",
-                  "type": "text"
-                },
-                {
-                  "key": "phase",
-                  "value": "Phase 1",
-                  "type": "text"
-                },
-                {
-                  "key": "profilePicture",
-                  "type": "file",
-                  "src": "/path/to/profile/picture.jpg"
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Test Security",
+                      "type": "text"
+                    },
+                    {
+                      "key": "mobile",
+                      "value": "1234567890",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password",
+                      "value": "Test@123",
+                      "type": "text"
+                    },
+                    {
+                      "key": "aadhar",
+                      "value": "123456789012",
+                      "type": "text"
+                    },
+                    {
+                      "key": "address",
+                      "value": "123 Test Street, Test City",
+                      "type": "text"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "Phase 1",
+                      "type": "text"
+                    },
+                    {
+                      "key": "profilePicture",
+                      "type": "file",
+                      "src": "/path/to/profile/picture.jpg"
+                    }
+                  ]
                 }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Security Verify OTP",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
               }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/security-auth/verify-otp",
-              "host": ["{{base_url}}"],
-              "path": ["api", "security-auth", "verify-otp"]
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"mobile\": \"1234567890\",\n    \"otp\": \"123456\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Security Login",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+            {
+              "name": "Security Login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/security-auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "security-auth", "login"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"mobile\": \"1234567890\",\n    \"password\": \"Test@123\",\n    \"phase\": \"Phase 1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
               }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/security-auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["api", "security-auth", "login"]
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"mobile\": \"1234567890\",\n    \"password\": \"Test@123\"\n}"
+            {
+              "name": "Security Forgot Password",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/security-auth/forgot-password",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "security-auth", "forgot-password"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"mobile\": \"1234567890\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Security Reset Password",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/security-auth/reset-password/:token",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "security-auth", "reset-password", ":token"],
+                  "variable": [
+                    {
+                      "key": "token",
+                      "value": "reset_token_here"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"password\": \"NewPassword@123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Security Update Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/security-auth/update-profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "security-auth", "update-profile"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Name\",\n    \"securityCompany\": \"Updated Company\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Security Get Profile Picture",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/security-auth/profile-picture/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "security-auth", "profile-picture", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "user_id_here"
+                    }
+                  ]
+                }
+              }
             }
-          }
+          ]
         },
         {
           "name": "Manager Signup",

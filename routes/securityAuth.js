@@ -183,16 +183,16 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
 // Login
 router.post('/login', async (req, res) => {
   try {
-    const { mobile, password } = req.body;
+    const { mobile, password, phase } = req.body;
 
-    // Find user
-    const user = await SecurityUser.findOne({ mobile });
+    // Find user with both mobile and phase
+    const user = await SecurityUser.findOne({ mobile, phase });
     if (!user) {
       return res.status(401).json({
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid mobile number or password'
+          message: 'Invalid mobile number, phase or password'
         }
       });
     }
@@ -204,7 +204,7 @@ router.post('/login', async (req, res) => {
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid mobile number or password'
+          message: 'Invalid mobile number, phase or password'
         }
       });
     }
