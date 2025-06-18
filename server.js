@@ -31,6 +31,7 @@ app.use('/api/madhayams', require('./routes/madhayams'));
 app.use('/api/fish-types', require('./routes/fishTypes'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/managers', require('./routes/managers'));
+app.use('/api/sikaris', require('./routes/sikaris'));
 
 // Handle upload errors
 app.use((err, req, res, next) => {

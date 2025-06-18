@@ -1406,6 +1406,289 @@
           }
         }
       ]
+    },
+    {
+      "name": "Sikaris",
+      "item": [
+        {
+          "name": "Get All Sikaris",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris"]
+            }
+          }
+        },
+        {
+          "name": "Get Sikari by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "sikari_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Sikari",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sikariId",
+                  "value": "SK001",
+                  "type": "text"
+                },
+                {
+                  "key": "sikariName",
+                  "value": "John Doe",
+                  "type": "text"
+                },
+                {
+                  "key": "mobileNumber",
+                  "value": "1234567890",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "Mumbai",
+                  "type": "text"
+                },
+                {
+                  "key": "dateOfJoining",
+                  "value": "2024-03-21",
+                  "type": "text"
+                },
+                {
+                  "key": "smargId",
+                  "value": "SM001",
+                  "type": "text"
+                },
+                {
+                  "key": "adharCardNumber",
+                  "value": "123456789012",
+                  "type": "text"
+                },
+                {
+                  "key": "bankAccountNumber",
+                  "value": "1234567890",
+                  "type": "text"
+                },
+                {
+                  "key": "ifscCode",
+                  "value": "SBIN0001234",
+                  "type": "text"
+                },
+                {
+                  "key": "madhayamName",
+                  "value": "Madhayam Name",
+                  "type": "text"
+                },
+                {
+                  "key": "madhayamMobileNumber",
+                  "value": "9876543210",
+                  "type": "text"
+                },
+                {
+                  "key": "madhayamAddress",
+                  "value": "Madhayam Address",
+                  "type": "text"
+                },
+                {
+                  "key": "boatNumber",
+                  "value": "BT001",
+                  "type": "text"
+                },
+                {
+                  "key": "boatId",
+                  "value": "BI001",
+                  "type": "text"
+                },
+                {
+                  "key": "boatType",
+                  "value": "company boat",
+                  "type": "text"
+                },
+                {
+                  "key": "position",
+                  "value": "personal duty",
+                  "type": "text"
+                },
+                {
+                  "key": "profilePhoto",
+                  "type": "file",
+                  "src": "/path/to/profile/photo.jpg"
+                },
+                {
+                  "key": "bannerPhoto",
+                  "type": "file",
+                  "src": "/path/to/banner/photo.jpg"
+                },
+                {
+                  "key": "adharCardPhoto",
+                  "type": "file",
+                  "src": "/path/to/aadhar/photo.jpg"
+                },
+                {
+                  "key": "bankPassbookPhoto",
+                  "type": "file",
+                  "src": "/path/to/passbook/photo.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Sikari",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris", "update", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "sikari_id_here"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sikariName",
+                  "value": "Updated Name",
+                  "type": "text"
+                },
+                {
+                  "key": "mobileNumber",
+                  "value": "9876543210",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "Updated Location",
+                  "type": "text"
+                },
+                {
+                  "key": "adharCardNumber",
+                  "value": "987654321098",
+                  "type": "text"
+                },
+                {
+                  "key": "bankAccountNumber",
+                  "value": "9876543210",
+                  "type": "text"
+                },
+                {
+                  "key": "ifscCode",
+                  "value": "SBIN0005678",
+                  "type": "text"
+                },
+                {
+                  "key": "madhayamName",
+                  "value": "Updated Madhayam",
+                  "type": "text"
+                },
+                {
+                  "key": "madhayamMobileNumber",
+                  "value": "8765432109",
+                  "type": "text"
+                },
+                {
+                  "key": "madhayamAddress",
+                  "value": "Updated Madhayam Address",
+                  "type": "text"
+                },
+                {
+                  "key": "profilePhoto",
+                  "type": "file",
+                  "src": "/path/to/new/profile/photo.jpg"
+                },
+                {
+                  "key": "bannerPhoto",
+                  "type": "file",
+                  "src": "/path/to/new/banner/photo.jpg"
+                },
+                {
+                  "key": "adharCardPhoto",
+                  "type": "file",
+                  "src": "/path/to/new/aadhar/photo.jpg"
+                },
+                {
+                  "key": "bankPassbookPhoto",
+                  "type": "file",
+                  "src": "/path/to/new/passbook/photo.jpg"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Sikari",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris", "delete", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "sikari_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [

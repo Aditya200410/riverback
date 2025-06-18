@@ -53,12 +53,20 @@ router.get('/', auth(['company']), async (req, res) => {
         location: sikari.location,
         dateOfJoining: sikari.dateOfJoining,
         smargId: sikari.smargId,
+        adharCardNumber: sikari.adharCardNumber,
+        bankAccountNumber: sikari.bankAccountNumber,
+        ifscCode: sikari.ifscCode,
+        madhayamName: sikari.madhayamName,
+        madhayamMobileNumber: sikari.madhayamMobileNumber,
+        madhayamAddress: sikari.madhayamAddress,
         boatNumber: sikari.boatNumber,
         boatId: sikari.boatId,
         boatType: sikari.boatType,
         position: sikari.position,
         profilePhoto: sikari.profilePhoto,
-        bannerPhoto: sikari.bannerPhoto
+        bannerPhoto: sikari.bannerPhoto,
+        adharCardPhoto: sikari.adharCardPhoto,
+        bankPassbookPhoto: sikari.bankPassbookPhoto
       }))
     });
   } catch (err) {
