@@ -12,8 +12,7 @@ const { validate, validationRules } = require('../middleware/validator');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
-
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
+const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/config');
 
 // Middleware to protect routes
 const auth = (req, res, next) => {
@@ -215,11 +214,15 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Generate token
+    // Generate token with consistent payload structure
     const token = jwt.sign(
-      { id: user._id, role: 'company' },
+      { 
+        id: user._id,
+        role: 'company',
+        companyId: user._id
+      },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: JWT_EXPIRES_IN }
     );
 
     res.json({

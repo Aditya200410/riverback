@@ -32,6 +32,7 @@ app.use('/api/fish-types', require('./routes/fishTypes'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/managers', require('./routes/managers'));
 app.use('/api/sikaris', require('./routes/sikaris'));
+app.use('/api/company-summary', require('./routes/companySummary'));
 
 // Handle upload errors
 app.use((err, req, res, next) => {
@@ -53,7 +54,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({
     success: false,
     error: {
-      code: 'INTERNAL_SERVER_ERROR',
+      code: 'SERVER_ERROR',
       message: 'Something went wrong!'
     }
   });

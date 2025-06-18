@@ -2,15 +2,25 @@ const jwt = require('jsonwebtoken');
 const CompanyUser = require('../models/CompanyUser');
 const SecurityUser = require('../models/SecurityUser');
 const Manager = require('../models/Manager');
-const crypto = require('crypto');
-
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
+const { JWT_SECRET } = require('../config/config');
 
 const auth = (roles = []) => {
   return async (req, res, next) => {
     try {
-      const token = req.header('Authorization')?.replace('Bearer ', '');
-      
+      // Get token from header
+      const authHeader = req.header('Authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({
+          success: false,
+          error: {
+            code: 'NO_TOKEN',
+            message: 'No token, authorization denied'
+          }
+        });
+      }
+
+      // Extract token
+      const token = authHeader.replace('Bearer ', '').trim();
       if (!token) {
         return res.status(401).json({
           success: false,
@@ -21,14 +31,25 @@ const auth = (roles = []) => {
         });
       }
 
-      const decoded = jwt.verify(token, JWT_SECRET);
-      console.log('Decoded token:', decoded); // Log the decoded token
-      
+      // Verify token
+      let decoded;
+      try {
+        decoded = jwt.verify(token, JWT_SECRET);
+      } catch (error) {
+        console.error('Token verification error:', error);
+        return res.status(401).json({
+          success: false,
+          error: {
+            code: 'INVALID_TOKEN',
+            message: 'Invalid token'
+          }
+        });
+      }
+
       // Find user based on role
       let user = null;
       if (roles.includes('company')) {
         user = await CompanyUser.findById(decoded.id).select('-password');
-        console.log('Found user:', user); // Log the found user
       }
       if (roles.includes('security')) {
         user = await SecurityUser.findById(decoded.id).select('-password');
@@ -50,16 +71,18 @@ const auth = (roles = []) => {
       // Add user to request
       req.user = {
         id: user._id,
-        companyId: user._id // For company users, their ID is their company ID
+        role: decoded.role,
+        companyId: decoded.companyId || user._id
       };
       req.token = token;
       next();
     } catch (error) {
-        return res.status(401).json({
-          success: false,
-          error: {
-            code: 'INVALID_TOKEN',
-            message: 'Invalid token'
+      console.error('Auth middleware error:', error);
+      return res.status(500).json({
+        success: false,
+        error: {
+          code: 'SERVER_ERROR',
+          message: 'Server error in authentication'
         }
       });
     }
