@@ -169,7 +169,7 @@ router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res)
 // Signup
 router.post('/signup', upload.single('profilePicture'), async (req, res) => {
   try {
-    const { name, mobile, password, email, companyName, companyAddress } = req.body;
+    const { name, mobile, password, email, companyName, companyAddress, phase } = req.body;
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -183,6 +183,7 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       email,
       companyName,
       companyAddress,
+      phase,
       otp,
       otpExpiry,
       profilePicture: req.file ? req.file.filename : undefined
@@ -214,6 +215,7 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
           email: newUser.email,
           companyName: newUser.companyName,
           companyAddress: newUser.companyAddress,
+          phase: newUser.phase,
           profilePicture: newUser.profilePicture,
           isVerified: newUser.isVerified,
           createdAt: newUser.createdAt,
@@ -281,6 +283,7 @@ router.post('/login', async (req, res) => {
           email: user.email,
           companyName: user.companyName,
           companyAddress: user.companyAddress,
+          phase: user.phase,
           profilePicture: user.profilePicture,
           isVerified: user.isVerified,
           createdAt: user.createdAt,

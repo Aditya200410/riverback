@@ -39,6 +39,10 @@ const securityUserSchema = new mongoose.Schema({
   profilePicture: {
     type: String
   },
+  phase: {
+    type: String,
+    trim: true
+  },
   isVerified: {
     type: Boolean,
     default: false

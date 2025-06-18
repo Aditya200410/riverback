@@ -57,6 +57,11 @@
                   "type": "text"
                 },
                 {
+                  "key": "phase",
+                  "value": "Phase 1",
+                  "type": "text"
+                },
+                {
                   "key": "profilePicture",
                   "type": "file",
                   "src": "/path/to/profile/picture.jpg"
@@ -151,6 +156,11 @@
                   "type": "text"
                 },
                 {
+                  "key": "phase",
+                  "value": "Phase 1",
+                  "type": "text"
+                },
+                {
                   "key": "profilePicture",
                   "type": "file",
                   "src": "/path/to/profile/picture.jpg"
@@ -240,6 +250,11 @@
                   "type": "text"
                 },
                 {
+                  "key": "phase",
+                  "value": "Phase 1",
+                  "type": "text"
+                },
+                {
                   "key": "profilePicture",
                   "type": "file",
                   "src": "/path/to/profile/picture.jpg"
@@ -286,7 +301,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"mobile\": \"1234567890\",\n    \"password\": \"Test@123\"\n}"
+              "raw": "{\n    \"mobile\": \"1234567890\",\n    \"password\": \"Test@123\",\n    \"phase\": \"Phase 1\"\n}"
             }
           }
         }

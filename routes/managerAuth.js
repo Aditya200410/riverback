@@ -66,7 +66,7 @@ router.get('/validate-token', auth, async (req, res) => {
 // Signup
 router.post('/signup', upload.single('profilePicture'), async (req, res) => {
   try {
-    const { name, mobile, password, aadhar } = req.body;
+    const { name, mobile, password, aadhar, phase } = req.body;
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -78,6 +78,7 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       mobile,
       password,
       aadhar,
+      phase,
       otp,
       otpExpiry,
       profilePicture: req.file ? req.file.filename : undefined
@@ -107,6 +108,7 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
           name: newUser.name,
           mobile: newUser.mobile,
           aadhar: newUser.aadhar,
+          phase: newUser.phase,
           profilePicture: newUser.profilePicture,
           isVerified: newUser.isVerified,
           createdAt: newUser.createdAt,
@@ -197,16 +199,16 @@ router.post('/verify-otp', validationRules.verifyOTP, validate, async (req, res)
 // Login
 router.post('/login', async (req, res) => {
   try {
-    const { mobile, password } = req.body;
+    const { mobile, password, phase } = req.body;
 
-    // Find user
-    const user = await Manager.findOne({ mobile });
+    // Find user with both mobile and phase
+    const user = await Manager.findOne({ mobile, phase });
     if (!user) {
       return res.status(401).json({
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid mobile number or password'
+          message: 'Invalid mobile number, phase or password'
         }
       });
     }
@@ -218,7 +220,7 @@ router.post('/login', async (req, res) => {
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid mobile number or password'
+          message: 'Invalid mobile number, phase or password'
         }
       });
     }
@@ -240,6 +242,7 @@ router.post('/login', async (req, res) => {
           name: user.name,
           mobile: user.mobile,
           aadhar: user.aadhar,
+          phase: user.phase,
           profilePicture: user.profilePicture,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
