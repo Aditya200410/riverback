@@ -14,6 +14,13 @@ const managerSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 50
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true
+  },
   mobile: {
     type: String,
     required: true,
@@ -52,7 +59,26 @@ const managerSchema = new mongoose.Schema({
     default: false
   },
   resetPasswordToken: String,
-  resetPasswordExpires: Date
+  resetPasswordExpires: Date,
+  location: {
+    type: String,
+    trim: true
+  },
+  isSignedIn: {
+    type: Boolean,
+    default: false
+  },
+  signInTime: {
+    type: Date
+  },
+  lastActive: {
+    type: Date
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive', 'deleted'],
+    default: 'active'
+  }
 }, {
   timestamps: true
 });

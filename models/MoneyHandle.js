@@ -11,6 +11,11 @@ const moneyHandleSchema = new mongoose.Schema({
     required: true,
     enum: ['pay', 'take']
   },
+  toWhom: {
+    type: String,
+    required: true,
+    trim: true
+  },
   description: {
     type: String,
     required: true,
@@ -37,5 +42,6 @@ const moneyHandleSchema = new mongoose.Schema({
 // Create index for faster queries
 moneyHandleSchema.index({ companyId: 1, status: 1 });
 moneyHandleSchema.index({ date: -1 });
+moneyHandleSchema.index({ toWhom: 1 });
 
 module.exports = mongoose.model('MoneyHandle', moneyHandleSchema); 
