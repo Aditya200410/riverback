@@ -51,8 +51,6 @@ const managerSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  otp: String,
-  otpExpiry: Date,
   resetPasswordToken: String,
   resetPasswordExpires: Date
 }, {

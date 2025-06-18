@@ -90,10 +90,6 @@ const validate = (req, res, next) => {
 
 // Validation rule sets
 const validationRules = {
-  // OTP validation
-  sendOTP: [commonRules.mobile],
-  verifyOTP: [commonRules.mobile, body('otp').trim().isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')],
-
   // Login validation
   login: [commonRules.mobile, commonRules.password],
 

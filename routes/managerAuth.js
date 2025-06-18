@@ -5,9 +5,11 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const Manager = require('../models/Manager');
 const { upload } = require('../middleware/upload');
-const { otpLimiter, loginLimiter } = require('../middleware/rateLimiter');
+const { loginLimiter } = require('../middleware/rateLimiter');
 const { validate, validationRules } = require('../middleware/validator');
 const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
@@ -63,8 +65,35 @@ router.get('/validate-token', auth, async (req, res) => {
   }
 });
 
-// Signup
-router.post('/signup', upload.single('profilePicture'), async (req, res) => {
+// Create uploads directory if it doesn't exist
+const uploadDir = 'uploads/manager-users';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const uploadMulter = multer({ 
+    storage: storage,
+    fileFilter: function (req, file, cb) {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Not an image! Please upload an image.'), false);
+        }
+    }
+});
+
+// Signup - Direct user creation without OTP
+router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) => {
   try {
     const {
       name,
@@ -75,7 +104,7 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       phase
     } = req.body;
 
-    // Check if user already exists
+    // Check if user already exists in database
     const existingUser = await Manager.findOne({
       $or: [
         { mobile },
@@ -93,15 +122,11 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       });
     }
 
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('Manager Signup OTP:', otp); // Added OTP logging
-
     // Generate managerId
     const count = await Manager.countDocuments();
     const managerId = `MN${(count + 1).toString().padStart(3, '0')}`;
 
-    // Create new user
+    // Create new user in database
     const user = new Manager({
       managerId,
       name,
@@ -111,7 +136,7 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       address,
       phase,
       profilePicture: req.file ? req.file.path : undefined,
-      otp
+      isVerified: true
     });
 
     await user.save();
@@ -150,83 +175,6 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       error: {
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Error in signup process'
-      }
-    });
-  }
-});
-
-// Verify OTP
-router.post('/verify-otp', async (req, res) => {
-  try {
-    const { mobile, otp } = req.body;
-
-    if (!mobile || !otp) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_FIELDS',
-          message: 'Mobile number and OTP are required'
-        }
-      });
-    }
-
-    const user = await Manager.findOne({ mobile });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
-
-    if (!user.otp) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'OTP_NOT_REQUESTED',
-          message: 'OTP not requested'
-        }
-      });
-    }
-
-    if (user.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_OTP',
-          message: 'Invalid OTP'
-        }
-      });
-    }
-
-    // Update user verification status and clear OTP
-    user.isVerified = true;
-    user.otp = undefined;
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'OTP verified successfully',
-      data: {
-        user: {
-          _id: user._id,
-          managerId: user.managerId,
-          name: user.name,
-          mobile: user.mobile,
-          isVerified: user.isVerified
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error verifying OTP:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Error verifying OTP'
       }
     });
   }
@@ -275,9 +223,11 @@ router.post('/login', async (req, res) => {
         token,
         user: {
           _id: user._id,
+          managerId: user.managerId,
           name: user.name,
           mobile: user.mobile,
           aadhar: user.aadhar,
+          address: user.address,
           phase: user.phase,
           profilePicture: user.profilePicture,
           isVerified: user.isVerified,
@@ -312,7 +262,7 @@ router.get('/profile-picture/:id', async (req, res) => {
       });
     }
 
-    res.sendFile(path.join(__dirname, '..', 'uploads', user.profilePicture));
+    res.sendFile(path.join(__dirname, '..', user.profilePicture));
   } catch (error) {
     console.error('Error getting profile picture:', error);
     res.status(500).json({

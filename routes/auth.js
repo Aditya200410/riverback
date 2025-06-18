@@ -5,18 +5,13 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const CompanyUser = require('../models/CompanyUser');
-const {
-    sendOTP,
-    verifyOTP,
-    signup,
-    login,
-    getProfilePicture
-} = require('../controllers/authController');
 const { upload } = require('../middleware/upload');
-const { otpLimiter, loginLimiter } = require('../middleware/rateLimiter');
+const { loginLimiter } = require('../middleware/rateLimiter');
 const validatePassword = require('../middleware/passwordValidation');
 const { validate, validationRules } = require('../middleware/validator');
 const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
@@ -72,88 +67,35 @@ router.get('/validate-token', auth, async (req, res) => {
   }
 });
 
-// Send OTP
-router.post('/send-otp', otpLimiter, validationRules.sendOTP, validate, sendOTP);
+// Create uploads directory if it doesn't exist
+const uploadDir = 'uploads/company-users';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-// Verify OTP
-router.post('/verify-otp', async (req, res) => {
-  try {
-    const { mobile, otp } = req.body;
-
-    if (!mobile || !otp) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_FIELDS',
-          message: 'Mobile number and OTP are required'
-        }
-      });
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
     }
-
-    const user = await CompanyUser.findOne({ mobile });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
-
-    if (!user.otp) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'OTP_NOT_REQUESTED',
-          message: 'OTP not requested'
-        }
-      });
-    }
-
-    if (user.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_OTP',
-          message: 'Invalid OTP'
-        }
-      });
-    }
-
-    // Update user verification status and clear OTP
-    user.isVerified = true;
-    user.otp = undefined;
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'OTP verified successfully',
-      data: {
-        user: {
-          _id: user._id,
-          userId: user.userId,
-          name: user.name,
-          mobile: user.mobile,
-          isVerified: user.isVerified
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error verifying OTP:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Error verifying OTP'
-      }
-    });
-  }
 });
 
-// Signup
-router.post('/signup', upload.single('profilePicture'), async (req, res) => {
+const uploadMulter = multer({ 
+    storage: storage,
+    fileFilter: function (req, file, cb) {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Not an image! Please upload an image.'), false);
+        }
+    }
+});
+
+// Signup - Direct user creation without OTP
+router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) => {
   try {
     const {
       name,
@@ -165,7 +107,7 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       aadhar_no
     } = req.body;
 
-    // Check if user already exists
+    // Check if user already exists in database
     const existingUser = await CompanyUser.findOne({
       $or: [
         { mobile },
@@ -184,15 +126,11 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       });
     }
 
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('Company Signup OTP:', otp); // Added OTP logging
-
     // Generate companyId
     const count = await CompanyUser.countDocuments();
     const companyId = `CPM${(count + 1).toString().padStart(3, '0')}`;
 
-    // Create new user
+    // Create new user in database
     const user = new CompanyUser({
       companyId,
       name,
@@ -203,7 +141,7 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       companyAddress,
       aadhar_no,
       profilePicture: req.file ? req.file.path : undefined,
-      otp
+      isVerified: true
     });
 
     await user.save();
@@ -291,12 +229,13 @@ router.post('/login', async (req, res) => {
         token,
         user: {
           _id: user._id,
+          companyId: user.companyId,
           name: user.name,
           mobile: user.mobile,
           email: user.email,
           companyName: user.companyName,
           companyAddress: user.companyAddress,
-          phase: user.phase,
+          aadhar_no: user.aadhar_no,
           profilePicture: user.profilePicture,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
@@ -317,7 +256,31 @@ router.post('/login', async (req, res) => {
 });
 
 // Get Profile Picture
-router.get('/profile-picture/:id', getProfilePicture);
+router.get('/profile-picture/:id', async (req, res) => {
+  try {
+    const user = await CompanyUser.findById(req.params.id);
+    if (!user || !user.profilePicture) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'PROFILE_PICTURE_NOT_FOUND',
+          message: 'Profile picture not found'
+        }
+      });
+    }
+
+    res.sendFile(path.join(__dirname, '..', user.profilePicture));
+  } catch (error) {
+    console.error('Error getting profile picture:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error getting profile picture'
+      }
+    });
+  }
+});
 
 // Forgot Password
 router.post('/forgot-password', async (req, res) => {

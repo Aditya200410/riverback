@@ -5,9 +5,11 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const SecurityUser = require('../models/SecurityUser');
 const { upload } = require('../middleware/upload');
-const { otpLimiter, loginLimiter } = require('../middleware/rateLimiter');
+const { loginLimiter } = require('../middleware/rateLimiter');
 const { validate, validationRules } = require('../middleware/validator');
 const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
@@ -63,124 +65,35 @@ router.get('/validate-token', auth, async (req, res) => {
   }
 });
 
-// Send OTP
-router.post('/send-otp', otpLimiter, validationRules.sendOTP, validate, async (req, res) => {
-  try {
-    const { mobile } = req.body;
+// Create uploads directory if it doesn't exist
+const uploadDir = 'uploads/security-users';
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-    // Generate 6 digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-    // Store OTP in user document
-    await SecurityUser.findOneAndUpdate(
-      { mobile },
-      { otp, otpExpiry },
-      { upsert: true, new: true }
-    );
-
-    // TODO: Integrate with SMS service to send OTP
-    console.log(`OTP for ${mobile}: ${otp}`);
-
-    res.json({
-      success: true,
-      message: 'OTP sent successfully',
-      data: {
-        mobile,
-        otpExpiry
-      }
-    });
-  } catch (error) {
-    console.error('Error sending OTP:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Error sending OTP'
-      }
-    });
-  }
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
 });
 
-// Verify OTP
-router.post('/verify-otp', async (req, res) => {
-  try {
-    const { mobile, otp } = req.body;
-
-    if (!mobile || !otp) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_FIELDS',
-          message: 'Mobile number and OTP are required'
+const uploadMulter = multer({ 
+    storage: storage,
+    fileFilter: function (req, file, cb) {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Not an image! Please upload an image.'), false);
         }
-      });
     }
-
-    const user = await SecurityUser.findOne({ mobile });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found'
-        }
-      });
-    }
-
-    if (!user.otp) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'OTP_NOT_REQUESTED',
-          message: 'OTP not requested'
-        }
-      });
-    }
-
-    if (user.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_OTP',
-          message: 'Invalid OTP'
-        }
-      });
-    }
-
-    // Update user verification status and clear OTP
-    user.isVerified = true;
-    user.otp = undefined;
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'OTP verified successfully',
-      data: {
-        user: {
-          _id: user._id,
-          securityId: user.securityId,
-          name: user.name,
-          mobile: user.mobile,
-          isVerified: user.isVerified
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error verifying OTP:', error);
-    res.status(500).json({
-      success: false,
-      error: {
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Error verifying OTP'
-      }
-    });
-  }
 });
 
-// Signup
-router.post('/signup', upload.single('profilePicture'), async (req, res) => {
+// Signup - Direct user creation without OTP
+router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) => {
   try {
     const {
       name,
@@ -191,7 +104,7 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       phase
     } = req.body;
 
-    // Check if user already exists
+    // Check if user already exists in database
     const existingUser = await SecurityUser.findOne({
       $or: [
         { mobile },
@@ -209,15 +122,11 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       });
     }
 
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('Security Signup OTP:', otp); // Added OTP logging
-
     // Generate securityId
     const count = await SecurityUser.countDocuments();
     const securityId = `SCU${(count + 1).toString().padStart(3, '0')}`;
 
-    // Create new user
+    // Create new user in database
     const user = new SecurityUser({
       securityId,
       name,
@@ -227,7 +136,7 @@ router.post('/signup', upload.single('profilePicture'), async (req, res) => {
       address,
       phase,
       profilePicture: req.file ? req.file.path : undefined,
-      otp
+      isVerified: true
     });
 
     await user.save();
@@ -314,10 +223,11 @@ router.post('/login', async (req, res) => {
         token,
         user: {
           _id: user._id,
+          securityId: user.securityId,
           name: user.name,
           mobile: user.mobile,
           aadhar: user.aadhar,
-          securityCompany: user.securityCompany,
+          address: user.address,
           phase: user.phase,
           profilePicture: user.profilePicture,
           isVerified: user.isVerified,
@@ -350,10 +260,19 @@ router.post('/forgot-password', async (req, res) => {
       await securityUser.save();
       // Send SMS here with resetToken (not shown)
     }
-    return res.json({ message: 'If security user exists, reset link sent' });
+    return res.json({ 
+      success: true,
+      message: 'If security user exists, reset link sent'
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error sending reset link' });
+    res.status(500).json({ 
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error sending reset link'
+      }
+    });
   }
 });
 
@@ -362,7 +281,13 @@ router.post('/reset-password/:token', async (req, res) => {
   const { password } = req.body;
   const { token } = req.params;
 
-  if (!password) return res.status(400).json({ message: 'New password required' });
+  if (!password) return res.status(400).json({ 
+    success: false,
+    error: {
+      code: 'PASSWORD_REQUIRED',
+      message: 'New password required'
+    }
+  });
 
   try {
     const securityUsers = await SecurityUser.find({ resetPasswordExpires: { $gt: Date.now() } });
@@ -373,17 +298,32 @@ router.post('/reset-password/:token', async (req, res) => {
         break;
       }
     }
-    if (!matchedSecurityUser) return res.status(400).json({ message: 'Invalid or expired token' });
+    if (!matchedSecurityUser) return res.status(400).json({ 
+      success: false,
+      error: {
+        code: 'INVALID_TOKEN',
+        message: 'Invalid or expired token'
+      }
+    });
 
     matchedSecurityUser.password = password;
     matchedSecurityUser.resetPasswordToken = undefined;
     matchedSecurityUser.resetPasswordExpires = undefined;
     await matchedSecurityUser.save();
 
-    return res.json({ message: 'Password reset successful' });
+    return res.json({ 
+      success: true,
+      message: 'Password reset successful'
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error resetting password' });
+    res.status(500).json({ 
+      success: false,
+      error: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error resetting password'
+      }
+    });
   }
 });
 
@@ -448,7 +388,7 @@ router.get('/profile-picture/:id', async (req, res) => {
       });
     }
 
-    res.sendFile(path.join(__dirname, '..', 'uploads', user.profilePicture));
+    res.sendFile(path.join(__dirname, '..', user.profilePicture));
   } catch (error) {
     console.error('Error getting profile picture:', error);
     res.status(500).json({
