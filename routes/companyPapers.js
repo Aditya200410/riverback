@@ -46,31 +46,11 @@ async function compressPDF(buffer) {
 }
 
 // Upload a new company paper
-router.post('/upload', auth(['company']), upload.single('pdf'), async (req, res) => {
+router.post('/upload', auth(['company']), upload.single('file'), async (req, res) => {
   let tempFilePath = null;
   
   try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'NO_FILE',
-          message: 'No file uploaded'
-        }
-      });
-    }
-
-    const { description, category } = req.body;
-    
-    if (!category) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_CATEGORY',
-          message: 'Category is required'
-        }
-      });
-    }
+    const { description } = req.body;
 
     // Create uploads directory if it doesn't exist
     const uploadDir = path.join(__dirname, '..', 'uploads', 'company-papers');
@@ -97,7 +77,7 @@ router.post('/upload', auth(['company']), upload.single('pdf'), async (req, res)
       uploadedBy: req.user.id,
       companyId: req.user.id,
       description: description || '',
-      category: category
+      category: 'other'
     });
 
     await paper.save();

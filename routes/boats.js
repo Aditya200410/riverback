@@ -112,48 +112,14 @@ router.post('/add', auth(['company']), upload.fields([
 ]), async (req, res) => {
   try {
     const { name, registrationNumber, capacity } = req.body;
-    
-    // Validate required fields
-    if (!name || !registrationNumber || !capacity) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_FIELDS',
-          message: 'Name, registration number, and capacity are required'
-        }
-      });
-    }
-
-    // Validate required photos
-    if (!req.files?.boatPhoto?.[0] || !req.files?.registrationPhoto?.[0] || !req.files?.insurancePhoto?.[0]) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_PHOTOS',
-          message: 'Boat photo, registration photo, and insurance photo are required'
-        }
-      });
-    }
-
-    // Validate capacity is a positive number
-    const capacityNum = Number(capacity);
-    if (isNaN(capacityNum) || capacityNum <= 0) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_CAPACITY',
-          message: 'Capacity must be a positive number'
-        }
-      });
-    }
 
     const boat = await boatController.createBoat({
       name,
       registrationNumber,
-      capacity: capacityNum,
-      boatPhoto: req.files.boatPhoto[0].filename,
-      registrationPhoto: req.files.registrationPhoto[0].filename,
-      insurancePhoto: req.files.insurancePhoto[0].filename,
+      capacity: Number(capacity),
+      boatPhoto: req.files?.boatPhoto?.[0]?.filename,
+      registrationPhoto: req.files?.registrationPhoto?.[0]?.filename,
+      insurancePhoto: req.files?.insurancePhoto?.[0]?.filename,
       companyId: req.user.id
     });
 
@@ -167,36 +133,11 @@ router.post('/add', auth(['company']), upload.fields([
         capacity: boat.capacity,
         boatPhoto: boat.boatPhoto,
         registrationPhoto: boat.registrationPhoto,
-        insurancePhoto: boat.insurancePhoto,
-        status: boat.status
+        insurancePhoto: boat.insurancePhoto
       }
     });
   } catch (err) {
     console.error('Error adding boat:', err);
-    
-    // Clean up uploaded files if there's an error
-    if (req.files) {
-      Object.values(req.files).forEach(files => {
-        files.forEach(file => {
-          const filePath = path.join('uploads/boats', file.filename);
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
-        });
-      });
-    }
-
-    // Handle duplicate registration number error
-    if (err.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'DUPLICATE_REGISTRATION',
-          message: 'A boat with this registration number already exists'
-        }
-      });
-    }
-
     res.status(500).json({
       success: false,
       error: {

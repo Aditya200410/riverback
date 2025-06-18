@@ -23,7 +23,7 @@ const auth = (roles = []) => {
 
       const decoded = jwt.verify(token, JWT_SECRET);
       console.log('Decoded token:', decoded); // Log the decoded token
-
+      
       // Find user based on role
       let user = null;
       if (roles.includes('company')) {

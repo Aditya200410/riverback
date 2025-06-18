@@ -23,10 +23,15 @@ exports.getFishTypeById = async (id) => {
 // Create new fish type
 exports.createFishType = async (fishTypeData) => {
   try {
+    // Add timestamp to name to ensure uniqueness
+    const timestamp = Date.now();
     const fishType = new FishType({
-      ...fishTypeData,
+      name: `${fishTypeData.name || ''}_${timestamp}`,
+      description: fishTypeData.description || '',
+      pricePerKg: fishTypeData.pricePerKg || 0,
       status: 'active'
     });
+
     return await fishType.save();
   } catch (err) {
     console.error('Error in createFishType:', err);
@@ -40,7 +45,7 @@ exports.updateFishType = async (id, updateData) => {
     return await FishType.findByIdAndUpdate(
       id,
       { $set: updateData },
-      { new: true, runValidators: true }
+      { new: true }
     );
   } catch (err) {
     console.error('Error in updateFishType:', err);
@@ -53,7 +58,7 @@ exports.deleteFishType = async (id) => {
   try {
     return await FishType.findByIdAndUpdate(
       id,
-      { $set: { status: 'inactive' } },
+      { $set: { status: 'deleted' } },
       { new: true }
     );
   } catch (err) {

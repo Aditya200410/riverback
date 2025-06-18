@@ -69,7 +69,7 @@ router.get('/validate-token', auth, async (req, res) => {
 const uploadDir = 'uploads/security-users';
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
-}
+  }
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -78,8 +78,8 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname);
-    }
-});
+        }
+      });
 
 const uploadMulter = multer({ 
     storage: storage,
@@ -89,7 +89,7 @@ const uploadMulter = multer({
         } else {
             cb(new Error('Not an image! Please upload an image.'), false);
         }
-    }
+  }
 });
 
 // Signup - Direct user creation without OTP

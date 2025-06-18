@@ -38,7 +38,7 @@ const companyPaperSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: true,
+    default: 'other',
     enum: ['legal', 'financial', 'contract', 'other']
   },
   status: {

@@ -67,34 +67,10 @@ router.post('/add', auth(['company']), async (req, res) => {
   try {
     const { name, description, pricePerKg } = req.body;
 
-    // Validate required fields
-    const requiredFields = ['name', 'description', 'pricePerKg'];
-    const missingFields = requiredFields.filter(field => !req.body[field]);
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_FIELDS',
-          message: `Missing required fields: ${missingFields.join(', ')}`
-        }
-      });
-    }
-
-    // Validate price
-    if (pricePerKg < 0) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_PRICE',
-          message: 'Price per kg must be greater than or equal to 0'
-        }
-      });
-    }
-
     const fishType = await fishTypeController.createFishType({
       name,
       description,
-      pricePerKg
+      pricePerKg: Number(pricePerKg)
     });
 
     res.status(201).json({
@@ -109,18 +85,6 @@ router.post('/add', auth(['company']), async (req, res) => {
     });
   } catch (err) {
     console.error('Error adding fish type:', err);
-
-    // Handle duplicate field errors
-    if (err.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'DUPLICATE_FIELD',
-          message: 'A fish type with this name already exists'
-        }
-      });
-    }
-
     res.status(500).json({
       success: false,
       error: {

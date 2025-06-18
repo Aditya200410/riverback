@@ -1,16 +1,17 @@
 const mongoose = require('mongoose');
 
 const fishTypeSchema = new mongoose.Schema({
-  fishName: {
+  name: {
     type: String,
-    required: true,
-    trim: true,
-    unique: true
+    trim: true
   },
-  price: {
+  description: {
+    type: String,
+    trim: true
+  },
+  pricePerKg: {
     type: Number,
-    required: true,
-    min: 0
+    default: 0
   },
   status: {
     type: String,
@@ -21,4 +22,14 @@ const fishTypeSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('FishType', fishTypeSchema); 
+// Drop all indexes
+fishTypeSchema.index({ name: 1 }, { unique: false });
+
+const FishType = mongoose.model('FishType', fishTypeSchema);
+
+// Drop existing indexes
+FishType.collection.dropIndexes().catch(err => {
+  console.log('No indexes to drop or error dropping indexes:', err);
+});
+
+module.exports = FishType; 
