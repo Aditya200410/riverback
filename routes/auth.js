@@ -148,8 +148,8 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
 
     // Generate token
     const token = jwt.sign(
-      { userId: user._id, role: 'company' },
-      process.env.JWT_SECRET,
+      { id: user._id, role: 'company' },
+      JWT_SECRET,
       { expiresIn: '24h' }
     );
 
@@ -217,8 +217,8 @@ router.post('/login', async (req, res) => {
 
     // Generate token
     const token = jwt.sign(
-      { userId: user._id, role: 'company' },
-      process.env.JWT_SECRET,
+      { id: user._id, role: 'company' },
+      JWT_SECRET,
       { expiresIn: '24h' }
     );
 

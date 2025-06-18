@@ -22,11 +22,13 @@ const auth = (roles = []) => {
       }
 
       const decoded = jwt.verify(token, JWT_SECRET);
-      
+      console.log('Decoded token:', decoded); // Log the decoded token
+
       // Find user based on role
       let user = null;
       if (roles.includes('company')) {
         user = await CompanyUser.findById(decoded.id).select('-password');
+        console.log('Found user:', user); // Log the found user
       }
       if (roles.includes('security')) {
         user = await SecurityUser.findById(decoded.id).select('-password');
