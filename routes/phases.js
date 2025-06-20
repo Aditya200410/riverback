@@ -4,7 +4,7 @@ const Phase = require('../models/Phase');
 const { auth } = require('../middleware/auth');
 
 // Get all phases
-router.get('/', auth(['company']), async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const phases = await Phase.find();
     res.json({
