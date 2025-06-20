@@ -775,16 +775,24 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
               "raw": "{{base_url}}/api/company-papers/papers",
               "host": ["{{base_url}}"],
               "path": ["api", "company-papers", "papers"]
-            }
+            },
+            "response": [
+              {
+                "name": "Success",
+                "originalRequest": {},
+                "status": "OK",
+                "code": 200,
+                "_postman_previewlanguage": "json",
+                "header": [],
+                "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"6855344bf99445a6896e9ed6\",\n      \"fileName\": \"paper-1750414411439-98280263.pdf\",\n      \"originalName\": \"MT_Keys.pdf\",\n      \"uploadDate\": \"2025-06-20T10:13:31.534Z\",\n      \"category\": \"other\",\n      \"description\": \"Test document\",\n      \"fileSize\": 208327,\n      \"pdfUrl\": \"http://localhost:5000/uploads/company-papers/paper-1750414411439-98280263.pdf\"\n    }\n  ]\n}"
+              }
+            ]
           }
         },
         {
@@ -792,22 +800,27 @@
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" }
             ],
             "url": {
               "raw": "{{base_url}}/api/company-papers/papers/:id",
               "host": ["{{base_url}}"],
               "path": ["api", "company-papers", "papers", ":id"],
               "variable": [
-                {
-                  "key": "id",
-                  "value": "paper_id_here"
-                }
+                { "key": "id", "value": "paper_id_here" }
               ]
-            }
+            },
+            "response": [
+              {
+                "name": "Success",
+                "originalRequest": {},
+                "status": "OK",
+                "code": 200,
+                "_postman_previewlanguage": "json",
+                "header": [],
+                "body": "{\n  \"_id\": \"660000000000000000000000\",\n  \"fileName\": \"paper-1750245493846-941547226.pdf\",\n  \"originalName\": \"mydoc.pdf\",\n  \"uploadDate\": \"2024-03-24T10:00:00.000Z\",\n  \"category\": \"legal\",\n  \"description\": \"Test document\",\n  \"fileSize\": 123456,\n  \"pdfUrl\": \"http://localhost:5000/uploads/company-papers/paper-1750245493846-941547226.pdf\"\n}"
+              }
+            ]
           }
         },
         {

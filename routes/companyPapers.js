@@ -125,6 +125,7 @@ router.get('/papers', auth(['company']), async (req, res) => {
       status: 'active'
     }).sort({ uploadDate: -1 });
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       data: papers.map(paper => ({
@@ -134,7 +135,8 @@ router.get('/papers', auth(['company']), async (req, res) => {
         uploadDate: paper.uploadDate,
         category: paper.category,
         description: paper.description,
-        fileSize: paper.fileSize
+        fileSize: paper.fileSize,
+        pdfUrl: `${baseUrl}/uploads/company-papers/${paper.fileName}`
       }))
     });
   } catch (err) {
