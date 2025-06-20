@@ -10,6 +10,7 @@ const { validate, validationRules } = require('../middleware/validator');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
@@ -122,9 +123,8 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
       });
     }
 
-    // Generate securityId
-    const count = await SecurityUser.countDocuments();
-    const securityId = `SCU${(count + 1).toString().padStart(3, '0')}`;
+    // Generate unique securityId
+    const securityId = `SCU${uuidv4()}`;
 
     // Create new user in database
     const user = new SecurityUser({
