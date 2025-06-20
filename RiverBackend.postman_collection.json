@@ -404,6 +404,41 @@
               "raw": "{\n    \"mobile\": \"1234567890\",\n    \"password\": \"Test@123\",\n    \"phase\": \"Phase 1\"\n}"
             }
           }
+        },
+        {
+          "name": "Manager Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/manager-auth/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "manager-auth", "update", ":id"],
+              "variable": [ { "key": "id", "value": "manager_id_here" } ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"mobile\": \"9876543210\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Manager Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/manager-auth/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "manager-auth", "delete", ":id"],
+              "variable": [ { "key": "id", "value": "manager_id_here" } ]
+            }
+          }
         }
       ]
     },
@@ -1802,6 +1837,111 @@
               "raw": "{{base_url}}/api/company-summary",
               "host": ["{{base_url}}"],
               "path": ["api", "company-summary"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Company Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", ":id"],
+              "variable": [ { "key": "id", "value": "user_id_here" } ]
+            }
+          }
+        },
+        {
+          "name": "Add User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Test User", "type": "text" },
+                { "key": "mobile", "value": "1234567890", "type": "text" },
+                { "key": "email", "value": "user@test.com", "type": "text" },
+                { "key": "password", "value": "Test@123", "type": "text" },
+                { "key": "companyName", "value": "Test Company", "type": "text" },
+                { "key": "companyAddress", "value": "123 Test Street", "type": "text" },
+                { "key": "aadhar_no", "value": "123456789012", "type": "text" },
+                { "key": "profilePhoto", "type": "file", "src": "/path/to/profile/photo.jpg" },
+                { "key": "bannerPhoto", "type": "file", "src": "/path/to/banner/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "update", ":id"],
+              "variable": [ { "key": "id", "value": "user_id_here" } ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Updated User", "type": "text" },
+                { "key": "mobile", "value": "9876543210", "type": "text" },
+                { "key": "email", "value": "updated@test.com", "type": "text" },
+                { "key": "companyName", "value": "Updated Company", "type": "text" },
+                { "key": "companyAddress", "value": "456 Updated Street", "type": "text" },
+                { "key": "aadhar_no", "value": "987654321098", "type": "text" },
+                { "key": "profilePhoto", "type": "file", "src": "/path/to/new/profile/photo.jpg" },
+                { "key": "bannerPhoto", "type": "file", "src": "/path/to/new/banner/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "delete", ":id"],
+              "variable": [ { "key": "id", "value": "user_id_here" } ]
             }
           }
         }

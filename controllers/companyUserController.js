@@ -61,11 +61,13 @@ exports.updateCompanyUser = async (req, res) => {
 // Delete company user
 exports.deleteCompanyUser = async (req, res) => {
   try {
-    const companyUser = await CompanyUser.findByIdAndDelete(req.params.id);
+    const companyUser = await CompanyUser.findById(req.params.id);
     if (!companyUser) {
       return res.status(404).json({ message: 'Company user not found' });
     }
-    res.status(200).json({ message: 'Company user deleted successfully' });
+    companyUser.name = 'deleted';
+    await companyUser.save();
+    res.status(200).json({ message: 'Company user anonymized successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

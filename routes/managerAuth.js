@@ -322,4 +322,40 @@ router.put('/update-profile', auth, async (req, res) => {
   }
 });
 
+// Update manager user by ID
+router.put('/update/:id', auth, async (req, res) => {
+  try {
+    const user = await Manager.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    const { name, mobile, aadhar, address, phase } = req.body;
+    if (name) user.name = name;
+    if (mobile) user.mobile = mobile;
+    if (aadhar) user.aadhar = aadhar;
+    if (address) user.address = address;
+    if (phase) user.phase = phase;
+    await user.save();
+    res.json({ success: true, message: 'User updated successfully', user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Delete (anonymize) manager user by ID
+router.delete('/delete/:id', auth, async (req, res) => {
+  try {
+    const user = await Manager.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    user.name = 'deleted';
+    user.status = 'deleted';
+    await user.save();
+    res.json({ success: true, message: 'User anonymized successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router; 
