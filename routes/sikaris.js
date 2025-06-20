@@ -157,55 +157,19 @@ router.post('/add', auth(['company']), upload.fields([
       position
     } = req.body;
 
-    // Validate required fields
-    const requiredFields = [
-      'sikariId', 'sikariName', 'mobileNumber', 'location', 'dateOfJoining',
-      'smargId', 'adharCardNumber', 'bankAccountNumber', 'ifscCode',
-      'madhayamName', 'madhayamMobileNumber', 'madhayamAddress',
-      'boatNumber', 'boatId', 'boatType', 'position'
-    ];
-
-    const missingFields = requiredFields.filter(field => !req.body[field]);
-    if (missingFields.length > 0) {
+    // Only check for duplicate mobileNumber, sikariId, smargId, adharCardNumber
+    const duplicate = await sikariController.findDuplicateSikari({
+      mobileNumber,
+      sikariId,
+      smargId,
+      adharCardNumber
+    });
+    if (duplicate) {
       return res.status(400).json({
         success: false,
         error: {
-          code: 'MISSING_FIELDS',
-          message: `Missing required fields: ${missingFields.join(', ')}`
-        }
-      });
-    }
-
-    // Validate required photos
-    if (!req.files?.profilePhoto?.[0] || !req.files?.bannerPhoto?.[0] ||
-        !req.files?.adharCardPhoto?.[0] || !req.files?.bankPassbookPhoto?.[0]) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_PHOTOS',
-          message: 'All photos (profile, banner, Aadhar card, bank passbook) are required'
-        }
-      });
-    }
-
-    // Validate boat type
-    if (!['company boat', 'self boat'].includes(boatType)) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_BOAT_TYPE',
-          message: 'Boat type must be either "company boat" or "self boat"'
-        }
-      });
-    }
-
-    // Validate position
-    if (!['personal duty', 'government register fisherman', 'illegal'].includes(position)) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_POSITION',
-          message: 'Position must be one of: personal duty, government register fisherman, illegal'
+          code: 'DUPLICATE_FIELD',
+          message: 'A sikari with the same mobile number, sikari ID, smarg ID, or adhar card number already exists.'
         }
       });
     }
@@ -215,7 +179,7 @@ router.post('/add', auth(['company']), upload.fields([
       sikariName,
       mobileNumber,
       location,
-      dateOfJoining: new Date(dateOfJoining),
+      dateOfJoining: dateOfJoining ? new Date(dateOfJoining) : undefined,
       smargId,
       adharCardNumber,
       bankAccountNumber,
@@ -227,10 +191,10 @@ router.post('/add', auth(['company']), upload.fields([
       boatId,
       boatType,
       position,
-      profilePhoto: req.files.profilePhoto[0].filename,
-      bannerPhoto: req.files.bannerPhoto[0].filename,
-      adharCardPhoto: req.files.adharCardPhoto[0].filename,
-      bankPassbookPhoto: req.files.bankPassbookPhoto[0].filename
+      profilePhoto: req.files?.profilePhoto?.[0]?.filename,
+      bannerPhoto: req.files?.bannerPhoto?.[0]?.filename,
+      adharCardPhoto: req.files?.adharCardPhoto?.[0]?.filename,
+      bankPassbookPhoto: req.files?.bankPassbookPhoto?.[0]?.filename
     });
 
     res.status(201).json({
@@ -254,7 +218,6 @@ router.post('/add', auth(['company']), upload.fields([
     });
   } catch (err) {
     console.error('Error adding sikari:', err);
-    
     // Clean up uploaded files if there's an error
     if (req.files) {
       Object.values(req.files).forEach(files => {
@@ -266,7 +229,6 @@ router.post('/add', auth(['company']), upload.fields([
         });
       });
     }
-
     // Handle duplicate field errors
     if (err.code === 11000) {
       const field = Object.keys(err.keyPattern)[0];
@@ -278,7 +240,6 @@ router.post('/add', auth(['company']), upload.fields([
         }
       });
     }
-
     res.status(500).json({
       success: false,
       error: {
