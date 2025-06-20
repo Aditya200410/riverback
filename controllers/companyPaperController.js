@@ -6,7 +6,12 @@ exports.getAllPapers = async (req, res) => {
     const papers = await CompanyPaper.find({ status: 'active' })
       .populate('uploadedBy', 'name email')
       .populate('companyId', 'name');
-    res.status(200).json(papers);
+    // Add public link to each paper
+    const papersWithLink = papers.map(paper => ({
+      ...paper.toObject(),
+      pdfUrl: `/uploads/company-papers/${paper.fileName}`
+    }));
+    res.status(200).json(papersWithLink);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -21,7 +26,12 @@ exports.getPaperById = async (req, res) => {
     if (!paper) {
       return res.status(404).json({ message: 'Paper not found' });
     }
-    res.status(200).json(paper);
+    // Add public link to the paper
+    const paperWithLink = {
+      ...paper.toObject(),
+      pdfUrl: `/uploads/company-papers/${paper.fileName}`
+    };
+    res.status(200).json(paperWithLink);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
