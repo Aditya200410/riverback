@@ -7,7 +7,8 @@ const Madhayam = require('../models/Madhayam');
 // Get all reports for a company
 exports.getAllReports = async (companyId) => {
   try {
-    return await Report.find({ companyId, status: 'active' })
+    const query = companyId ? { companyId, status: 'active' } : { status: 'active' };
+    return await Report.find(query)
       .sort({ createdAt: -1 })
       .populate('generatedBy', 'name email');
   } catch (err) {
@@ -39,7 +40,7 @@ exports.generateReport = async (reportData) => {
     } = reportData;
 
     // Calculate report data based on type
-    let reportData = {};
+    let calculatedReportData = {};
     
     switch (reportType) {
       case 'daily':
@@ -48,43 +49,39 @@ exports.generateReport = async (reportData) => {
       case 'yearly':
       case 'custom':
         // Get financial data
-        const financialData = await MoneyHandle.find({
-          companyId,
-          createdAt: { $gte: startDate, $lte: endDate },
-          status: 'active'
-        });
+        const financialQuery = companyId ? 
+          { companyId, date: { $gte: startDate, $lte: endDate }, status: 'active' } :
+          { date: { $gte: startDate, $lte: endDate }, status: 'active' };
+        const financialData = await MoneyHandle.find(financialQuery);
 
         // Get boat data
-        const boatData = await Boat.find({
-          companyId,
-          createdAt: { $gte: startDate, $lte: endDate },
-          status: 'active'
-        });
+        const boatQuery = companyId ? 
+          { companyId, createdAt: { $gte: startDate, $lte: endDate }, status: 'active' } :
+          { createdAt: { $gte: startDate, $lte: endDate }, status: 'active' };
+        const boatData = await Boat.find(boatQuery);
 
         // Get sikari data
-        const sikariData = await Sikari.find({
-          companyId,
-          createdAt: { $gte: startDate, $lte: endDate },
-          status: 'active'
-        });
+        const sikariQuery = companyId ? 
+          { companyId, createdAt: { $gte: startDate, $lte: endDate }, status: 'active' } :
+          { createdAt: { $gte: startDate, $lte: endDate }, status: 'active' };
+        const sikariData = await Sikari.find(sikariQuery);
 
         // Get madhayam data
-        const madhayamData = await Madhayam.find({
-          companyId,
-          createdAt: { $gte: startDate, $lte: endDate },
-          status: 'active'
-        });
+        const madhayamQuery = companyId ? 
+          { companyId, createdAt: { $gte: startDate, $lte: endDate }, status: 'active' } :
+          { createdAt: { $gte: startDate, $lte: endDate }, status: 'active' };
+        const madhayamData = await Madhayam.find(madhayamQuery);
 
         // Calculate totals
         const totalIncome = financialData
-          .filter(transaction => transaction.type === 'income')
+          .filter(transaction => transaction.type === 'pay')
           .reduce((sum, transaction) => sum + transaction.amount, 0);
 
         const totalExpense = financialData
-          .filter(transaction => transaction.type === 'expense')
+          .filter(transaction => transaction.type === 'take')
           .reduce((sum, transaction) => sum + transaction.amount, 0);
 
-        reportData = {
+        calculatedReportData = {
           financial: {
             totalIncome,
             totalExpense,
@@ -115,7 +112,7 @@ exports.generateReport = async (reportData) => {
       reportType,
       startDate,
       endDate,
-      reportData,
+      reportData: calculatedReportData,
       generatedBy,
       companyId
     });

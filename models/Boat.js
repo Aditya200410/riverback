@@ -31,8 +31,7 @@ const boatSchema = new mongoose.Schema({
     },
     companyId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Company',
-        required: true
+        ref: 'Company'
     },
     status: {
         type: String,

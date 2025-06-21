@@ -36,26 +36,26 @@ const securityMemberSchema = new mongoose.Schema({
     },
     aadharPhoto: {
         type: String,
-        required: true
+        required: false
     },
     photo: {
         type: String,
-        required: true
+        required: false
     },
     bankDetails: {
         accountNumber: {
             type: String,
-            required: true,
+            required: false,
             trim: true
         },
         ifscCode: {
             type: String,
-            required: true,
+            required: false,
             trim: true
         },
         bankName: {
             type: String,
-            required: true,
+            required: false,
             trim: true
         }
     },
@@ -65,6 +65,15 @@ const securityMemberSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
+});
+
+// Add error handling for the model
+securityMemberSchema.post('save', function(error, doc, next) {
+    if (error.name === 'MongoError' && error.code === 11000) {
+        next(new Error('Duplicate key error'));
+    } else {
+        next(error);
+    }
 });
 
 const SecurityMember = mongoose.model('SecurityMember', securityMemberSchema);

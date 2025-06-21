@@ -48,20 +48,20 @@ const auth = (req, res, next) => {
 };
 
 // Routes
-router.get('/', auth, smargController.getAllSmargs);
-router.get('/:id', auth, smargController.getSmargById);
-router.post('/add', auth, upload.fields([
+router.get('/', smargController.getAllSmargs);
+router.get('/:id', smargController.getSmargById);
+router.post('/add', upload.fields([
   { name: 'profilePhoto', maxCount: 1 },
   { name: 'bannerPhoto', maxCount: 1 },
   { name: 'adharCardPhoto', maxCount: 1 },
   { name: 'bankPassbookPhoto', maxCount: 1 }
 ]), smargController.createSmarg);
-router.put('/update/:id', auth, upload.fields([
+router.put('/update/:id', upload.fields([
   { name: 'profilePhoto', maxCount: 1 },
   { name: 'bannerPhoto', maxCount: 1 },
   { name: 'adharCardPhoto', maxCount: 1 },
   { name: 'bankPassbookPhoto', maxCount: 1 }
 ]), smargController.updateSmarg);
-router.delete('/delete/:id', auth, smargController.deleteSmarg);
+router.delete('/delete/:id', smargController.deleteSmarg);
 
 module.exports = router; 

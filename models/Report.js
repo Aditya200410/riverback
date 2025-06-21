@@ -20,13 +20,11 @@ const reportSchema = new mongoose.Schema({
     },
     generatedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        ref: 'User'
     },
     companyId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Company',
-        required: true
+        ref: 'Company'
     },
     status: {
         type: String,

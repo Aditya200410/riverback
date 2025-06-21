@@ -3,7 +3,8 @@ const Boat = require('../models/Boat');
 // Get all boats for a company
 const getAllBoats = async (companyId) => {
     try {
-        return await Boat.find({ companyId, status: 'active' })
+        const query = companyId ? { companyId, status: 'active' } : { status: 'active' };
+        return await Boat.find(query)
             .sort({ createdAt: -1 });
     } catch (error) {
         console.error('Error in getAllBoats:', error);
@@ -14,7 +15,8 @@ const getAllBoats = async (companyId) => {
 // Get boat by ID
 const getBoatById = async (boatId, companyId) => {
     try {
-        return await Boat.findOne({ _id: boatId, companyId, status: 'active' });
+        const query = companyId ? { _id: boatId, companyId, status: 'active' } : { _id: boatId, status: 'active' };
+        return await Boat.findOne(query);
     } catch (error) {
         console.error('Error in getBoatById:', error);
         throw error;
@@ -38,8 +40,9 @@ const createBoat = async (boatData) => {
 // Update boat
 const updateBoat = async (boatId, updateData, companyId) => {
     try {
+        const query = companyId ? { _id: boatId, companyId, status: 'active' } : { _id: boatId, status: 'active' };
         return await Boat.findOneAndUpdate(
-            { _id: boatId, companyId, status: 'active' },
+            query,
             { $set: updateData },
             { new: true, runValidators: true }
         );
@@ -52,8 +55,9 @@ const updateBoat = async (boatId, updateData, companyId) => {
 // Delete boat (soft delete)
 const deleteBoat = async (boatId, companyId) => {
     try {
+        const query = companyId ? { _id: boatId, companyId, status: 'active' } : { _id: boatId, status: 'active' };
         return await Boat.findOneAndUpdate(
-            { _id: boatId, companyId, status: 'active' },
+            query,
             { $set: { status: 'inactive' } },
             { new: true }
         );

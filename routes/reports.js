@@ -5,7 +5,7 @@ const reportController = require('../controllers/reportController');
 // Get all reports for a company
 router.get('/', async (req, res) => {
   try {
-    const reports = await reportController.getAllReports(req.user.companyId);
+    const reports = await reportController.getAllReports(null);
     res.json({
       success: true,
       data: reports.map(report => ({
@@ -49,17 +49,6 @@ router.get('/:id', async (req, res) => {
         error: {
           code: 'REPORT_NOT_FOUND',
           message: 'Report not found'
-        }
-      });
-    }
-
-    // Check if report belongs to the company
-    if (report.companyId.toString() !== req.user.companyId) {
-      return res.status(403).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'You do not have access to this report'
         }
       });
     }
@@ -145,8 +134,8 @@ router.post('/generate', async (req, res) => {
       reportType,
       startDate: start,
       endDate: end,
-      generatedBy: req.user._id,
-      companyId: req.user.companyId
+      generatedBy: null,
+      companyId: null
     });
 
     res.status(201).json({
@@ -172,11 +161,36 @@ router.post('/generate', async (req, res) => {
     });
   } catch (err) {
     console.error('Error generating report:', err);
+    
+    // Handle specific error types
+    if (err.name === 'ValidationError') {
+      const validationErrors = Object.values(err.errors).map(error => error.message);
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Validation failed',
+          details: validationErrors
+        }
+      });
+    }
+
+    if (err.message === 'Invalid report type') {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_REPORT_TYPE',
+          message: 'Invalid report type provided'
+        }
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: {
         code: 'SERVER_ERROR',
-        message: 'Error generating report'
+        message: 'Error generating report',
+        details: err.message
       }
     });
   }
@@ -192,17 +206,6 @@ router.delete('/archive/:id', async (req, res) => {
         error: {
           code: 'REPORT_NOT_FOUND',
           message: 'Report not found'
-        }
-      });
-    }
-
-    // Check if report belongs to the company
-    if (report.companyId.toString() !== req.user.companyId) {
-      return res.status(403).json({
-        success: false,
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'You do not have access to this report'
         }
       });
     }

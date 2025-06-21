@@ -19,11 +19,12 @@ const auth = (req, res, next) => {
 };
 
 // Get all active sikaris
-router.get('/all', auth, async (req, res) => {
+router.get('/all', async (req, res) => {
   try {
     const sikaris = await Sikari.find({ status: 'active' })
       .sort({ dateOfJoining: -1 });
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       sikaris: sikaris.map(sikari => ({
@@ -38,8 +39,8 @@ router.get('/all', auth, async (req, res) => {
         boatId: sikari.boatId,
         boatType: sikari.boatType,
         position: sikari.position,
-        profilePhoto: sikari.profilePhoto,
-        bannerPhoto: sikari.bannerPhoto
+        profilePhoto: sikari.profilePhoto ? `${baseUrl}/uploads/sikaris/${sikari.profilePhoto}` : null,
+        bannerPhoto: sikari.bannerPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bannerPhoto}` : null
       }))
     });
   } catch (err) {
@@ -52,7 +53,7 @@ router.get('/all', auth, async (req, res) => {
 });
 
 // Get sikari by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const sikari = await Sikari.findOne({
       _id: req.params.id,
@@ -66,6 +67,7 @@ router.get('/:id', auth, async (req, res) => {
       });
     }
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       sikari: {
@@ -86,10 +88,10 @@ router.get('/:id', auth, async (req, res) => {
         boatId: sikari.boatId,
         boatType: sikari.boatType,
         position: sikari.position,
-        profilePhoto: sikari.profilePhoto,
-        bannerPhoto: sikari.bannerPhoto,
-        adharCardPhoto: sikari.adharCardPhoto,
-        bankPassbookPhoto: sikari.bankPassbookPhoto
+        profilePhoto: sikari.profilePhoto ? `${baseUrl}/uploads/sikaris/${sikari.profilePhoto}` : null,
+        bannerPhoto: sikari.bannerPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bannerPhoto}` : null,
+        adharCardPhoto: sikari.adharCardPhoto ? `${baseUrl}/uploads/sikaris/${sikari.adharCardPhoto}` : null,
+        bankPassbookPhoto: sikari.bankPassbookPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bankPassbookPhoto}` : null
       }
     });
   } catch (err) {
@@ -102,7 +104,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Search sikaris
-router.get('/search', auth, async (req, res) => {
+router.get('/search', async (req, res) => {
   try {
     const { query } = req.query;
     
@@ -124,6 +126,7 @@ router.get('/search', auth, async (req, res) => {
       ]
     }).sort({ dateOfJoining: -1 });
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       sikaris: sikaris.map(sikari => ({
@@ -138,8 +141,8 @@ router.get('/search', auth, async (req, res) => {
         boatId: sikari.boatId,
         boatType: sikari.boatType,
         position: sikari.position,
-        profilePhoto: sikari.profilePhoto,
-        bannerPhoto: sikari.bannerPhoto
+        profilePhoto: sikari.profilePhoto ? `${baseUrl}/uploads/sikaris/${sikari.profilePhoto}` : null,
+        bannerPhoto: sikari.bannerPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bannerPhoto}` : null
       }))
     });
   } catch (err) {
@@ -152,13 +155,14 @@ router.get('/search', auth, async (req, res) => {
 });
 
 // Get sikaris by boat type
-router.get('/boat-type/:type', auth, async (req, res) => {
+router.get('/boat-type/:type', async (req, res) => {
   try {
     const sikaris = await Sikari.find({
       boatType: req.params.type,
       status: 'active'
     }).sort({ dateOfJoining: -1 });
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       sikaris: sikaris.map(sikari => ({
@@ -173,8 +177,8 @@ router.get('/boat-type/:type', auth, async (req, res) => {
         boatId: sikari.boatId,
         boatType: sikari.boatType,
         position: sikari.position,
-        profilePhoto: sikari.profilePhoto,
-        bannerPhoto: sikari.bannerPhoto
+        profilePhoto: sikari.profilePhoto ? `${baseUrl}/uploads/sikaris/${sikari.profilePhoto}` : null,
+        bannerPhoto: sikari.bannerPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bannerPhoto}` : null
       }))
     });
   } catch (err) {
@@ -187,13 +191,14 @@ router.get('/boat-type/:type', auth, async (req, res) => {
 });
 
 // Get sikaris by position
-router.get('/position/:position', auth, async (req, res) => {
+router.get('/position/:position', async (req, res) => {
   try {
     const sikaris = await Sikari.find({
       position: req.params.position,
       status: 'active'
     }).sort({ dateOfJoining: -1 });
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       sikaris: sikaris.map(sikari => ({
@@ -208,8 +213,8 @@ router.get('/position/:position', auth, async (req, res) => {
         boatId: sikari.boatId,
         boatType: sikari.boatType,
         position: sikari.position,
-        profilePhoto: sikari.profilePhoto,
-        bannerPhoto: sikari.bannerPhoto
+        profilePhoto: sikari.profilePhoto ? `${baseUrl}/uploads/sikaris/${sikari.profilePhoto}` : null,
+        bannerPhoto: sikari.bannerPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bannerPhoto}` : null
       }))
     });
   } catch (err) {

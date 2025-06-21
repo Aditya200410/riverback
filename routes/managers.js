@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Manager = require('../models/Manager');
-const { auth } = require('../middleware/auth');
 
 // Get all signed-in managers
-router.get('/signed-in', auth(['company']), async (req, res) => {
+router.get('/signed-in', async (req, res) => {
   try {
     const signedInManagers = await Manager.find({
       status: 'active',

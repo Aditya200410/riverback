@@ -19,10 +19,9 @@ const auth = (req, res, next) => {
 };
 
 // Get all papers for a company
-router.get('/all', auth, async (req, res) => {
+router.get('/all', async (req, res) => {
   try {
     const papers = await CompanyPaper.find({ 
-      companyId: req.user.id,
       status: 'active'
     }).sort({ uploadDate: -1 });
 
@@ -48,10 +47,9 @@ router.get('/all', auth, async (req, res) => {
 });
 
 // Get papers by category
-router.get('/category/:category', auth, async (req, res) => {
+router.get('/category/:category', async (req, res) => {
   try {
     const papers = await CompanyPaper.find({
-      companyId: req.user.id,
       category: req.params.category,
       status: 'active'
     }).sort({ uploadDate: -1 });
@@ -78,7 +76,7 @@ router.get('/category/:category', auth, async (req, res) => {
 });
 
 // Get papers by date range
-router.get('/date-range', auth, async (req, res) => {
+router.get('/date-range', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     
@@ -90,7 +88,6 @@ router.get('/date-range', auth, async (req, res) => {
     }
 
     const papers = await CompanyPaper.find({
-      companyId: req.user.id,
       status: 'active',
       uploadDate: {
         $gte: new Date(startDate),
@@ -120,7 +117,7 @@ router.get('/date-range', auth, async (req, res) => {
 });
 
 // Search papers by description
-router.get('/search', auth, async (req, res) => {
+router.get('/search', async (req, res) => {
   try {
     const { query } = req.query;
     
@@ -132,7 +129,6 @@ router.get('/search', auth, async (req, res) => {
     }
 
     const papers = await CompanyPaper.find({
-      companyId: req.user.id,
       status: 'active',
       $or: [
         { description: { $regex: query, $options: 'i' } },
@@ -162,11 +158,10 @@ router.get('/search', auth, async (req, res) => {
 });
 
 // Get paper details by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const paper = await CompanyPaper.findOne({
       _id: req.params.id,
-      companyId: req.user.id,
       status: 'active'
     });
 

@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Phase = require('../models/Phase');
-const { auth } = require('../middleware/auth');
 
 // Get all phases
 router.get('/', async (req, res) => {
@@ -23,7 +22,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get single phase
-router.get('/:id', auth(['company']), async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const phase = await Phase.findById(req.params.id);
     if (!phase) {
@@ -51,7 +50,7 @@ router.get('/:id', auth(['company']), async (req, res) => {
 });
 
 // Create phase
-router.post('/', auth(['company']), async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const phase = new Phase(req.body);
     await phase.save();
@@ -71,7 +70,7 @@ router.post('/', auth(['company']), async (req, res) => {
 });
 
 // Update phase
-router.put('/:id', auth(['company']), async (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const phase = await Phase.findByIdAndUpdate(
       req.params.id,
@@ -103,7 +102,7 @@ router.put('/:id', auth(['company']), async (req, res) => {
 });
 
 // Delete phase
-router.delete('/:id', auth(['company']), async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     const phase = await Phase.findByIdAndDelete(req.params.id);
     if (!phase) {

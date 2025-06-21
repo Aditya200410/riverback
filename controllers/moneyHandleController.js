@@ -4,7 +4,6 @@ const MoneyHandle = require('../models/MoneyHandle');
 exports.getAllTransactions = async (req, res) => {
     try {
         const transactions = await MoneyHandle.find({
-            companyId: req.user.companyId,
             status: 'active'
         }).sort({ date: -1 });
 
@@ -27,7 +26,6 @@ exports.getTransactionById = async (req, res) => {
     try {
         const transaction = await MoneyHandle.findOne({
             _id: req.params.id,
-            companyId: req.user.companyId,
             status: 'active'
         });
 
@@ -62,7 +60,7 @@ exports.createTransaction = async (req, res) => {
             amount,
             type,
             description,
-            companyId: req.user.companyId
+            companyId: null
         });
 
         await transaction.save();
@@ -89,7 +87,6 @@ exports.updateTransaction = async (req, res) => {
         const transaction = await MoneyHandle.findOneAndUpdate(
             {
                 _id: req.params.id,
-                companyId: req.user.companyId,
                 status: 'active'
             },
             {
@@ -128,7 +125,6 @@ exports.deleteTransaction = async (req, res) => {
         const transaction = await MoneyHandle.findOneAndUpdate(
             {
                 _id: req.params.id,
-                companyId: req.user.companyId,
                 status: 'active'
             },
             { status: 'deleted' },

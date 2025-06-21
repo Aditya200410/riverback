@@ -24,13 +24,11 @@ const companyPaperSchema = new mongoose.Schema({
   },
   uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'CompanyUser',
-    required: true
+    ref: 'CompanyUser'
   },
   companyId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'CompanyUser',
-    required: true
+    ref: 'CompanyUser'
   },
   description: {
     type: String,

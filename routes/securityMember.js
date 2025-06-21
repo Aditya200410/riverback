@@ -5,6 +5,23 @@ const path = require('path');
 const fs = require('fs');
 const SecurityMember = require('../models/SecurityMember');
 
+// Test route to check if the router is working
+router.get('/test', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Security members route is working'
+    });
+});
+
+// Health check route
+router.get('/health', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Security members health check passed',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Create uploads directory if it doesn't exist
 const uploadDir = 'uploads/security-members';
 if (!fs.existsSync(uploadDir)) {
@@ -107,10 +124,15 @@ router.post('/', upload.fields([
 
         await member.save();
 
+        const baseUrl = req.protocol + '://' + req.get('host');
         res.status(201).json({
             success: true,
             message: 'Security member added successfully',
-            data: member
+            data: {
+                ...member.toObject(),
+                aadharPhoto: member.aadharPhoto ? `${baseUrl}/${member.aadharPhoto}` : null,
+                photo: member.photo ? `${baseUrl}/${member.photo}` : null
+            }
         });
     } catch (error) {
         console.error('Error adding security member:', error);
@@ -127,11 +149,50 @@ router.post('/', upload.fields([
 // Get all security members
 router.get('/', async (req, res) => {
     try {
+        console.log('Fetching security members...');
+        
+        // Check if SecurityMember model is properly defined
+        if (!SecurityMember) {
+            throw new Error('SecurityMember model is not defined');
+        }
+        
         const members = await SecurityMember.find().sort({ createdAt: -1 });
+        console.log(`Found ${members.length} security members`);
+        
+        const baseUrl = req.protocol + '://' + req.get('host');
+        const membersWithUrls = members.map(member => {
+            try {
+                // Convert to plain object safely
+                const memberObj = member.toObject ? member.toObject() : member;
+                
+                // Add full URLs for photos
+                return {
+                    ...memberObj,
+                    aadharPhoto: memberObj.aadharPhoto ? `${baseUrl}/${memberObj.aadharPhoto}` : null,
+                    photo: memberObj.photo ? `${baseUrl}/${memberObj.photo}` : null
+                };
+            } catch (mapError) {
+                console.error('Error mapping member:', mapError);
+                // Return basic member data if mapping fails
+                return {
+                    _id: member._id,
+                    idNumber: member.idNumber,
+                    name: member.name,
+                    address: member.address,
+                    mobile: member.mobile,
+                    phase: member.phase,
+                    isActive: member.isActive,
+                    createdAt: member.createdAt,
+                    updatedAt: member.updatedAt,
+                    aadharPhoto: null,
+                    photo: null
+                };
+            }
+        });
         
         res.status(200).json({
             success: true,
-            data: members
+            data: membersWithUrls
         });
     } catch (error) {
         console.error('Error fetching security members:', error);
@@ -139,7 +200,7 @@ router.get('/', async (req, res) => {
             success: false,
             error: {
                 code: 'INTERNAL_SERVER_ERROR',
-                message: 'Error fetching security members'
+                message: 'Error fetching security members: ' + error.message
             }
         });
     }
@@ -160,9 +221,14 @@ router.get('/:id', async (req, res) => {
             });
         }
 
+        const baseUrl = req.protocol + '://' + req.get('host');
         res.status(200).json({
             success: true,
-            data: member
+            data: {
+                ...member.toObject(),
+                aadharPhoto: member.aadharPhoto ? `${baseUrl}/${member.aadharPhoto}` : null,
+                photo: member.photo ? `${baseUrl}/${member.photo}` : null
+            }
         });
     } catch (error) {
         console.error('Error fetching security member:', error);

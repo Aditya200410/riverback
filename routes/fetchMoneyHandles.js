@@ -19,7 +19,7 @@ const auth = (req, res, next) => {
 };
 
 // Get all active transactions
-router.get('/all', auth, async (req, res) => {
+router.get('/all', async (req, res) => {
   try {
     const transactions = await MoneyHandle.find({ status: 'active' })
       .sort({ createdAt: -1 });
@@ -45,7 +45,7 @@ router.get('/all', auth, async (req, res) => {
 });
 
 // Get transactions by moneytaker
-router.get('/moneytaker/:type', auth, async (req, res) => {
+router.get('/moneytaker/:type', async (req, res) => {
   try {
     const transactions = await MoneyHandle.find({
       moneytaker: req.params.type,
@@ -73,7 +73,7 @@ router.get('/moneytaker/:type', auth, async (req, res) => {
 });
 
 // Get transactions by type (pay/take)
-router.get('/type/:type', auth, async (req, res) => {
+router.get('/type/:type', async (req, res) => {
   try {
     const transactions = await MoneyHandle.find({
       transactionType: req.params.type,
@@ -101,7 +101,7 @@ router.get('/type/:type', auth, async (req, res) => {
 });
 
 // Get transactions by date range
-router.get('/date-range', auth, async (req, res) => {
+router.get('/date-range', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     
@@ -141,7 +141,7 @@ router.get('/date-range', auth, async (req, res) => {
 });
 
 // Get transaction by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const transaction = await MoneyHandle.findOne({
       _id: req.params.id,

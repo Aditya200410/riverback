@@ -21,14 +21,50 @@ const getSikariById = async (sikariId) => {
     }
 };
 
+// Find duplicate sikari
+const findDuplicateSikari = async (data) => {
+    try {
+        const { mobileNumber, sikariId, smargId, adharCardNumber } = data;
+        console.log('Checking for duplicates with:', { mobileNumber, sikariId, smargId, adharCardNumber });
+        
+        const duplicate = await Sikari.findOne({
+            status: 'active',
+            $or: [
+                { mobileNumber: mobileNumber },
+                { sikariId: sikariId },
+                { smargId: smargId },
+                { adharCardNumber: adharCardNumber }
+            ]
+        });
+        
+        if (duplicate) {
+            console.log('Duplicate found:', duplicate._id);
+        } else {
+            console.log('No duplicates found');
+        }
+        
+        return duplicate;
+    } catch (error) {
+        console.error('Error in findDuplicateSikari:', error);
+        throw error;
+    }
+};
+
 // Create new sikari
 const createSikari = async (sikariData) => {
     try {
+        console.log('Creating sikari with data:', sikariData);
+        
         const sikari = new Sikari({
             ...sikariData,
             status: 'active'
         });
-        return await sikari.save();
+        
+        console.log('Sikari model created, saving...');
+        const savedSikari = await sikari.save();
+        console.log('Sikari saved successfully:', savedSikari._id);
+        
+        return savedSikari;
     } catch (error) {
         console.error('Error in createSikari:', error);
         throw error;
@@ -66,6 +102,7 @@ const deleteSikari = async (sikariId) => {
 module.exports = {
     getAllSikaris,
     getSikariById,
+    findDuplicateSikari,
     createSikari,
     updateSikari,
     deleteSikari

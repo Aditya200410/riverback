@@ -42,6 +42,7 @@ const upload = multer({
 router.get('/', async (req, res) => {
   try {
     const madhayams = await madhayamController.getAllMadhayams();
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       data: madhayams.map(madhayam => ({
@@ -54,10 +55,10 @@ router.get('/', async (req, res) => {
         adharCardNumber: madhayam.adharCardNumber,
         bankAccountNumber: madhayam.bankAccountNumber,
         ifscCode: madhayam.ifscCode,
-        profilePhoto: madhayam.profilePhoto,
-        bannerPhoto: madhayam.bannerPhoto,
-        adharCardPhoto: madhayam.adharCardPhoto,
-        bankPassbookPhoto: madhayam.bankPassbookPhoto
+        profilePhoto: madhayam.profilePhoto ? `${baseUrl}/uploads/madhayams/${madhayam.profilePhoto}` : null,
+        bannerPhoto: madhayam.bannerPhoto ? `${baseUrl}/uploads/madhayams/${madhayam.bannerPhoto}` : null,
+        adharCardPhoto: madhayam.adharCardPhoto ? `${baseUrl}/uploads/madhayams/${madhayam.adharCardPhoto}` : null,
+        bankPassbookPhoto: madhayam.bankPassbookPhoto ? `${baseUrl}/uploads/madhayams/${madhayam.bankPassbookPhoto}` : null
       }))
     });
   } catch (err) {
@@ -84,6 +85,7 @@ router.get('/:id', async (req, res) => {
         }
       });
     }
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       data: {
@@ -96,10 +98,10 @@ router.get('/:id', async (req, res) => {
         adharCardNumber: madhayam.adharCardNumber,
         bankAccountNumber: madhayam.bankAccountNumber,
         ifscCode: madhayam.ifscCode,
-        profilePhoto: madhayam.profilePhoto,
-        bannerPhoto: madhayam.bannerPhoto,
-        adharCardPhoto: madhayam.adharCardPhoto,
-        bankPassbookPhoto: madhayam.bankPassbookPhoto
+        profilePhoto: madhayam.profilePhoto ? `${baseUrl}/uploads/madhayams/${madhayam.profilePhoto}` : null,
+        bannerPhoto: madhayam.bannerPhoto ? `${baseUrl}/uploads/madhayams/${madhayam.bannerPhoto}` : null,
+        adharCardPhoto: madhayam.adharCardPhoto ? `${baseUrl}/uploads/madhayams/${madhayam.adharCardPhoto}` : null,
+        bankPassbookPhoto: madhayam.bankPassbookPhoto ? `${baseUrl}/uploads/madhayams/${madhayam.bankPassbookPhoto}` : null
       }
     });
   } catch (err) {
@@ -176,6 +178,7 @@ router.post('/add', upload.fields([
       bankPassbookPhoto: req.files.bankPassbookPhoto[0].filename
     });
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.status(201).json({
       success: true,
       message: 'Madhayam added successfully',
@@ -189,8 +192,10 @@ router.post('/add', upload.fields([
         adharCardNumber: madhayam.adharCardNumber,
         bankAccountNumber: madhayam.bankAccountNumber,
         ifscCode: madhayam.ifscCode,
-        profilePhoto: madhayam.profilePhoto,
-        bannerPhoto: madhayam.bannerPhoto
+        profilePhoto: madhayam.profilePhoto ? `${baseUrl}/uploads/madhayams/${madhayam.profilePhoto}` : null,
+        bannerPhoto: madhayam.bannerPhoto ? `${baseUrl}/uploads/madhayams/${madhayam.bannerPhoto}` : null,
+        adharCardPhoto: madhayam.adharCardPhoto ? `${baseUrl}/uploads/madhayams/${madhayam.adharCardPhoto}` : null,
+        bankPassbookPhoto: madhayam.bankPassbookPhoto ? `${baseUrl}/uploads/madhayams/${madhayam.bankPassbookPhoto}` : null
       }
     });
   } catch (err) {

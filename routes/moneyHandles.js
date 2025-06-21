@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const MoneyHandle = require('../models/MoneyHandle');
-const { auth } = require('../middleware/auth');
 const {
     getAllTransactions,
     getTransactionById,
@@ -14,7 +13,6 @@ const {
 router.get('/', async (req, res) => {
   try {
     const transactions = await MoneyHandle.find({
-      companyId: req.user.id,
       status: 'active'
     }).sort({ date: -1 });
 
@@ -82,12 +80,46 @@ router.post('/add', async (req, res) => {
   try {
     const { amount, type, toWhom, description } = req.body;
 
+    // Validate required fields
+    if (!amount || !type || !toWhom || !description) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_FIELDS',
+          message: 'All fields (amount, type, toWhom, description) are required'
+        }
+      });
+    }
+
+    // Validate amount is a positive number
+    const amountNum = Number(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_AMOUNT',
+          message: 'Amount must be a positive number'
+        }
+      });
+    }
+
+    // Validate type is either 'pay' or 'take'
+    if (!['pay', 'take'].includes(type)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_TYPE',
+          message: 'Type must be either "pay" or "take"'
+        }
+      });
+    }
+
     const transaction = new MoneyHandle({
-      amount,
+      amount: amountNum,
       type,
       toWhom,
       description,
-      companyId: req.user.id
+      companyId: null
     });
 
     await transaction.save();
@@ -106,11 +138,37 @@ router.post('/add', async (req, res) => {
     });
   } catch (err) {
     console.error('Error adding transaction:', err);
+    
+    // Handle mongoose validation errors
+    if (err.name === 'ValidationError') {
+      const validationErrors = Object.values(err.errors).map(error => error.message);
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Validation failed',
+          details: validationErrors
+        }
+      });
+    }
+
+    // Handle duplicate key errors
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_ERROR',
+          message: 'A transaction with these details already exists'
+        }
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: {
         code: 'SERVER_ERROR',
-        message: 'Error adding transaction'
+        message: 'Error adding transaction',
+        details: err.message
       }
     });
   }
@@ -120,7 +178,6 @@ router.post('/add', async (req, res) => {
 router.get('/type/:type', async (req, res) => {
   try {
     const transactions = await MoneyHandle.find({
-      companyId: req.user.id,
       type: req.params.type,
       status: 'active'
     }).sort({ date: -1 });
@@ -152,7 +209,6 @@ router.get('/type/:type', async (req, res) => {
 router.get('/person/:toWhom', async (req, res) => {
   try {
     const transactions = await MoneyHandle.find({
-      companyId: req.user.id,
       toWhom: req.params.toWhom,
       status: 'active'
     }).sort({ date: -1 });

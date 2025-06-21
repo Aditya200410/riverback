@@ -64,13 +64,20 @@ router.get('/:id', async (req, res) => {
 // Create new fish type
 router.post('/add', async (req, res) => {
   try {
+    console.log('Full request body:', req.body);
+    console.log('Request headers:', req.headers);
+    
     const { name, description, pricePerKg } = req.body;
+    
+    console.log('Received data:', { name, description, pricePerKg });
 
     const fishType = await fishTypeController.createFishType({
       name,
       description,
       pricePerKg: Number(pricePerKg)
     });
+
+    console.log('Created fish type:', fishType);
 
     res.status(201).json({
       success: true,

@@ -13,7 +13,7 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/config');
-const { v4: uuidv4 } = require('uuid');
+const { generateCompanyId } = require('../utils/idGenerator');
 
 // Middleware to protect routes
 const auth = (req, res, next) => {
@@ -126,8 +126,8 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
       });
     }
 
-    // Generate unique companyId
-    const companyId = `CPM${uuidv4()}`;
+    // Generate unique companyId using the ID generator
+    const companyId = await generateCompanyId();
 
     // Create new user in database
     const user = new CompanyUser({

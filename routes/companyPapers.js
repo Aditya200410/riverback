@@ -4,7 +4,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const CompanyPaper = require('../models/CompanyPaper');
-const { auth } = require('../middleware/auth');
 const pdf = require('pdf-lib');
 const { promisify } = require('util');
 const writeFileAsync = promisify(fs.writeFile);
@@ -50,6 +49,20 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   let tempFilePath = null;
   
   try {
+    console.log('Upload request received');
+    console.log('Request body:', req.body);
+    console.log('Request file:', req.file);
+    
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'NO_FILE',
+          message: 'No file uploaded'
+        }
+      });
+    }
+
     const { description } = req.body;
 
     // Create uploads directory if it doesn't exist
@@ -63,25 +76,30 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     const filename = 'paper-' + uniqueSuffix + '.pdf';
     tempFilePath = path.join(uploadDir, filename);
 
+    console.log('Compressing PDF...');
     // Compress PDF
     const compressedBuffer = await compressPDF(req.file.buffer);
 
+    console.log('Writing file...');
     // Write compressed file
     await writeFileAsync(tempFilePath, compressedBuffer);
 
+    console.log('Creating paper record...');
     const paper = new CompanyPaper({
       fileName: filename,
       originalName: req.file.originalname,
       fileType: req.file.mimetype,
       fileSize: compressedBuffer.length,
-      uploadedBy: req.user.id,
-      companyId: req.user.id,
+      uploadedBy: null,
+      companyId: null,
       description: description || '',
       category: 'other'
     });
 
     await paper.save();
+    console.log('Paper saved successfully');
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.status(201).json({
       success: true,
       message: 'Paper uploaded successfully',
@@ -92,7 +110,8 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         uploadDate: paper.uploadDate,
         category: paper.category,
         description: paper.description,
-        fileSize: paper.fileSize
+        fileSize: paper.fileSize,
+        pdfUrl: `${baseUrl}/uploads/company-papers/${paper.fileName}`
       }
     });
   } catch (err) {
@@ -121,7 +140,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 router.get('/papers', async (req, res) => {
   try {
     const papers = await CompanyPaper.find({ 
-      companyId: req.user.id,
       status: 'active'
     }).sort({ uploadDate: -1 });
 
@@ -156,7 +174,6 @@ router.get('/papers/:id', async (req, res) => {
   try {
     const paper = await CompanyPaper.findOne({
       _id: req.params.id,
-      companyId: req.user.id,
       status: 'active'
     });
 
@@ -202,7 +219,6 @@ router.put('/papers/:id', async (req, res) => {
     
     const paper = await CompanyPaper.findOne({
       _id: req.params.id,
-      companyId: req.user.id,
       status: 'active'
     });
 
@@ -221,6 +237,7 @@ router.put('/papers/:id', async (req, res) => {
 
     await paper.save();
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       message: 'Paper updated successfully',
@@ -231,7 +248,8 @@ router.put('/papers/:id', async (req, res) => {
         uploadDate: paper.uploadDate,
         category: paper.category,
         description: paper.description,
-        fileSize: paper.fileSize
+        fileSize: paper.fileSize,
+        pdfUrl: `${baseUrl}/uploads/company-papers/${paper.fileName}`
       }
     });
   } catch (err) {
@@ -251,7 +269,6 @@ router.delete('/papers/:id', async (req, res) => {
   try {
     const paper = await CompanyPaper.findOne({
       _id: req.params.id,
-      companyId: req.user.id,
       status: 'active'
     });
 
@@ -294,11 +311,11 @@ router.delete('/papers/:id', async (req, res) => {
 router.get('/papers/category/:category', async (req, res) => {
   try {
     const papers = await CompanyPaper.find({
-      companyId: req.user.id,
       category: req.params.category,
       status: 'active'
     }).sort({ uploadDate: -1 });
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       data: papers.map(paper => ({
@@ -308,7 +325,8 @@ router.get('/papers/category/:category', async (req, res) => {
         uploadDate: paper.uploadDate,
         category: paper.category,
         description: paper.description,
-        fileSize: paper.fileSize
+        fileSize: paper.fileSize,
+        pdfUrl: `${baseUrl}/uploads/company-papers/${paper.fileName}`
       }))
     });
   } catch (err) {

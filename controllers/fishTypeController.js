@@ -23,16 +23,21 @@ exports.getFishTypeById = async (id) => {
 // Create new fish type
 exports.createFishType = async (fishTypeData) => {
   try {
-    // Add timestamp to name to ensure uniqueness
-    const timestamp = Date.now();
+    console.log('Controller received data:', fishTypeData);
+    
     const fishType = new FishType({
-      name: `${fishTypeData.name || ''}_${timestamp}`,
+      name: fishTypeData.name || '',
       description: fishTypeData.description || '',
       pricePerKg: fishTypeData.pricePerKg || 0,
       status: 'active'
     });
 
-    return await fishType.save();
+    console.log('FishType object before save:', fishType);
+
+    const savedFishType = await fishType.save();
+    console.log('Saved fish type:', savedFishType);
+    
+    return savedFishType;
   } catch (err) {
     console.error('Error in createFishType:', err);
     throw err;

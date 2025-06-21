@@ -41,7 +41,8 @@ const upload = multer({
 // Routes
 router.get('/', async (req, res) => {
   try {
-    const boats = await boatController.getAllBoats(req.user.id);
+    const boats = await boatController.getAllBoats(null);
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       data: boats.map(boat => ({
@@ -49,9 +50,9 @@ router.get('/', async (req, res) => {
         name: boat.name,
         registrationNumber: boat.registrationNumber,
         capacity: boat.capacity,
-        boatPhoto: boat.boatPhoto,
-        registrationPhoto: boat.registrationPhoto,
-        insurancePhoto: boat.insurancePhoto,
+        boatPhoto: boat.boatPhoto ? `${baseUrl}/uploads/boats/${boat.boatPhoto}` : null,
+        registrationPhoto: boat.registrationPhoto ? `${baseUrl}/uploads/boats/${boat.registrationPhoto}` : null,
+        insurancePhoto: boat.insurancePhoto ? `${baseUrl}/uploads/boats/${boat.insurancePhoto}` : null,
         status: boat.status
       }))
     });
@@ -69,7 +70,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const boat = await boatController.getBoatById(req.params.id, req.user.id);
+    const boat = await boatController.getBoatById(req.params.id, null);
     if (!boat) {
       return res.status(404).json({
         success: false,
@@ -79,6 +80,7 @@ router.get('/:id', async (req, res) => {
         }
       });
   }
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       data: {
@@ -86,9 +88,9 @@ router.get('/:id', async (req, res) => {
         name: boat.name,
         registrationNumber: boat.registrationNumber,
         capacity: boat.capacity,
-        boatPhoto: boat.boatPhoto,
-        registrationPhoto: boat.registrationPhoto,
-        insurancePhoto: boat.insurancePhoto,
+        boatPhoto: boat.boatPhoto ? `${baseUrl}/uploads/boats/${boat.boatPhoto}` : null,
+        registrationPhoto: boat.registrationPhoto ? `${baseUrl}/uploads/boats/${boat.registrationPhoto}` : null,
+        insurancePhoto: boat.insurancePhoto ? `${baseUrl}/uploads/boats/${boat.insurancePhoto}` : null,
         status: boat.status
       }
     });
@@ -119,9 +121,10 @@ router.post('/add', upload.fields([
       boatPhoto: req.files?.boatPhoto?.[0]?.filename,
       registrationPhoto: req.files?.registrationPhoto?.[0]?.filename,
       insurancePhoto: req.files?.insurancePhoto?.[0]?.filename,
-      companyId: req.user.id
+      companyId: null
     });
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.status(201).json({
       success: true,
       message: 'Boat added successfully',
@@ -130,9 +133,9 @@ router.post('/add', upload.fields([
         name: boat.name,
         registrationNumber: boat.registrationNumber,
         capacity: boat.capacity,
-        boatPhoto: boat.boatPhoto,
-        registrationPhoto: boat.registrationPhoto,
-        insurancePhoto: boat.insurancePhoto
+        boatPhoto: boat.boatPhoto ? `${baseUrl}/uploads/boats/${boat.boatPhoto}` : null,
+        registrationPhoto: boat.registrationPhoto ? `${baseUrl}/uploads/boats/${boat.registrationPhoto}` : null,
+        insurancePhoto: boat.insurancePhoto ? `${baseUrl}/uploads/boats/${boat.insurancePhoto}` : null
       }
     });
   } catch (err) {
@@ -177,7 +180,7 @@ router.put('/update/:id', upload.fields([
     if (req.files?.registrationPhoto?.[0]) updateData.registrationPhoto = req.files.registrationPhoto[0].filename;
     if (req.files?.insurancePhoto?.[0]) updateData.insurancePhoto = req.files.insurancePhoto[0].filename;
 
-    const boat = await boatController.updateBoat(req.params.id, updateData, req.user.id);
+    const boat = await boatController.updateBoat(req.params.id, updateData, null);
 
     if (!boat) {
       return res.status(404).json({
@@ -189,6 +192,7 @@ router.put('/update/:id', upload.fields([
       });
     }
 
+    const baseUrl = req.protocol + '://' + req.get('host');
     res.json({
       success: true,
       message: 'Boat updated successfully',
@@ -197,9 +201,9 @@ router.put('/update/:id', upload.fields([
         name: boat.name,
         registrationNumber: boat.registrationNumber,
         capacity: boat.capacity,
-        boatPhoto: boat.boatPhoto,
-        registrationPhoto: boat.registrationPhoto,
-        insurancePhoto: boat.insurancePhoto,
+        boatPhoto: boat.boatPhoto ? `${baseUrl}/uploads/boats/${boat.boatPhoto}` : null,
+        registrationPhoto: boat.registrationPhoto ? `${baseUrl}/uploads/boats/${boat.registrationPhoto}` : null,
+        insurancePhoto: boat.insurancePhoto ? `${baseUrl}/uploads/boats/${boat.insurancePhoto}` : null,
         status: boat.status
       }
     });
@@ -241,7 +245,7 @@ router.put('/update/:id', upload.fields([
 
 router.delete('/delete/:id', async (req, res) => {
   try {
-    const boat = await boatController.deleteBoat(req.params.id, req.user.id);
+    const boat = await boatController.deleteBoat(req.params.id, null);
     if (!boat) {
       return res.status(404).json({
         success: false,

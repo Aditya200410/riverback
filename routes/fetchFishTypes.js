@@ -19,17 +19,18 @@ const auth = (req, res, next) => {
 };
 
 // Get all active fish types
-router.get('/all', auth, async (req, res) => {
+router.get('/all', async (req, res) => {
   try {
     const fishTypes = await FishType.find({ status: 'active' })
-      .sort({ fishName: 1 });
+      .sort({ name: 1 });
 
     res.json({
       success: true,
-      fishTypes: fishTypes.map(fish => ({
+      data: fishTypes.map(fish => ({
         id: fish._id,
-        fishName: fish.fishName,
-        price: fish.price
+        name: fish.name,
+        description: fish.description,
+        pricePerKg: fish.pricePerKg
       }))
     });
   } catch (err) {
@@ -42,7 +43,7 @@ router.get('/all', auth, async (req, res) => {
 });
 
 // Search fish types by name
-router.get('/search', auth, async (req, res) => {
+router.get('/search', async (req, res) => {
   try {
     const { query } = req.query;
     
@@ -54,16 +55,17 @@ router.get('/search', auth, async (req, res) => {
     }
 
     const fishTypes = await FishType.find({
-      fishName: { $regex: query, $options: 'i' },
+      name: { $regex: query, $options: 'i' },
       status: 'active'
-    }).sort({ fishName: 1 });
+    }).sort({ name: 1 });
 
     res.json({
       success: true,
-      fishTypes: fishTypes.map(fish => ({
+      data: fishTypes.map(fish => ({
         id: fish._id,
-        fishName: fish.fishName,
-        price: fish.price
+        name: fish.name,
+        description: fish.description,
+        pricePerKg: fish.pricePerKg
       }))
     });
   } catch (err) {
@@ -76,7 +78,7 @@ router.get('/search', auth, async (req, res) => {
 });
 
 // Get fish type by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const fishType = await FishType.findOne({
       _id: req.params.id,
@@ -92,10 +94,11 @@ router.get('/:id', auth, async (req, res) => {
 
     res.json({
       success: true,
-      fishType: {
+      data: {
         id: fishType._id,
-        fishName: fishType.fishName,
-        price: fishType.price
+        name: fishType.name,
+        description: fishType.description,
+        pricePerKg: fishType.pricePerKg
       }
     });
   } catch (err) {

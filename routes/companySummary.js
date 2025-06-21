@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth');
 const FishType = require('../models/FishType');
 const Manager = require('../models/Manager');
 const SecurityUser = require('../models/SecurityUser');
@@ -8,7 +7,7 @@ const Boat = require('../models/Boat');
 const Sikari = require('../models/Sikari');
 
 // Get company summary
-router.get('/', auth(['company']), async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     // Get total fish types count
     const totalFishTypes = await FishType.countDocuments();

@@ -10,7 +10,7 @@ const { validate, validationRules } = require('../middleware/validator');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const { generateManagerId } = require('../utils/idGenerator');
 
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
@@ -123,8 +123,8 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
       });
     }
 
-    // Generate unique managerId
-    const managerId = `MN${uuidv4()}`;
+    // Generate unique managerId using the ID generator
+    const managerId = await generateManagerId();
 
     // Create new user in database
     const user = new Manager({
