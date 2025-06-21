@@ -52,9 +52,19 @@ router.get('/validate-token', auth, async (req, res) => {
       }
     });
 
+    // Construct the full URL for profile picture
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
+    
+    // Create a user object with the proper profile picture URL
+    const userWithUrl = {
+      ...user.toObject(),
+      profilePicture: profilePictureUrl
+    };
+
     res.json({ 
       success: true,
-      data: { user }
+      data: { user: userWithUrl }
     });
   } catch (err) {
     res.status(500).json({ 
@@ -127,7 +137,19 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
     }
 
     // Generate unique companyId using the ID generator
-    const companyId = await generateCompanyId();
+    let companyId;
+    try {
+      companyId = await generateCompanyId();
+    } catch (idError) {
+      console.error('Error generating company ID:', idError);
+      return res.status(500).json({
+        success: false,
+        error: {
+          code: 'ID_GENERATION_ERROR',
+          message: 'Failed to generate unique company ID. Please try again.'
+        }
+      });
+    }
 
     // Create new user in database
     const user = new CompanyUser({
@@ -152,6 +174,10 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
       { expiresIn: '24h' }
     );
 
+    // Construct the full URL for profile picture
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
+
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
@@ -166,7 +192,7 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
           companyName: user.companyName,
           companyAddress: user.companyAddress,
           aadhar_no: user.aadhar_no,
-          profilePicture: user.profilePicture,
+          profilePicture: profilePictureUrl,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
@@ -175,6 +201,20 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
     });
   } catch (error) {
     console.error('Error in signup:', error);
+    
+    // Handle specific MongoDB errors
+    if (error.code === 11000) {
+      // Duplicate key error
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_FIELD',
+          message: `${field} already exists in the system`
+        }
+      });
+    }
+    
     res.status(500).json({
       success: false,
       error: {
@@ -225,6 +265,10 @@ router.post('/login', async (req, res) => {
       { expiresIn: JWT_EXPIRES_IN }
     );
 
+    // Construct the full URL for profile picture
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
+
     res.json({
       success: true,
       message: 'Login successful',
@@ -239,7 +283,7 @@ router.post('/login', async (req, res) => {
           companyName: user.companyName,
           companyAddress: user.companyAddress,
           aadhar_no: user.aadhar_no,
-          profilePicture: user.profilePicture,
+          profilePicture: profilePictureUrl,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt

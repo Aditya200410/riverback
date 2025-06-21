@@ -138,8 +138,90 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"mobile\": \"1234567890\",\n    \"password\": \"Test@123\"\n}"
-            }
+              "raw": "{\n    \"mobile\": \"1234567890\",\n    \"password\": \"Test@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "response": [
+              {
+                "name": "Success Response",
+                "originalRequest": {
+                  "method": "POST",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "url": {
+                    "raw": "{{base_url}}/api/auth/login",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "auth", "login"]
+                  }
+                },
+                "status": "OK",
+                "code": 200,
+                "_postman_previewlanguage": "json",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "cookie": [],
+                "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NTZhYzE2NWMyMDY1MzgzZTVkMWIyNSIsInJvbGUiOiJjb21wYW55IiwiY29tcGFueUlkIjoiNjg1NmFjMTY1YzIwNjUzODNlNWQxYjI1IiwiaWF0IjoxNzUwNTEwNjYzLCJleHAiOjE3NTA1OTcwNjN9.example\",\n    \"user\": {\n      \"_id\": \"6856ac165c2065383e5d1b25\",\n      \"companyId\": \"CPM001\",\n      \"name\": \"Test Company\",\n      \"mobile\": \"1234567890\",\n      \"email\": \"company@test.com\",\n      \"companyName\": \"Test Company Ltd\",\n      \"companyAddress\": \"123 Test Street, Test City\",\n      \"aadhar_no\": \"123456789012\",\n      \"profilePicture\": \"{{base_url}}/uploads/company-users/1750507129679-test-image.jpg\",\n      \"isVerified\": true,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  }\n}"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Company Validate Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/validate-token",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "validate-token"]
+            },
+            "response": [
+              {
+                "name": "Success Response",
+                "originalRequest": {
+                  "method": "GET",
+                  "header": [
+                    {
+                      "key": "Authorization",
+                      "value": "Bearer {{token}}"
+                    }
+                  ],
+                  "url": {
+                    "raw": "{{base_url}}/api/auth/validate-token",
+                    "host": ["{{base_url}}"],
+                    "path": ["api", "auth", "validate-token"]
+                  }
+                },
+                "status": "OK",
+                "code": 200,
+                "_postman_previewlanguage": "json",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "cookie": [],
+                "body": "{\n  \"success\": true,\n  \"data\": {\n    \"user\": {\n      \"_id\": \"6856ac165c2065383e5d1b25\",\n      \"companyId\": \"CPM001\",\n      \"name\": \"Test Company\",\n      \"mobile\": \"1234567890\",\n      \"email\": \"company@test.com\",\n      \"companyName\": \"Test Company Ltd\",\n      \"companyAddress\": \"123 Test Street, Test City\",\n      \"aadhar_no\": \"123456789012\",\n      \"profilePicture\": \"{{base_url}}/uploads/company-users/1750507129679-test-image.jpg\",\n      \"isVerified\": true,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  }\n}"
+              }
+            ]
           }
         },
         {
@@ -227,7 +309,7 @@
                       }
                     ],
                     "cookie": [],
-                    "body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"user\": {\n      \"_id\": \"507f1f77bcf86cd799439011\",\n      \"securityId\": \"SCU001\",\n      \"name\": \"Test Security\",\n      \"mobile\": \"1234567890\",\n      \"aadhar\": \"123456789012\",\n      \"address\": \"123 Test Street, Test City\",\n      \"phase\": \"Phase 1\",\n      \"profilePicture\": \"{{base_url}}/uploads/security-users/profile-1234567890.jpg\",\n      \"isVerified\": true,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  }\n}"
+                    "body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"user\": {\n      \"_id\": \"507f1f77bcf86cd799439011\",\n      \"securityId\": \"SCU001\",\n      \"name\": \"Test Security\",\n      \"mobile\": \"1234567890\",\n      \"aadhar\": \"123456789012\",\n      \"address\": \"123 Test Street, Test City\",\n      \"phase\": \"Phase 1\",\n      \"profilePicture\": \"{{base_url}}/uploads/security-users/1750507129679-test-image.jpg\",\n      \"isVerified\": true,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  }\n}"
                   }
                 ]
               }
@@ -255,7 +337,84 @@
                       "language": "json"
                     }
                   }
-                }
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "POST",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/security-auth/login",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "security-auth", "login"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODU2YWMxNjVjMjA2NTM4M2U1ZDFiMjUiLCJyb2xlIjoic2VjdXJpdHkiLCJpYXQiOjE3NTA1MTA2NjMsImV4cCI6MTc1MDU5NzA2M30.quG4UeR2yOc9cbl9dMm02lOLQoM7B-SkHo6dq6Diu2Q\",\n    \"user\": {\n      \"_id\": \"6856ac165c2065383e5d1b25\",\n      \"securityId\": \"SCU001\",\n      \"name\": \"Test Security\",\n      \"mobile\": \"1234567890\",\n      \"aadhar\": \"123456789012\",\n      \"address\": \"123 Test Street, Test City\",\n      \"phase\": \"Phase 1\",\n      \"profilePicture\": \"{{base_url}}/uploads/security-users/1750507129679-test-image.jpg\",\n      \"isVerified\": true,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  }\n}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Security Validate Token",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/security-auth/validate-token",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "security-auth", "validate-token"]
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "GET",
+                      "header": [
+                        {
+                          "key": "Authorization",
+                          "value": "Bearer {{token}}"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/security-auth/validate-token",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "security-auth", "validate-token"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"data\": {\n    \"securityUser\": {\n      \"_id\": \"6856ac165c2065383e5d1b25\",\n      \"securityId\": \"SCU001\",\n      \"name\": \"Test Security\",\n      \"mobile\": \"1234567890\",\n      \"aadhar\": \"123456789012\",\n      \"address\": \"123 Test Street, Test City\",\n      \"phase\": \"Phase 1\",\n      \"profilePicture\": \"{{base_url}}/uploads/security-users/1750507129679-test-image.jpg\",\n      \"isVerified\": true,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  }\n}"
+                  }
+                ]
               }
             },
             {
@@ -343,2053 +502,44 @@
                       "language": "json"
                     }
                   }
-                }
-              }
-            },
-            {
-              "name": "Security Get Profile Picture",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{base_url}}/api/security-auth/profile-picture/:id",
-                  "host": ["{{base_url}}"],
-                  "path": ["api", "security-auth", "profile-picture", ":id"],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "user_id_here"
-                    }
-                  ]
-                }
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "PUT",
+                      "header": [
+                        {
+                          "key": "Authorization",
+                          "value": "Bearer {{token}}"
+                        },
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/security-auth/update-profile",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "security-auth", "update-profile"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"Profile updated successfully\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"6856ac165c2065383e5d1b25\",\n      \"name\": \"Updated Name\",\n      \"mobile\": \"1234567890\",\n      \"aadhar\": \"123456789012\",\n      \"securityCompany\": \"Updated Company\",\n      \"profilePicture\": \"{{base_url}}/uploads/security-users/1750507129679-test-image.jpg\",\n      \"hasProfilePicture\": true\n    }\n  }\n}"
+                  }
+                ]
               }
             }
           ]
-        },
-        {
-          "name": "Manager Signup",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "multipart/form-data"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/manager-auth/signup",
-              "host": ["{{base_url}}"],
-              "path": ["api", "manager-auth", "signup"]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "name",
-                  "value": "Test Manager",
-                  "type": "text"
-                },
-                {
-                  "key": "mobile",
-                  "value": "1234567890",
-                  "type": "text"
-                },
-                {
-                  "key": "password",
-                  "value": "Test@123",
-                  "type": "text"
-                },
-                {
-                  "key": "aadhar",
-                  "value": "123456789012",
-                  "type": "text"
-                },
-                {
-                  "key": "address",
-                  "value": "123 Test Street, Test City",
-                  "type": "text"
-                },
-                {
-                  "key": "phase",
-                  "value": "Phase 1",
-                  "type": "text"
-                },
-                {
-                  "key": "profilePicture",
-                  "type": "file",
-                  "src": "/path/to/profile/picture.jpg"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Manager Verify OTP",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/manager-auth/verify-otp",
-              "host": ["{{base_url}}"],
-              "path": ["api", "manager-auth", "verify-otp"]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"mobile\": \"1234567890\",\n    \"otp\": \"123456\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Manager Login",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/manager-auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["api", "manager-auth", "login"]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"mobile\": \"1234567890\",\n    \"password\": \"Test@123\",\n    \"phase\": \"Phase 1\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Manager Update User",
-          "request": {
-            "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/manager-auth/update/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "manager-auth", "update", ":id"],
-              "variable": [ { "key": "id", "value": "manager_id_here" } ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Name\",\n  \"mobile\": \"9876543210\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Manager Delete User",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/manager-auth/delete/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "manager-auth", "delete", ":id"],
-              "variable": [ { "key": "id", "value": "manager_id_here" } ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Phases",
-      "item": [
-        {
-          "name": "Add Phase",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/phases",
-              "host": ["{{base_url}}"],
-              "path": ["api", "phases"]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Phase Name\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Get All Phases",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/phases",
-              "host": ["{{base_url}}"],
-              "path": ["api", "phases"]
-            }
-          }
-        },
-        {
-          "name": "Get Phase by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/phases/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "phases", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "phase_id_here"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/phases/507f1f77bcf86cd799439011",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "phases", "507f1f77bcf86cd799439011"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Phase 1\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n    \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Update Phase",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/phases/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "phases", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "phase_id_here"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Updated Phase Name\"\n}"
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "PUT",
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "url": {
-                    "raw": "{{base_url}}/api/phases/507f1f77bcf86cd799439011",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "phases", "507f1f77bcf86cd799439011"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Updated Phase Name\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n    \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Delete Phase",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/phases/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "phases", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "phase_id_here"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "DELETE",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/phases/507f1f77bcf86cd799439011",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "phases", "507f1f77bcf86cd799439011"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"message\": \"Phase deleted successfully\"\n}"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "Boats",
-      "item": [
-        {
-          "name": "Get All Boats",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/boats",
-              "host": ["{{base_url}}"],
-              "path": ["api", "boats"]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/boats",
-              "host": ["{{base_url}}"],
-              "path": ["api", "boats"]
-            }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"Test Boat\",\n      \"registrationNumber\": \"REG123\",\n      \"capacity\": 10,\n      \"boatPhoto\": \"{{base_url}}/uploads/boats/boat-1234567890.jpg\",\n      \"registrationPhoto\": \"{{base_url}}/uploads/boats/registration-1234567890.jpg\",\n      \"insurancePhoto\": \"{{base_url}}/uploads/boats/insurance-1234567890.jpg\",\n      \"status\": \"active\"\n    }\n  ]\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Get Boat by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/boats/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "boats", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "boat_id_here"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/boats/507f1f77bcf86cd799439011",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "boats", "507f1f77bcf86cd799439011"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Test Boat\",\n    \"registrationNumber\": \"REG123\",\n    \"capacity\": 10,\n    \"boatPhoto\": \"{{base_url}}/uploads/boats/boat-1234567890.jpg\",\n    \"registrationPhoto\": \"{{base_url}}/uploads/boats/registration-1234567890.jpg\",\n    \"insurancePhoto\": \"{{base_url}}/uploads/boats/insurance-1234567890.jpg\",\n    \"status\": \"active\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Add Boat",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/boats/add",
-              "host": ["{{base_url}}"],
-              "path": ["api", "boats", "add"]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "name",
-                  "value": "Test Boat",
-                  "type": "text"
-                },
-                {
-                  "key": "registrationNumber",
-                  "value": "REG123",
-                  "type": "text"
-                },
-                {
-                  "key": "capacity",
-                  "value": "10",
-                  "type": "text"
-                },
-                {
-                  "key": "boatPhoto",
-                  "type": "file",
-                  "src": "/path/to/boat/photo.jpg"
-                },
-                {
-                  "key": "registrationPhoto",
-                  "type": "file",
-                  "src": "/path/to/registration/photo.jpg"
-                },
-                {
-                  "key": "insurancePhoto",
-                  "type": "file",
-                  "src": "/path/to/insurance/photo.jpg"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "POST",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/boats/add",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "boats", "add"]
-                  }
-                },
-                "status": "Created",
-                "code": 201,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"message\": \"Boat added successfully\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Test Boat\",\n    \"registrationNumber\": \"REG123\",\n    \"capacity\": 10,\n    \"boatPhoto\": \"{{base_url}}/uploads/boats/boat-1234567890.jpg\",\n    \"registrationPhoto\": \"{{base_url}}/uploads/boats/registration-1234567890.jpg\",\n    \"insurancePhoto\": \"{{base_url}}/uploads/boats/insurance-1234567890.jpg\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Update Boat",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/boats/update/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "boats", "update", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "boat_id_here"
-                }
-              ]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "name",
-                  "value": "Updated Boat Name",
-                  "type": "text"
-                },
-                {
-                  "key": "capacity",
-                  "value": "15",
-                  "type": "text"
-                },
-                {
-                  "key": "boatPhoto",
-                  "type": "file",
-                  "src": "/path/to/new/boat/photo.jpg"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "PUT",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/boats/update/507f1f77bcf86cd799439011",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "boats", "update", "507f1f77bcf86cd799439011"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"message\": \"Boat updated successfully\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"name\": \"Updated Boat Name\",\n    \"registrationNumber\": \"REG123\",\n    \"capacity\": 15,\n    \"boatPhoto\": \"{{base_url}}/uploads/boats/boat-1234567890.jpg\",\n    \"registrationPhoto\": \"{{base_url}}/uploads/boats/registration-1234567890.jpg\",\n    \"insurancePhoto\": \"{{base_url}}/uploads/boats/insurance-1234567890.jpg\",\n    \"status\": \"active\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Delete Boat",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/boats/delete/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "boats", "delete", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "boat_id_here"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Money Handles",
-      "item": [
-        {
-          "name": "Get All Transactions",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles"]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/money-handles",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "money-handles"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"amount\": 1000,\n      \"type\": \"pay\",\n      \"toWhom\": \"John Doe\",\n      \"sendTo\": \"Manager\",\n      \"receiverName\": \"Manager John\",\n      \"receiverId\": \"MN001\",\n      \"pay\": true,\n      \"received\": false,\n      \"description\": \"Payment for services\",\n      \"date\": \"2024-03-21T10:30:00.000Z\"\n    }\n  ]\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Get Transaction by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "transaction_id_here"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/money-handles/507f1f77bcf86cd799439011",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "money-handles", "507f1f77bcf86cd799439011"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"amount\": 1000,\n    \"type\": \"pay\",\n    \"toWhom\": \"John Doe\",\n    \"sendTo\": \"Manager\",\n    \"receiverName\": \"Manager John\",\n    \"receiverId\": \"MN001\",\n    \"pay\": true,\n    \"received\": false,\n    \"description\": \"Payment for services\",\n    \"date\": \"2024-03-21T10:30:00.000Z\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Add Transaction",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/add",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "add"]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"amount\": 1000,\n    \"type\": \"pay\",\n    \"toWhom\": \"John Doe\",\n    \"sendTo\": \"Manager\",\n    \"receiverName\": \"Manager John\",\n    \"receiverId\": \"MN001\",\n    \"pay\": true,\n    \"received\": false,\n    \"description\": \"Payment for services\"\n}"
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "POST",
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "url": {
-                    "raw": "{{base_url}}/api/money-handles/add",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "money-handles", "add"]
-                  }
-                },
-                "status": "Created",
-                "code": 201,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"message\": \"Transaction added successfully\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"amount\": 1000,\n    \"type\": \"pay\",\n    \"toWhom\": \"John Doe\",\n    \"sendTo\": \"Manager\",\n    \"receiverName\": \"Manager John\",\n    \"receiverId\": \"MN001\",\n    \"pay\": true,\n    \"received\": false,\n    \"description\": \"Payment for services\",\n    \"date\": \"2024-03-21T10:30:00.000Z\"\n  }\n}"
-              },
-              {
-                "name": "Validation Error",
-                "originalRequest": {
-                  "method": "POST",
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "url": {
-                    "raw": "{{base_url}}/api/money-handles/add",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "money-handles", "add"]
-                  }
-                },
-                "status": "Bad Request",
-                "code": 400,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"MISSING_FIELDS\",\n    \"message\": \"Required fields: amount, type, toWhom, sendTo, receiverName, description\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Get Transactions by Type",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/type/:type",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "type", ":type"],
-              "variable": [
-                {
-                  "key": "type",
-                  "value": "pay"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/money-handles/type/pay",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "money-handles", "type", "pay"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"amount\": 1000,\n      \"type\": \"pay\",\n      \"toWhom\": \"John Doe\",\n      \"sendTo\": \"Manager\",\n      \"receiverName\": \"Manager John\",\n      \"receiverId\": \"MN001\",\n      \"pay\": true,\n      \"received\": false,\n      \"description\": \"Payment for services\",\n      \"date\": \"2024-03-21T10:30:00.000Z\"\n    }\n  ]\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Get Transactions by SendTo",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/sendto/:sendTo",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "sendto", ":sendTo"],
-              "variable": [
-                {
-                  "key": "sendTo",
-                  "value": "Manager"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/money-handles/sendto/Manager",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "money-handles", "sendto", "Manager"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"amount\": 1000,\n      \"type\": \"pay\",\n      \"toWhom\": \"John Doe\",\n      \"sendTo\": \"Manager\",\n      \"receiverName\": \"Manager John\",\n      \"receiverId\": \"MN001\",\n      \"pay\": true,\n      \"received\": false,\n      \"description\": \"Payment for services\",\n      \"date\": \"2024-03-21T10:30:00.000Z\"\n    }\n  ]\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Get Transactions by Status",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/status/:status",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "status", ":status"],
-              "variable": [
-                {
-                  "key": "status",
-                  "value": "pay"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/money-handles/status/pay",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "money-handles", "status", "pay"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"amount\": 1000,\n      \"type\": \"pay\",\n      \"toWhom\": \"John Doe\",\n      \"sendTo\": \"Manager\",\n      \"receiverName\": \"Manager John\",\n      \"receiverId\": \"MN001\",\n      \"pay\": true,\n      \"received\": false,\n      \"description\": \"Payment for services\",\n      \"date\": \"2024-03-21T10:30:00.000Z\"\n    }\n  ]\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Update Transaction",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/update/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "update", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "transaction_id_here"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"amount\": 1500,\n    \"sendTo\": \"Company\",\n    \"receiverName\": \"Company ABC\",\n    \"pay\": false,\n    \"received\": true,\n    \"description\": \"Updated transaction\"\n}"
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "PUT",
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "url": {
-                    "raw": "{{base_url}}/api/money-handles/update/507f1f77bcf86cd799439011",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "money-handles", "update", "507f1f77bcf86cd799439011"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"message\": \"Transaction updated successfully\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"amount\": 1500,\n    \"type\": \"pay\",\n    \"toWhom\": \"John Doe\",\n    \"sendTo\": \"Company\",\n    \"receiverName\": \"Company ABC\",\n    \"receiverId\": \"CPM001\",\n    \"pay\": false,\n    \"received\": true,\n    \"description\": \"Updated transaction\",\n    \"date\": \"2024-03-21T10:30:00.000Z\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Delete Transaction",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/delete/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "delete", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "transaction_id_here"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Company Papers",
-      "item": [
-        {
-          "name": "Get All Papers",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/company-papers/papers",
-              "host": ["{{base_url}}"],
-              "path": ["api", "company-papers", "papers"]
-            },
-            "response": [
-              {
-                "name": "Success",
-                "originalRequest": {},
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [],
-                "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"6855344bf99445a6896e9ed6\",\n      \"fileName\": \"paper-1750414411439-98280263.pdf\",\n      \"originalName\": \"MT_Keys.pdf\",\n      \"uploadDate\": \"2025-06-20T10:13:31.534Z\",\n      \"category\": \"other\",\n      \"description\": \"Test document\",\n      \"fileSize\": 208327,\n      \"companyName\": \"Test Company Ltd\",\n      \"companyId\": \"507f1f77bcf86cd799439011\",\n      \"pdfUrl\": \"http://localhost:5000/uploads/company-papers/paper-1750414411439-98280263.pdf\",\n      \"fileExists\": true\n    }\n  ]\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Get Paper by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/company-papers/papers/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "company-papers", "papers", ":id"],
-              "variable": [
-                { "key": "id", "value": "paper_id_here" }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success",
-                "originalRequest": {},
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [],
-                "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"660000000000000000000000\",\n    \"fileName\": \"paper-1750245493846-941547226.pdf\",\n    \"originalName\": \"mydoc.pdf\",\n    \"uploadDate\": \"2024-03-24T10:00:00.000Z\",\n    \"category\": \"legal\",\n    \"description\": \"Test document\",\n    \"fileSize\": 123456,\n    \"companyName\": \"Test Company Ltd\",\n    \"companyId\": \"507f1f77bcf86cd799439011\",\n    \"pdfUrl\": \"http://localhost:5000/uploads/company-papers/paper-1750245493846-941547226.pdf\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Upload Paper",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/company-papers/upload",
-              "host": ["{{base_url}}"],
-              "path": ["api", "company-papers", "upload"]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "src": "/path/to/document.pdf"
-                },
-                {
-                  "key": "description",
-                  "value": "Test document",
-                  "type": "text"
-                },
-                {
-                  "key": "companyName",
-                  "value": "Test Company Ltd",
-                  "type": "text"
-                },
-                {
-                  "key": "companyId",
-                  "value": "507f1f77bcf86cd799439011",
-                  "type": "text"
-                },
-                {
-                  "key": "category",
-                  "value": "legal",
-                  "type": "text"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Paper",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/company-papers/papers/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "company-papers", "papers", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "paper_id_here"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"description\": \"Updated document\",\n    \"category\": \"financial\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Delete Paper",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/company-papers/papers/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "company-papers", "papers", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "paper_id_here"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Papers by Category",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/company-papers/papers/category/:category",
-              "host": ["{{base_url}}"],
-              "path": ["api", "company-papers", "papers", "category", ":category"],
-              "variable": [
-                {
-                  "key": "category",
-                  "value": "legal"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Madhayams",
-      "item": [
-        {
-          "name": "Get All Madhayams",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/madhayams",
-              "host": ["{{base_url}}"],
-              "path": ["api", "madhayams"]
-            }
-          }
-        },
-        {
-          "name": "Get Madhayam by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/madhayams/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "madhayams", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "madhayam_id_here"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Add Madhayam",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/madhayams/add",
-              "host": ["{{base_url}}"],
-              "path": ["api", "madhayams", "add"]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "madhayamId",
-                  "value": "MADH001",
-                  "type": "text"
-                },
-                {
-                  "key": "madhayamName",
-                  "value": "Test Madhayam",
-                  "type": "text"
-                },
-                {
-                  "key": "mobileNumber",
-                  "value": "1234567890",
-                  "type": "text"
-                },
-                {
-                  "key": "location",
-                  "value": "Test Location",
-                  "type": "text"
-                },
-                {
-                  "key": "dateOfJoining",
-                  "value": "2024-03-20",
-                  "type": "text"
-                },
-                {
-                  "key": "adharCardNumber",
-                  "value": "123456789012",
-                  "type": "text"
-                },
-                {
-                  "key": "bankAccountNumber",
-                  "value": "1234567890",
-                  "type": "text"
-                },
-                {
-                  "key": "ifscCode",
-                  "value": "BANK0123456",
-                  "type": "text"
-                },
-                {
-                  "key": "profilePhoto",
-                  "type": "file",
-                  "src": "/path/to/profile/photo.jpg"
-                },
-                {
-                  "key": "bannerPhoto",
-                  "type": "file",
-                  "src": "/path/to/banner/photo.jpg"
-                },
-                {
-                  "key": "adharCardPhoto",
-                  "type": "file",
-                  "src": "/path/to/aadhar/photo.jpg"
-                },
-                {
-                  "key": "bankPassbookPhoto",
-                  "type": "file",
-                  "src": "/path/to/passbook/photo.jpg"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Madhayam",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/madhayams/update/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "madhayams", "update", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "madhayam_id_here"
-                }
-              ]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "madhayamName",
-                  "value": "Updated Madhayam",
-                  "type": "text"
-                },
-                {
-                  "key": "location",
-                  "value": "Updated Location",
-                  "type": "text"
-                },
-                {
-                  "key": "profilePhoto",
-                  "type": "file",
-                  "src": "/path/to/new/profile/photo.jpg"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Madhayam",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/madhayams/delete/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "madhayams", "delete", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "madhayam_id_here"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Fish Types",
-      "item": [
-        {
-          "name": "Get All Fish Types",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/fish-types",
-              "host": ["{{base_url}}"],
-              "path": ["api", "fish-types"]
-            }
-          }
-        },
-        {
-          "name": "Get Fish Type by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/fish-types/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "fish-types", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "fish_type_id_here"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Add Fish Type",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/fish-types/add",
-              "host": ["{{base_url}}"],
-              "path": ["api", "fish-types", "add"]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Test Fish\",\n    \"description\": \"Test fish type\",\n    \"pricePerKg\": 100\n}"
-            }
-          }
-        },
-        {
-          "name": "Update Fish Type",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/fish-types/update/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "fish-types", "update", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "fish_type_id_here"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Updated Fish\",\n    \"description\": \"Updated fish type\",\n    \"pricePerKg\": 150\n}"
-            }
-          }
-        },
-        {
-          "name": "Delete Fish Type",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/fish-types/delete/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "fish-types", "delete", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "fish_type_id_here"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Reports",
-      "item": [
-        {
-          "name": "Get All Reports",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/reports",
-              "host": ["{{base_url}}"],
-              "path": ["api", "reports"]
-            }
-          }
-        },
-        {
-          "name": "Get Report by ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/reports/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "reports", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "report_id_here"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Generate Report",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/reports/generate",
-              "host": ["{{base_url}}"],
-              "path": ["api", "reports", "generate"]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"reportType\": \"daily\",\n    \"startDate\": \"2024-03-20\",\n    \"endDate\": \"2024-03-20\"\n}"
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "POST",
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "url": {
-                    "raw": "{{base_url}}/api/reports/generate",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "reports", "generate"]
-                  }
-                },
-                "status": "Created",
-                "code": 201,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"message\": \"Report generated successfully\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"reportType\": \"daily\",\n    \"startDate\": \"2024-03-20T00:00:00.000Z\",\n    \"endDate\": \"2024-03-20T23:59:59.999Z\",\n    \"createdAt\": \"2024-03-21T10:30:00.000Z\",\n    \"financial\": {\n      \"totalIncome\": 5000,\n      \"totalExpense\": 2000,\n      \"netProfit\": 3000\n    },\n    \"summary\": {\n      \"totalBoats\": 5,\n      \"totalSikaris\": 20,\n      \"totalMadhayams\": 8\n    }\n  }\n}"
-              },
-              {
-                "name": "Validation Error",
-                "originalRequest": {
-                  "method": "POST",
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "url": {
-                    "raw": "{{base_url}}/api/reports/generate",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "reports", "generate"]
-                  }
-                },
-                "status": "Bad Request",
-                "code": 400,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"MISSING_FIELDS\",\n    \"message\": \"Missing required fields: reportType, startDate, endDate\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Archive Report",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/reports/archive/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "reports", "archive", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "report_id_here"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Security Members",
-      "item": [
-        {
-          "name": "Add Security Member",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "multipart/form-data"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/security-members",
-              "host": ["{{base_url}}"],
-              "path": ["api", "security-members"]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "idNumber",
-                  "value": "SEC001",
-                  "type": "text"
-                },
-                {
-                  "key": "name",
-                  "value": "John Doe",
-                  "type": "text"
-                },
-                {
-                  "key": "address",
-                  "value": "123 Security Street",
-                  "type": "text"
-                },
-                {
-                  "key": "mobile",
-                  "value": "1234567890",
-                  "type": "text"
-                },
-                {
-                  "key": "phase",
-                  "value": "Phase 1",
-                  "type": "text"
-                },
-                {
-                  "key": "accountNumber",
-                  "value": "1234567890",
-                  "type": "text"
-                },
-                {
-                  "key": "ifscCode",
-                  "value": "SBIN0001234",
-                  "type": "text"
-                },
-                {
-                  "key": "bankName",
-                  "value": "State Bank of India",
-                  "type": "text"
-                },
-                {
-                  "key": "aadharPhoto",
-                  "type": "file",
-                  "src": "/path/to/aadhar.jpg"
-                },
-                {
-                  "key": "photo",
-                  "type": "file",
-                  "src": "/path/to/photo.jpg"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get All Security Members",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/security-members",
-              "host": ["{{base_url}}"],
-              "path": ["api", "security-members"]
-            }
-          }
-        },
-        {
-          "name": "Get Security Member by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/security-members/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "security-members", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "member_id_here",
-                  "description": "ID of the security member"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Security Member",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "multipart/form-data"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/security-members/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "security-members", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "member_id_here",
-                  "description": "ID of the security member"
-                }
-              ]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "name",
-                  "value": "John Doe Updated",
-                  "type": "text"
-                },
-                {
-                  "key": "address",
-                  "value": "456 Security Street",
-                  "type": "text"
-                },
-                {
-                  "key": "mobile",
-                  "value": "9876543210",
-                  "type": "text"
-                },
-                {
-                  "key": "phase",
-                  "value": "Phase 2",
-                  "type": "text"
-                },
-                {
-                  "key": "accountNumber",
-                  "value": "0987654321",
-                  "type": "text"
-                },
-                {
-                  "key": "ifscCode",
-                  "value": "SBIN0005678",
-                  "type": "text"
-                },
-                {
-                  "key": "bankName",
-                  "value": "State Bank of India",
-                  "type": "text"
-                },
-                {
-                  "key": "aadharPhoto",
-                  "type": "file",
-                  "src": "/path/to/new-aadhar.jpg"
-                },
-                {
-                  "key": "photo",
-                  "type": "file",
-                  "src": "/path/to/new-photo.jpg"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Security Member",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/security-members/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "security-members", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "member_id_here",
-                  "description": "ID of the security member"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Sikaris",
-      "item": [
-        {
-          "name": "Get All Sikaris",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/sikaris",
-              "host": ["{{base_url}}"],
-              "path": ["api", "sikaris"]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/sikaris",
-              "host": ["{{base_url}}"],
-              "path": ["api", "sikaris"]
-            }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"sikariId\": \"SK001\",\n      \"sikariName\": \"John Doe\",\n      \"mobileNumber\": \"1234567890\",\n      \"location\": \"Mumbai\",\n      \"dateOfJoining\": \"2024-03-21T00:00:00.000Z\",\n      \"smargId\": \"SM001\",\n      \"adharCardNumber\": \"123456789012\",\n      \"bankAccountNumber\": \"1234567890\",\n      \"ifscCode\": \"SBIN0001234\",\n      \"madhayamName\": \"Madhayam Name\",\n      \"madhayamMobileNumber\": \"9876543210\",\n      \"madhayamAddress\": \"Madhayam Address\",\n      \"boatNumber\": \"BT001\",\n      \"boatId\": \"BI001\",\n      \"boatType\": \"company boat\",\n      \"position\": \"personal duty\",\n      \"profilePhoto\": \"{{base_url}}/uploads/sikaris/sikari-1234567890.jpg\",\n      \"bannerPhoto\": \"{{base_url}}/uploads/sikaris/banner-1234567890.jpg\",\n      \"adharCardPhoto\": \"{{base_url}}/uploads/sikaris/aadhar-1234567890.jpg\",\n      \"bankPassbookPhoto\": \"{{base_url}}/uploads/sikaris/passbook-1234567890.jpg\"\n    }\n  ]\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Get Sikari by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/sikaris/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "sikaris", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "sikari_id_here"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "GET",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/sikaris/507f1f77bcf86cd799439011",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "sikaris", "507f1f77bcf86cd799439011"]
-                  }
-                },
-                "status": "OK",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"sikariId\": \"SK001\",\n    \"sikariName\": \"John Doe\",\n    \"mobileNumber\": \"1234567890\",\n    \"location\": \"Mumbai\",\n    \"dateOfJoining\": \"2024-03-21T00:00:00.000Z\",\n    \"smargId\": \"SM001\",\n    \"adharCardNumber\": \"123456789012\",\n    \"bankAccountNumber\": \"1234567890\",\n    \"ifscCode\": \"SBIN0001234\",\n    \"madhayamName\": \"Madhayam Name\",\n    \"madhayamMobileNumber\": \"9876543210\",\n    \"madhayamAddress\": \"Madhayam Address\",\n    \"boatNumber\": \"BT001\",\n    \"boatId\": \"BI001\",\n    \"boatType\": \"company boat\",\n    \"position\": \"personal duty\",\n    \"profilePhoto\": \"{{base_url}}/uploads/sikaris/sikari-1234567890.jpg\",\n    \"bannerPhoto\": \"{{base_url}}/uploads/sikaris/banner-1234567890.jpg\",\n    \"adharCardPhoto\": \"{{base_url}}/uploads/sikaris/aadhar-1234567890.jpg\",\n    \"bankPassbookPhoto\": \"{{base_url}}/uploads/sikaris/passbook-1234567890.jpg\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Add Sikari",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/sikaris/add",
-              "host": ["{{base_url}}"],
-              "path": ["api", "sikaris", "add"]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "sikariId",
-                  "value": "SK001",
-                  "type": "text"
-                },
-                {
-                  "key": "sikariName",
-                  "value": "John Doe",
-                  "type": "text"
-                },
-                {
-                  "key": "mobileNumber",
-                  "value": "1234567890",
-                  "type": "text"
-                },
-                {
-                  "key": "location",
-                  "value": "Mumbai",
-                  "type": "text"
-                },
-                {
-                  "key": "dateOfJoining",
-                  "value": "2024-03-21",
-                  "type": "text"
-                },
-                {
-                  "key": "smargId",
-                  "value": "SM001",
-                  "type": "text"
-                },
-                {
-                  "key": "adharCardNumber",
-                  "value": "123456789012",
-                  "type": "text"
-                },
-                {
-                  "key": "bankAccountNumber",
-                  "value": "1234567890",
-                  "type": "text"
-                },
-                {
-                  "key": "ifscCode",
-                  "value": "SBIN0001234",
-                  "type": "text"
-                },
-                {
-                  "key": "madhayamName",
-                  "value": "Madhayam Name",
-                  "type": "text"
-                },
-                {
-                  "key": "madhayamMobileNumber",
-                  "value": "9876543210",
-                  "type": "text"
-                },
-                {
-                  "key": "madhayamAddress",
-                  "value": "Madhayam Address",
-                  "type": "text"
-                },
-                {
-                  "key": "boatNumber",
-                  "value": "BT001",
-                  "type": "text"
-                },
-                {
-                  "key": "boatId",
-                  "value": "BI001",
-                  "type": "text"
-                },
-                {
-                  "key": "boatType",
-                  "value": "company boat",
-                  "type": "text"
-                },
-                {
-                  "key": "position",
-                  "value": "personal duty",
-                  "type": "text"
-                },
-                {
-                  "key": "profilePhoto",
-                  "type": "file",
-                  "src": "/path/to/profile/photo.jpg"
-                },
-                {
-                  "key": "bannerPhoto",
-                  "type": "file",
-                  "src": "/path/to/banner/photo.jpg"
-                },
-                {
-                  "key": "adharCardPhoto",
-                  "type": "file",
-                  "src": "/path/to/aadhar/photo.jpg"
-                },
-                {
-                  "key": "bankPassbookPhoto",
-                  "type": "file",
-                  "src": "/path/to/passbook/photo.jpg"
-                }
-              ]
-            },
-            "response": [
-              {
-                "name": "Success Response",
-                "originalRequest": {
-                  "method": "POST",
-                  "header": [],
-                  "url": {
-                    "raw": "{{base_url}}/api/sikaris/add",
-                    "host": ["{{base_url}}"],
-                    "path": ["api", "sikaris", "add"]
-                  }
-                },
-                "status": "Created",
-                "code": 201,
-                "_postman_previewlanguage": "json",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "cookie": [],
-                "body": "{\n  \"success\": true,\n  \"message\": \"Sikari added successfully\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"sikariId\": \"SK001\",\n    \"sikariName\": \"John Doe\",\n    \"mobileNumber\": \"1234567890\",\n    \"location\": \"Mumbai\",\n    \"dateOfJoining\": \"2024-03-21T00:00:00.000Z\",\n    \"smargId\": \"SM001\",\n    \"adharCardNumber\": \"123456789012\",\n    \"bankAccountNumber\": \"1234567890\",\n    \"ifscCode\": \"SBIN0001234\",\n    \"madhayamName\": \"Madhayam Name\",\n    \"madhayamMobileNumber\": \"9876543210\",\n    \"madhayamAddress\": \"Madhayam Address\",\n    \"boatNumber\": \"BT001\",\n    \"boatId\": \"BI001\",\n    \"boatType\": \"company boat\",\n    \"position\": \"personal duty\",\n    \"profilePhoto\": \"{{base_url}}/uploads/sikaris/sikari-1234567890.jpg\",\n    \"bannerPhoto\": \"{{base_url}}/uploads/sikaris/banner-1234567890.jpg\",\n    \"adharCardPhoto\": \"{{base_url}}/uploads/sikaris/aadhar-1234567890.jpg\",\n    \"bankPassbookPhoto\": \"{{base_url}}/uploads/sikaris/passbook-1234567890.jpg\"\n  }\n}"
-              }
-            ]
-          }
-        },
-        {
-          "name": "Update Sikari",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/sikaris/update/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "sikaris", "update", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "sikari_id_here"
-                }
-              ]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "sikariName",
-                  "value": "Updated Name",
-                  "type": "text"
-                },
-                {
-                  "key": "mobileNumber",
-                  "value": "9876543210",
-                  "type": "text"
-                },
-                {
-                  "key": "location",
-                  "value": "Updated Location",
-                  "type": "text"
-                },
-                {
-                  "key": "adharCardNumber",
-                  "value": "987654321098",
-                  "type": "text"
-                },
-                {
-                  "key": "bankAccountNumber",
-                  "value": "9876543210",
-                  "type": "text"
-                },
-                {
-                  "key": "ifscCode",
-                  "value": "SBIN0005678",
-                  "type": "text"
-                },
-                {
-                  "key": "madhayamName",
-                  "value": "Updated Madhayam",
-                  "type": "text"
-                },
-                {
-                  "key": "madhayamMobileNumber",
-                  "value": "8765432109",
-                  "type": "text"
-                },
-                {
-                  "key": "madhayamAddress",
-                  "value": "Updated Madhayam Address",
-                  "type": "text"
-                },
-                {
-                  "key": "profilePhoto",
-                  "type": "file",
-                  "src": "/path/to/new/profile/photo.jpg"
-                },
-                {
-                  "key": "bannerPhoto",
-                  "type": "file",
-                  "src": "/path/to/new/banner/photo.jpg"
-                },
-                {
-                  "key": "adharCardPhoto",
-                  "type": "file",
-                  "src": "/path/to/new/aadhar/photo.jpg"
-                },
-                {
-                  "key": "bankPassbookPhoto",
-                  "type": "file",
-                  "src": "/path/to/new/passbook/photo.jpg"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Sikari",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/sikaris/delete/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "sikaris", "delete", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "sikari_id_here"
-                }
-              ]
-            }
-          }
         }
       ]
     },
@@ -2515,6 +665,902 @@
               "host": ["{{base_url}}"],
               "path": ["api", "users", "delete", ":id"],
               "variable": [ { "key": "id", "value": "user_id_here" } ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Money Handles",
+      "item": [
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles"]
+            }
+          }
+        },
+        {
+          "name": "Get Transaction by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", ":id"],
+              "variable": [
+                { "key": "id", "value": "transaction_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Transaction",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "add"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"amount\": 1000,\n    \"type\": \"pay\",\n    \"toWhom\": \"John Doe\",\n    \"sendTo\": \"Manager\",\n    \"receiverName\": \"Manager John\",\n    \"receiverId\": \"MN001\",\n    \"pay\": true,\n    \"received\": false,\n    \"description\": \"Payment for services\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Transactions by Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/type/:type",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "type", ":type"],
+              "variable": [
+                { "key": "type", "value": "pay" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Transactions by SendTo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/sendto/:sendTo",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "sendto", ":sendTo"],
+              "variable": [
+                { "key": "sendTo", "value": "Manager" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Transactions by Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/status/:status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "status", ":status"],
+              "variable": [
+                { "key": "status", "value": "pay" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Transaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "update", ":id"],
+              "variable": [
+                { "key": "id", "value": "transaction_id_here" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"amount\": 1500,\n    \"sendTo\": \"Company\",\n    \"receiverName\": \"Company ABC\",\n    \"pay\": false,\n    \"received\": true,\n    \"description\": \"Updated transaction\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Transaction",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "delete", ":id"],
+              "variable": [
+                { "key": "id", "value": "transaction_id_here" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Company Papers",
+      "item": [
+        {
+          "name": "Get All Papers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers"]
+            }
+          }
+        },
+        {
+          "name": "Get Paper by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers", ":id"],
+              "variable": [
+                { "key": "id", "value": "paper_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Paper",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "upload"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "/path/to/document.pdf" },
+                { "key": "description", "value": "Test document", "type": "text" },
+                { "key": "companyName", "value": "Test Company Ltd", "type": "text" },
+                { "key": "companyId", "value": "507f1f77bcf86cd799439011", "type": "text" },
+                { "key": "category", "value": "legal", "type": "text" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Paper",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers", ":id"],
+              "variable": [
+                { "key": "id", "value": "paper_id_here" }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"description\": \"Updated document\",\n    \"category\": \"financial\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Paper",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers", ":id"],
+              "variable": [
+                { "key": "id", "value": "paper_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Papers by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers/category/:category",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers", "category", ":category"],
+              "variable": [
+                { "key": "category", "value": "legal" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phases",
+      "item": [
+        {
+          "name": "Add Phase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/phases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Phase Name\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Phases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/phases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases"]
+            }
+          }
+        },
+        {
+          "name": "Get Phase by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/phases/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "phase_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Phase",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/phases/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "phase_id_here"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Phase Name\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Phase",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/phases/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "phase_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Boats",
+      "item": [
+        {
+          "name": "Get All Boats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/boats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "boats"]
+            }
+          }
+        },
+        {
+          "name": "Get Boat by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/boats/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "boats", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "boat_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Boat",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/boats/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "boats", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Test Boat", "type": "text" },
+                { "key": "registrationNumber", "value": "REG123", "type": "text" },
+                { "key": "capacity", "value": "10", "type": "text" },
+                { "key": "boatPhoto", "type": "file", "src": "/path/to/boat/photo.jpg" },
+                { "key": "registrationPhoto", "type": "file", "src": "/path/to/registration/photo.jpg" },
+                { "key": "insurancePhoto", "type": "file", "src": "/path/to/insurance/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Boat",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/boats/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "boats", "update", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "boat_id_here"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Updated Boat Name", "type": "text" },
+                { "key": "capacity", "value": "15", "type": "text" },
+                { "key": "boatPhoto", "type": "file", "src": "/path/to/new/boat/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Boat",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/boats/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "boats", "delete", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "boat_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Madhayams",
+      "item": [
+        {
+          "name": "Get All Madhayams",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/madhayams",
+              "host": ["{{base_url}}"],
+              "path": ["api", "madhayams"]
+            }
+          }
+        },
+        {
+          "name": "Get Madhayam by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/madhayams/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "madhayams", ":id"],
+              "variable": [
+                { "key": "id", "value": "madhayam_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Madhayam",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/madhayams/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "madhayams", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Test Madhayam", "type": "text" },
+                { "key": "description", "value": "Test description", "type": "text" },
+                { "key": "photo", "type": "file", "src": "/path/to/madhayam/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Madhayam",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/madhayams/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "madhayams", "update", ":id"],
+              "variable": [
+                { "key": "id", "value": "madhayam_id_here" }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Updated Madhayam", "type": "text" },
+                { "key": "description", "value": "Updated description", "type": "text" },
+                { "key": "photo", "type": "file", "src": "/path/to/new/madhayam/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Madhayam",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/madhayams/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "madhayams", "delete", ":id"],
+              "variable": [
+                { "key": "id", "value": "madhayam_id_here" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Fish Types",
+      "item": [
+        {
+          "name": "Get All Fish Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/fish-types",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fish-types"]
+            }
+          }
+        },
+        {
+          "name": "Get Fish Type by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/fish-types/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fish-types", ":id"],
+              "variable": [
+                { "key": "id", "value": "fish_type_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Fish Type",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/fish-types/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fish-types", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Test Fish", "type": "text" },
+                { "key": "description", "value": "Test fish description", "type": "text" },
+                { "key": "photo", "type": "file", "src": "/path/to/fish/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Fish Type",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/fish-types/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fish-types", "update", ":id"],
+              "variable": [
+                { "key": "id", "value": "fish_type_id_here" }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Updated Fish", "type": "text" },
+                { "key": "description", "value": "Updated fish description", "type": "text" },
+                { "key": "photo", "type": "file", "src": "/path/to/new/fish/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Fish Type",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/fish-types/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fish-types", "delete", ":id"],
+              "variable": [
+                { "key": "id", "value": "fish_type_id_here" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports"]
+            }
+          }
+        },
+        {
+          "name": "Get Report by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", ":id"],
+              "variable": [
+                { "key": "id", "value": "report_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Report",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Test Report", "type": "text" },
+                { "key": "description", "value": "Test report description", "type": "text" },
+                { "key": "reportedBy", "value": "John Doe", "type": "text" },
+                { "key": "reporterId", "value": "507f1f77bcf86cd799439011", "type": "text" },
+                { "key": "photo", "type": "file", "src": "/path/to/report/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Report",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "update", ":id"],
+              "variable": [
+                { "key": "id", "value": "report_id_here" }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Updated Report", "type": "text" },
+                { "key": "description", "value": "Updated report description", "type": "text" },
+                { "key": "photo", "type": "file", "src": "/path/to/new/report/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Report",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "delete", ":id"],
+              "variable": [
+                { "key": "id", "value": "report_id_here" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Security Members",
+      "item": [
+        {
+          "name": "Get All Security Members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/security-members",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members"]
+            }
+          }
+        },
+        {
+          "name": "Get Security Member by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/security-members/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members", ":id"],
+              "variable": [
+                { "key": "id", "value": "security_member_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Security Member",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/security-members/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Test Security Member", "type": "text" },
+                { "key": "mobile", "value": "1234567890", "type": "text" },
+                { "key": "aadhar", "value": "123456789012", "type": "text" },
+                { "key": "address", "value": "123 Test Street", "type": "text" },
+                { "key": "phase", "value": "Phase 1", "type": "text" },
+                { "key": "photo", "type": "file", "src": "/path/to/security/member/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Security Member",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/security-members/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members", "update", ":id"],
+              "variable": [
+                { "key": "id", "value": "security_member_id_here" }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Updated Security Member", "type": "text" },
+                { "key": "address", "value": "456 Updated Street", "type": "text" },
+                { "key": "photo", "type": "file", "src": "/path/to/new/security/member/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Security Member",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/security-members/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members", "delete", ":id"],
+              "variable": [
+                { "key": "id", "value": "security_member_id_here" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sikaris",
+      "item": [
+        {
+          "name": "Get All Sikaris",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris"]
+            }
+          }
+        },
+        {
+          "name": "Get Sikari by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris", ":id"],
+              "variable": [
+                { "key": "id", "value": "sikari_id_here" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Sikari",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Test Sikari", "type": "text" },
+                { "key": "mobile", "value": "1234567890", "type": "text" },
+                { "key": "aadhar", "value": "123456789012", "type": "text" },
+                { "key": "address", "value": "123 Test Street", "type": "text" },
+                { "key": "phase", "value": "Phase 1", "type": "text" },
+                { "key": "photo", "type": "file", "src": "/path/to/sikari/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Sikari",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris", "update", ":id"],
+              "variable": [
+                { "key": "id", "value": "sikari_id_here" }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Updated Sikari", "type": "text" },
+                { "key": "address", "value": "456 Updated Street", "type": "text" },
+                { "key": "photo", "type": "file", "src": "/path/to/new/sikari/photo.jpg" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Sikari",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris", "delete", ":id"],
+              "variable": [
+                { "key": "id", "value": "sikari_id_here" }
+              ]
             }
           }
         }

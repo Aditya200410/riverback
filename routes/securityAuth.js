@@ -51,9 +51,19 @@ router.get('/validate-token', auth, async (req, res) => {
       }
     });
 
+    // Construct the full URL for profile picture
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const profilePictureUrl = securityUser.profilePicture ? `${baseUrl}/${securityUser.profilePicture}` : null;
+    
+    // Create a user object with the proper profile picture URL
+    const userWithUrl = {
+      ...securityUser.toObject(),
+      profilePicture: profilePictureUrl
+    };
+
     res.json({ 
       success: true,
-      data: { securityUser }
+      data: { securityUser: userWithUrl }
     });
   } catch (err) {
     res.status(500).json({ 
@@ -148,6 +158,10 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
       { expiresIn: '24h' }
     );
 
+    // Construct the full URL for profile picture
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
+
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
@@ -161,7 +175,7 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
           aadhar: user.aadhar,
           address: user.address,
           phase: user.phase,
-          profilePicture: user.profilePicture,
+          profilePicture: profilePictureUrl,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
@@ -216,6 +230,10 @@ router.post('/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    // Construct the full URL for profile picture
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
+
     res.json({
       success: true,
       message: 'Login successful',
@@ -229,7 +247,7 @@ router.post('/login', async (req, res) => {
           aadhar: user.aadhar,
           address: user.address,
           phase: user.phase,
-          profilePicture: user.profilePicture,
+          profilePicture: profilePictureUrl,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
@@ -328,10 +346,10 @@ router.post('/reset-password/:token', async (req, res) => {
 });
 
 // Update Profile
-router.put('/update-profile', async (req, res) => {
+router.put('/update-profile', auth, async (req, res) => {
   try {
     const { name, securityCompany } = req.body;
-    const user = await SecurityUser.findById(req.user.id);
+    const user = await SecurityUser.findById(req.user.userId);
     
     if (!user) {
       return res.status(404).json({
@@ -348,6 +366,10 @@ router.put('/update-profile', async (req, res) => {
 
     await user.save();
 
+    // Construct the full URL for profile picture
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
+
     res.json({
       success: true,
       message: 'Profile updated successfully',
@@ -358,6 +380,7 @@ router.put('/update-profile', async (req, res) => {
           mobile: user.mobile,
           aadhar: user.aadhar,
           securityCompany: user.securityCompany,
+          profilePicture: profilePictureUrl,
           hasProfilePicture: !!user.profilePicture
         }
       }
