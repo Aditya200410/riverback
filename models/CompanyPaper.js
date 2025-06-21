@@ -30,6 +30,11 @@ const companyPaperSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'CompanyUser'
   },
+  companyName: {
+    type: String,
+    default: 'Unknown Company',
+    trim: true
+  },
   description: {
     type: String,
     default: ''

@@ -16,6 +16,30 @@ const moneyHandleSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  sendTo: {
+    type: String,
+    required: true,
+    enum: ['Company', 'Manager', 'Sikari', 'Security'],
+    trim: true
+  },
+  receiverName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  receiverId: {
+    type: String,
+    required: false,
+    trim: true
+  },
+  pay: {
+    type: Boolean,
+    default: false
+  },
+  received: {
+    type: Boolean,
+    default: false
+  },
   description: {
     type: String,
     required: true,
@@ -42,5 +66,7 @@ const moneyHandleSchema = new mongoose.Schema({
 moneyHandleSchema.index({ companyId: 1, status: 1 });
 moneyHandleSchema.index({ date: -1 });
 moneyHandleSchema.index({ toWhom: 1 });
+moneyHandleSchema.index({ sendTo: 1 });
+moneyHandleSchema.index({ receiverName: 1 });
 
 module.exports = mongoose.model('MoneyHandle', moneyHandleSchema); 
