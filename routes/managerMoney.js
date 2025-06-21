@@ -19,10 +19,20 @@ const auth = (req, res, next) => {
 };
 
 // Routes
-router.get('/', auth, managerMoneyController.getAllTransactions);
-router.get('/sikari', auth, managerMoneyController.getTransactionsBySikari);
-router.post('/add', auth, managerMoneyController.createTransaction);
-router.put('/update/:id', auth, managerMoneyController.updateTransaction);
-router.delete('/delete/:id', auth, managerMoneyController.deleteTransaction);
+router.get('/', async (req, res) => {
+    managerMoneyController.getAllTransactions(req, res);
+});
+router.get('/sikari', async (req, res) => {
+    managerMoneyController.getTransactionsBySikari(req, res);
+});
+router.post('/add', async (req, res) => {
+    managerMoneyController.createTransaction(req, res);
+});
+router.put('/update/:id', async (req, res) => {
+    managerMoneyController.updateTransaction(req, res);
+});
+router.delete('/delete/:id', async (req, res) => {
+    managerMoneyController.deleteTransaction(req, res);
+});
 
 module.exports = router; 

@@ -46,7 +46,7 @@ async function compressPDF(buffer) {
 }
 
 // Upload a new company paper
-router.post('/upload', auth(['company']), upload.single('file'), async (req, res) => {
+router.post('/upload', upload.single('file'), async (req, res) => {
   let tempFilePath = null;
   
   try {
@@ -118,7 +118,7 @@ router.post('/upload', auth(['company']), upload.single('file'), async (req, res
 });
 
 // Get all papers for a company
-router.get('/papers', auth(['company']), async (req, res) => {
+router.get('/papers', async (req, res) => {
   try {
     const papers = await CompanyPaper.find({ 
       companyId: req.user.id,
@@ -152,7 +152,7 @@ router.get('/papers', auth(['company']), async (req, res) => {
 });
 
 // Get a specific paper
-router.get('/papers/:id', auth(['company']), async (req, res) => {
+router.get('/papers/:id', async (req, res) => {
   try {
     const paper = await CompanyPaper.findOne({
       _id: req.params.id,
@@ -196,7 +196,7 @@ router.get('/papers/:id', auth(['company']), async (req, res) => {
 });
 
 // Update paper details
-router.put('/papers/:id', auth(['company']), async (req, res) => {
+router.put('/papers/:id', async (req, res) => {
   try {
     const { description, category } = req.body;
     
@@ -247,7 +247,7 @@ router.put('/papers/:id', auth(['company']), async (req, res) => {
 });
 
 // Delete a paper (soft delete)
-router.delete('/papers/:id', auth(['company']), async (req, res) => {
+router.delete('/papers/:id', async (req, res) => {
   try {
     const paper = await CompanyPaper.findOne({
       _id: req.params.id,
@@ -291,7 +291,7 @@ router.delete('/papers/:id', auth(['company']), async (req, res) => {
 });
 
 // Get papers by category
-router.get('/papers/category/:category', auth(['company']), async (req, res) => {
+router.get('/papers/category/:category', async (req, res) => {
   try {
     const papers = await CompanyPaper.find({
       companyId: req.user.id,

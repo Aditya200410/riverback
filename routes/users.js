@@ -48,16 +48,16 @@ const auth = (req, res, next) => {
 };
 
 // Routes
-router.get('/', auth, userController.getAllUsers);
-router.get('/:id', auth, userController.getUserById);
-router.post('/add', auth, upload.fields([
+router.get('/', userController.getAllUsers);
+router.get('/:id', userController.getUserById);
+router.post('/add', upload.fields([
   { name: 'profilePhoto', maxCount: 1 },
   { name: 'bannerPhoto', maxCount: 1 }
 ]), userController.createUser);
-router.put('/update/:id', auth, upload.fields([
+router.put('/update/:id', upload.fields([
   { name: 'profilePhoto', maxCount: 1 },
   { name: 'bannerPhoto', maxCount: 1 }
 ]), userController.updateUser);
-router.delete('/delete/:id', auth, userController.deleteUser);
+router.delete('/delete/:id', userController.deleteUser);
 
 module.exports = router; 

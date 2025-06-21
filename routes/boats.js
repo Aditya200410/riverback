@@ -4,7 +4,6 @@ const boatController = require('../controllers/boatController');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { auth } = require('../middleware/auth');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -40,7 +39,7 @@ const upload = multer({
 });
 
 // Routes
-router.get('/', auth(['company']), async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const boats = await boatController.getAllBoats(req.user.id);
     res.json({
@@ -68,7 +67,7 @@ router.get('/', auth(['company']), async (req, res) => {
   }
 });
 
-router.get('/:id', auth(['company']), async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const boat = await boatController.getBoatById(req.params.id, req.user.id);
     if (!boat) {
@@ -105,7 +104,7 @@ router.get('/:id', auth(['company']), async (req, res) => {
   }
 });
 
-router.post('/add', auth(['company']), upload.fields([
+router.post('/add', upload.fields([
   { name: 'boatPhoto', maxCount: 1 },
   { name: 'registrationPhoto', maxCount: 1 },
   { name: 'insurancePhoto', maxCount: 1 }
@@ -148,7 +147,7 @@ router.post('/add', auth(['company']), upload.fields([
   }
 });
 
-router.put('/update/:id', auth(['company']), upload.fields([
+router.put('/update/:id', upload.fields([
   { name: 'boatPhoto', maxCount: 1 },
   { name: 'registrationPhoto', maxCount: 1 },
   { name: 'insurancePhoto', maxCount: 1 }
@@ -240,7 +239,7 @@ router.put('/update/:id', auth(['company']), upload.fields([
   }
 });
 
-router.delete('/delete/:id', auth(['company']), async (req, res) => {
+router.delete('/delete/:id', async (req, res) => {
   try {
     const boat = await boatController.deleteBoat(req.params.id, req.user.id);
     if (!boat) {

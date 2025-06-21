@@ -4,7 +4,6 @@ const sikariController = require('../controllers/sikariController');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { auth } = require('../middleware/auth');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -40,7 +39,7 @@ const upload = multer({
 });
 
 // Routes
-router.get('/', auth(['company']), async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const sikaris = await sikariController.getAllSikaris();
     res.json({
@@ -81,7 +80,7 @@ router.get('/', auth(['company']), async (req, res) => {
   }
 });
 
-router.get('/:id', auth(['company']), async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const sikari = await sikariController.getSikariById(req.params.id);
     if (!sikari) {
@@ -131,7 +130,7 @@ router.get('/:id', auth(['company']), async (req, res) => {
   }
 });
 
-router.post('/add', auth(['company']), upload.fields([
+router.post('/add', upload.fields([
   { name: 'profilePhoto', maxCount: 1 },
   { name: 'bannerPhoto', maxCount: 1 },
   { name: 'adharCardPhoto', maxCount: 1 },
@@ -250,7 +249,7 @@ router.post('/add', auth(['company']), upload.fields([
   }
 });
 
-router.put('/update/:id', auth(['company']), upload.fields([
+router.put('/update/:id', upload.fields([
   { name: 'profilePhoto', maxCount: 1 },
   { name: 'bannerPhoto', maxCount: 1 },
   { name: 'adharCardPhoto', maxCount: 1 },
@@ -389,7 +388,7 @@ router.put('/update/:id', auth(['company']), upload.fields([
   }
 });
 
-router.delete('/delete/:id', auth(['company']), async (req, res) => {
+router.delete('/delete/:id', async (req, res) => {
   try {
     const sikari = await sikariController.deleteSikari(req.params.id);
     if (!sikari) {

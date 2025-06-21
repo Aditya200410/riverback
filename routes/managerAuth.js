@@ -276,7 +276,7 @@ router.get('/profile-picture/:id', async (req, res) => {
 });
 
 // Update Profile
-router.put('/update-profile', auth, async (req, res) => {
+router.put('/update-profile', async (req, res) => {
   try {
     const { name, companyId } = req.body;
     const user = await Manager.findById(req.user.id);
@@ -323,7 +323,7 @@ router.put('/update-profile', auth, async (req, res) => {
 });
 
 // Update manager user by ID
-router.put('/update/:id', auth, async (req, res) => {
+router.put('/update/:id', async (req, res) => {
   try {
     const user = await Manager.findById(req.params.id);
     if (!user) {
@@ -343,7 +343,7 @@ router.put('/update/:id', auth, async (req, res) => {
 });
 
 // Delete (anonymize) manager user by ID
-router.delete('/delete/:id', auth, async (req, res) => {
+router.delete('/delete/:id', async (req, res) => {
   try {
     const user = await Manager.findById(req.params.id);
     if (!user) {

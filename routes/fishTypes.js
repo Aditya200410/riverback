@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const fishTypeController = require('../controllers/fishTypeController');
-const { auth } = require('../middleware/auth');
 
 // Get all fish types
-router.get('/', auth(['company']), async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const fishTypes = await fishTypeController.getAllFishTypes();
     res.json({
@@ -29,7 +28,7 @@ router.get('/', auth(['company']), async (req, res) => {
 });
 
 // Get fish type by ID
-router.get('/:id', auth(['company']), async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const fishType = await fishTypeController.getFishTypeById(req.params.id);
     if (!fishType) {
@@ -63,7 +62,7 @@ router.get('/:id', auth(['company']), async (req, res) => {
 });
 
 // Create new fish type
-router.post('/add', auth(['company']), async (req, res) => {
+router.post('/add', async (req, res) => {
   try {
     const { name, description, pricePerKg } = req.body;
 
@@ -96,7 +95,7 @@ router.post('/add', auth(['company']), async (req, res) => {
 });
 
 // Update fish type
-router.put('/update/:id', auth(['company']), async (req, res) => {
+router.put('/update/:id', async (req, res) => {
   try {
     const { name, description, pricePerKg } = req.body;
     const updateData = {};
@@ -164,7 +163,7 @@ router.put('/update/:id', auth(['company']), async (req, res) => {
 });
 
 // Delete fish type
-router.delete('/delete/:id', auth(['company']), async (req, res) => {
+router.delete('/delete/:id', async (req, res) => {
   try {
     const fishType = await fishTypeController.deleteFishType(req.params.id);
     if (!fishType) {

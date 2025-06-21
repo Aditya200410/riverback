@@ -11,7 +11,7 @@ const {
 } = require('../controllers/moneyHandleController');
 
 // Get all money transactions
-router.get('/', auth(['company']), async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const transactions = await MoneyHandle.find({
       companyId: req.user.id,
@@ -42,10 +42,43 @@ router.get('/', auth(['company']), async (req, res) => {
 });
 
 // Get transaction by ID
-router.get('/:id', auth(['company']), getTransactionById);
+router.get('/:id', async (req, res) => {
+  try {
+    const transaction = await MoneyHandle.findById(req.params.id);
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Transaction not found'
+        }
+      });
+    }
+    res.json({
+      success: true,
+      data: {
+        id: transaction._id,
+        amount: transaction.amount,
+        type: transaction.type,
+        toWhom: transaction.toWhom,
+        description: transaction.description,
+        date: transaction.date
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching transaction:', err);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error fetching transaction'
+      }
+    });
+  }
+});
 
 // Add new money transaction
-router.post('/add', auth(['company']), async (req, res) => {
+router.post('/add', async (req, res) => {
   try {
     const { amount, type, toWhom, description } = req.body;
 
@@ -84,7 +117,7 @@ router.post('/add', auth(['company']), async (req, res) => {
 });
 
 // Get transactions by type (pay/take)
-router.get('/type/:type', auth(['company']), async (req, res) => {
+router.get('/type/:type', async (req, res) => {
   try {
     const transactions = await MoneyHandle.find({
       companyId: req.user.id,
@@ -116,7 +149,7 @@ router.get('/type/:type', auth(['company']), async (req, res) => {
 });
 
 // Get transactions by person
-router.get('/person/:toWhom', auth(['company']), async (req, res) => {
+router.get('/person/:toWhom', async (req, res) => {
   try {
     const transactions = await MoneyHandle.find({
       companyId: req.user.id,
@@ -148,9 +181,76 @@ router.get('/person/:toWhom', auth(['company']), async (req, res) => {
 });
 
 // Update transaction
-router.put('/update/:id', auth(['company']), updateTransaction);
+router.put('/update/:id', async (req, res) => {
+  try {
+    const transaction = await MoneyHandle.findById(req.params.id);
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Transaction not found'
+        }
+      });
+    }
+    const { amount, type, toWhom, description } = req.body;
+    transaction.amount = amount;
+    transaction.type = type;
+    transaction.toWhom = toWhom;
+    transaction.description = description;
+    await transaction.save();
+    res.json({
+      success: true,
+      message: 'Transaction updated successfully',
+      data: {
+        id: transaction._id,
+        amount: transaction.amount,
+        type: transaction.type,
+        toWhom: transaction.toWhom,
+        description: transaction.description,
+        date: transaction.date
+      }
+    });
+  } catch (err) {
+    console.error('Error updating transaction:', err);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error updating transaction'
+      }
+    });
+  }
+});
 
 // Delete transaction
-router.delete('/delete/:id', auth(['company']), deleteTransaction);
+router.delete('/delete/:id', async (req, res) => {
+  try {
+    const transaction = await MoneyHandle.findById(req.params.id);
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Transaction not found'
+        }
+      });
+    }
+    await transaction.remove();
+    res.json({
+      success: true,
+      message: 'Transaction deleted successfully'
+    });
+  } catch (err) {
+    console.error('Error deleting transaction:', err);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error deleting transaction'
+      }
+    });
+  }
+});
 
 module.exports = router; 

@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const reportController = require('../controllers/reportController');
-const { auth } = require('../middleware/auth');
 
 // Get all reports for a company
-router.get('/', auth(['company']), async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const reports = await reportController.getAllReports(req.user.companyId);
     res.json({
@@ -41,7 +40,7 @@ router.get('/', auth(['company']), async (req, res) => {
 });
 
 // Get report by ID
-router.get('/:id', auth(['company']), async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const report = await reportController.getReportById(req.params.id);
     if (!report) {
@@ -90,7 +89,7 @@ router.get('/:id', auth(['company']), async (req, res) => {
 });
 
 // Generate new report
-router.post('/generate', auth(['company']), async (req, res) => {
+router.post('/generate', async (req, res) => {
   try {
     const { reportType, startDate, endDate } = req.body;
 
@@ -184,7 +183,7 @@ router.post('/generate', auth(['company']), async (req, res) => {
 });
 
 // Archive report
-router.delete('/archive/:id', auth(['company']), async (req, res) => {
+router.delete('/archive/:id', async (req, res) => {
   try {
     const report = await reportController.getReportById(req.params.id);
     if (!report) {
