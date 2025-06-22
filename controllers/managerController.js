@@ -2,7 +2,6 @@ const Manager = require('../models/Manager');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
-const ManagerUser = require('../models/ManagerUser');
 const { generateOTP } = require('../utils/otpGenerator');
 const { storeTempData, getTempData, removeTempData } = require('../utils/tempStorage');
 

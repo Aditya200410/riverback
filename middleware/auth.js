@@ -89,4 +89,4 @@ const auth = (roles = []) => {
   };
 };
 
-module.exports = { auth }; 
+module.exports = auth; 
