@@ -51,9 +51,15 @@ router.get('/validate-token', auth, async (req, res) => {
       }
     });
 
+    // Convert profile picture path to full URL
+    const managerObj = manager.toObject();
+    if (managerObj.profilePicture) {
+      managerObj.profilePicture = `${req.protocol}://${req.get('host')}/${managerObj.profilePicture}`;
+    }
+
     res.json({ 
       success: true,
-      data: { manager }
+      data: { manager: managerObj }
     });
   } catch (err) {
     res.status(500).json({ 
@@ -148,6 +154,12 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
       { expiresIn: '24h' }
     );
 
+    // Convert profile picture path to full URL
+    let profilePictureUrl = user.profilePicture;
+    if (profilePictureUrl) {
+      profilePictureUrl = `${req.protocol}://${req.get('host')}/${profilePictureUrl}`;
+    }
+
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
@@ -161,7 +173,7 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
           aadhar: user.aadhar,
           address: user.address,
           phase: user.phase,
-          profilePicture: user.profilePicture,
+          profilePicture: profilePictureUrl,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
@@ -216,6 +228,12 @@ router.post('/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    // Convert profile picture path to full URL
+    let profilePictureUrl = user.profilePicture;
+    if (profilePictureUrl) {
+      profilePictureUrl = `${req.protocol}://${req.get('host')}/${profilePictureUrl}`;
+    }
+
     res.json({
       success: true,
       message: 'Login successful',
@@ -229,7 +247,7 @@ router.post('/login', async (req, res) => {
           aadhar: user.aadhar,
           address: user.address,
           phase: user.phase,
-          profilePicture: user.profilePicture,
+          profilePicture: profilePictureUrl,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
@@ -296,6 +314,12 @@ router.put('/update-profile', async (req, res) => {
 
     await user.save();
 
+    // Convert profile picture path to full URL
+    let profilePictureUrl = user.profilePicture;
+    if (profilePictureUrl) {
+      profilePictureUrl = `${req.protocol}://${req.get('host')}/${profilePictureUrl}`;
+    }
+
     res.json({
       success: true,
       message: 'Profile updated successfully',
@@ -306,6 +330,7 @@ router.put('/update-profile', async (req, res) => {
           mobile: user.mobile,
           aadhar: user.aadhar,
           companyId: user.companyId,
+          profilePicture: profilePictureUrl,
           hasProfilePicture: !!user.profilePicture
         }
       }

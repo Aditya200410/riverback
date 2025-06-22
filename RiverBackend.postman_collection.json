@@ -540,319 +540,581 @@
               }
             }
           ]
-        }
-      ]
-    },
-    {
-      "name": "Company Summary",
-      "item": [
+        },
         {
-          "name": "Get Company Summary",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
+          "name": "Manager Auth",
+          "item": [
+            {
+              "name": "Manager Signup",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "multipart/form-data"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/manager-auth/signup",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "manager-auth", "signup"]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "name",
+                      "value": "Test Manager",
+                      "type": "text"
+                    },
+                    {
+                      "key": "mobile",
+                      "value": "9876543210",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password",
+                      "value": "Test@123",
+                      "type": "text"
+                    },
+                    {
+                      "key": "aadhar",
+                      "value": "123456789012",
+                      "type": "text"
+                    },
+                    {
+                      "key": "address",
+                      "value": "123 Manager Street, City",
+                      "type": "text"
+                    },
+                    {
+                      "key": "phase",
+                      "value": "Phase 1",
+                      "type": "text"
+                    },
+                    {
+                      "key": "profilePicture",
+                      "type": "file",
+                      "src": "/path/to/profile/picture.jpg"
+                    }
+                  ]
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "POST",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "multipart/form-data"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/manager-auth/signup",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "manager-auth", "signup"]
+                      }
+                    },
+                    "status": "Created",
+                    "code": 201,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"user\": {\n      \"_id\": \"507f1f77bcf86cd799439011\",\n      \"managerId\": \"MN001\",\n      \"name\": \"Test Manager\",\n      \"mobile\": \"9876543210\",\n      \"aadhar\": \"123456789012\",\n      \"address\": \"123 Manager Street, City\",\n      \"phase\": \"Phase 1\",\n      \"profilePicture\": \"{{base_url}}/uploads/manager-users/1750507129679-test-image.jpg\",\n      \"isVerified\": true,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  }\n}"
+                  }
+                ]
               }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/company-summary",
-              "host": ["{{base_url}}"],
-              "path": ["api", "company-summary"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Company Users",
-      "item": [
-        {
-          "name": "Get All Users",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/users",
-              "host": ["{{base_url}}"],
-              "path": ["api", "users"]
-            }
-          }
-        },
-        {
-          "name": "Get User by ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/users/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "users", ":id"],
-              "variable": [ { "key": "id", "value": "user_id_here" } ]
-            }
-          }
-        },
-        {
-          "name": "Add User",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/users/add",
-              "host": ["{{base_url}}"],
-              "path": ["api", "users", "add"]
             },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "name", "value": "Test User", "type": "text" },
-                { "key": "mobile", "value": "1234567890", "type": "text" },
-                { "key": "email", "value": "user@test.com", "type": "text" },
-                { "key": "password", "value": "Test@123", "type": "text" },
-                { "key": "companyName", "value": "Test Company", "type": "text" },
-                { "key": "companyAddress", "value": "123 Test Street", "type": "text" },
-                { "key": "aadhar_no", "value": "123456789012", "type": "text" },
-                { "key": "profilePhoto", "type": "file", "src": "/path/to/profile/photo.jpg" },
-                { "key": "bannerPhoto", "type": "file", "src": "/path/to/banner/photo.jpg" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update User",
-          "request": {
-            "method": "PUT",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/users/update/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "users", "update", ":id"],
-              "variable": [ { "key": "id", "value": "user_id_here" } ]
-            },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "name", "value": "Updated User", "type": "text" },
-                { "key": "mobile", "value": "9876543210", "type": "text" },
-                { "key": "email", "value": "updated@test.com", "type": "text" },
-                { "key": "companyName", "value": "Updated Company", "type": "text" },
-                { "key": "companyAddress", "value": "456 Updated Street", "type": "text" },
-                { "key": "aadhar_no", "value": "987654321098", "type": "text" },
-                { "key": "profilePhoto", "type": "file", "src": "/path/to/new/profile/photo.jpg" },
-                { "key": "bannerPhoto", "type": "file", "src": "/path/to/new/banner/photo.jpg" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete User",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              { "key": "Authorization", "value": "Bearer {{token}}" }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/users/delete/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "users", "delete", ":id"],
-              "variable": [ { "key": "id", "value": "user_id_here" } ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Money Handles",
-      "item": [
-        {
-          "name": "Get All Transactions",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles"]
-            }
-          }
-        },
-        {
-          "name": "Get Transaction by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", ":id"],
-              "variable": [
-                { "key": "id", "value": "transaction_id_here" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Add Transaction",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/add",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "add"]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"amount\": 1000,\n    \"type\": \"pay\",\n    \"toWhom\": \"John Doe\",\n    \"sendTo\": \"Manager\",\n    \"receiverName\": \"Manager John\",\n    \"receiverId\": \"MN001\",\n    \"pay\": true,\n    \"received\": false,\n    \"description\": \"Payment for services\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Get Transactions by Type",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/type/:type",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "type", ":type"],
-              "variable": [
-                { "key": "type", "value": "pay" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Transactions by SendTo",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/sendto/:sendTo",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "sendto", ":sendTo"],
-              "variable": [
-                { "key": "sendTo", "value": "Manager" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Transactions by Status",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/status/:status",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "status", ":status"],
-              "variable": [
-                { "key": "status", "value": "pay" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Transaction",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+            {
+              "name": "Manager Login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/manager-auth/login",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "manager-auth", "login"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"mobile\": \"9876543210\",\n    \"password\": \"Test@123\",\n    \"phase\": \"Phase 1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "POST",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/manager-auth/login",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "manager-auth", "login"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"Login successful\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODU2YWMxNjVjMjA2NTM4M2U1ZDFiMjUiLCJyb2xlIjoibWFuYWdlciIsImlhdCI6MTc1MDUxMDY2MywiZXhwIjoxNzUwNTk3MDYzfQ.example\",\n    \"user\": {\n      \"_id\": \"6856ac165c2065383e5d1b25\",\n      \"managerId\": \"MN001\",\n      \"name\": \"Test Manager\",\n      \"mobile\": \"9876543210\",\n      \"aadhar\": \"123456789012\",\n      \"address\": \"123 Manager Street, City\",\n      \"phase\": \"Phase 1\",\n      \"profilePicture\": \"{{base_url}}/uploads/manager-users/1750507129679-test-image.jpg\",\n      \"isVerified\": true,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  }\n}"
+                  }
+                ]
               }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/update/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "update", ":id"],
-              "variable": [
-                { "key": "id", "value": "transaction_id_here" }
-              ]
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"amount\": 1500,\n    \"sendTo\": \"Company\",\n    \"receiverName\": \"Company ABC\",\n    \"pay\": false,\n    \"received\": true,\n    \"description\": \"Updated transaction\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Delete Transaction",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/money-handles/delete/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "money-handles", "delete", ":id"],
-              "variable": [
-                { "key": "id", "value": "transaction_id_here" }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Company Papers",
-      "item": [
-        {
-          "name": "Get All Papers",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/company-papers/papers",
-              "host": ["{{base_url}}"],
-              "path": ["api", "company-papers", "papers"]
-            }
-          }
-        },
-        {
-          "name": "Get Paper by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/company-papers/papers/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "company-papers", "papers", ":id"],
-              "variable": [
-                { "key": "id", "value": "paper_id_here" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Upload Paper",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/company-papers/upload",
-              "host": ["{{base_url}}"],
-              "path": ["api", "company-papers", "upload"]
+            {
+              "name": "Manager Validate Token",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/manager-auth/validate-token",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "manager-auth", "validate-token"]
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "GET",
+                      "header": [
+                        {
+                          "key": "Authorization",
+                          "value": "Bearer {{token}}"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/manager-auth/validate-token",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "manager-auth", "validate-token"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"data\": {\n    \"manager\": {\n      \"_id\": \"6856ac165c2065383e5d1b25\",\n      \"managerId\": \"MN001\",\n      \"name\": \"Test Manager\",\n      \"mobile\": \"9876543210\",\n      \"aadhar\": \"123456789012\",\n      \"address\": \"123 Manager Street, City\",\n      \"phase\": \"Phase 1\",\n      \"profilePicture\": \"{{base_url}}/uploads/manager-users/1750507129679-test-image.jpg\",\n      \"isVerified\": true,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  }\n}"
+                  }
+                ]
+              }
             },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "file", "type": "file", "src": "/path/to/document.pdf" },
-                { "key": "description", "value": "Test document", "type": "text" },
-                { "key": "companyName", "value": "Test Company Ltd", "type": "text" },
-                { "key": "companyId", "value": "507f1f77bcf86cd799439011", "type": "text" },
-                { "key": "category", "value": "legal", "type": "text" }
-              ]
+            {
+              "name": "Manager Update Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/manager-auth/update-profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "manager-auth", "update-profile"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Updated Manager Name\",\n    \"companyId\": \"CPM001\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "PUT",
+                      "header": [
+                        {
+                          "key": "Authorization",
+                          "value": "Bearer {{token}}"
+                        },
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/manager-auth/update-profile",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "manager-auth", "update-profile"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"Profile updated successfully\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"6856ac165c2065383e5d1b25\",\n      \"name\": \"Updated Manager Name\",\n      \"mobile\": \"9876543210\",\n      \"aadhar\": \"123456789012\",\n      \"companyId\": \"CPM001\",\n      \"profilePicture\": \"{{base_url}}/uploads/manager-users/1750507129679-test-image.jpg\",\n      \"hasProfilePicture\": true\n    }\n  }\n}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Add Manager",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/managers/add",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "managers", "add"]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    { "key": "managerId", "value": "MN001", "type": "text" },
+                    { "key": "managerName", "value": "Test Manager", "type": "text" },
+                    { "key": "mobileNumber", "value": "1234567890", "type": "text" },
+                    { "key": "location", "value": "Test Location", "type": "text" },
+                    { "key": "dateOfJoining", "value": "2024-01-01", "type": "text" },
+                    { "key": "smargId", "value": "SM001", "type": "text" },
+                    { "key": "adharCardNumber", "value": "123456789012", "type": "text" },
+                    { "key": "bankAccountNumber", "value": "1234567890", "type": "text" },
+                    { "key": "ifscCode", "value": "ABCD0001234", "type": "text" },
+                    { "key": "madhayamName", "value": "Test Madhayam", "type": "text" },
+                    { "key": "madhayamMobileNumber", "value": "9876543210", "type": "text" },
+                    { "key": "madhayamAddress", "value": "123 Madhayam Street", "type": "text" },
+                    { "key": "boatNumber", "value": "BT001", "type": "text" },
+                    { "key": "boatId", "value": "BID001", "type": "text" },
+                    { "key": "boatType", "value": "company boat", "type": "text" },
+                    { "key": "position", "value": "personal duty", "type": "text" },
+                    { "key": "email", "value": "manager@test.com", "type": "text" },
+                    { "key": "address", "value": "123 Manager Street", "type": "text" },
+                    { "key": "phase", "value": "Phase 1", "type": "text" },
+                    { "key": "profilePhoto", "type": "file", "src": "/path/to/manager/profile.jpg" },
+                    { "key": "bannerPhoto", "type": "file", "src": "/path/to/manager/banner.jpg" },
+                    { "key": "adharCardPhoto", "type": "file", "src": "/path/to/manager/adhar.jpg" },
+                    { "key": "bankPassbookPhoto", "type": "file", "src": "/path/to/manager/passbook.jpg" }
+                  ]
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "POST",
+                      "header": [],
+                      "url": {
+                        "raw": "{{base_url}}/api/managers/add",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "managers", "add"]
+                      }
+                    },
+                    "status": "Created",
+                    "code": 201,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"Manager added successfully\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"managerId\": \"MN001\",\n    \"managerName\": \"Test Manager\",\n    \"mobileNumber\": \"1234567890\",\n    \"location\": \"Test Location\",\n    \"dateOfJoining\": \"2024-01-01T00:00:00.000Z\",\n    \"smargId\": \"SM001\",\n    \"adharCardNumber\": \"123456789012\",\n    \"bankAccountNumber\": \"1234567890\",\n    \"ifscCode\": \"ABCD0001234\",\n    \"madhayamName\": \"Test Madhayam\",\n    \"madhayamMobileNumber\": \"9876543210\",\n    \"madhayamAddress\": \"123 Madhayam Street\",\n    \"boatNumber\": \"BT001\",\n    \"boatId\": \"BID001\",\n    \"boatType\": \"company boat\",\n    \"position\": \"personal duty\",\n    \"email\": \"manager@test.com\",\n    \"address\": \"123 Manager Street\",\n    \"phase\": \"Phase 1\",\n    \"profilePhoto\": \"{{base_url}}/uploads/manager-users/manager-1750507129679-123456789.jpg\",\n    \"bannerPhoto\": \"{{base_url}}/uploads/manager-users/manager-1750507129679-987654321.jpg\",\n    \"adharCardPhoto\": \"{{base_url}}/uploads/manager-users/manager-1750507129679-456789123.jpg\",\n    \"bankPassbookPhoto\": \"{{base_url}}/uploads/manager-users/manager-1750507129679-789123456.jpg\"\n  }\n}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Get All Managers",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/managers",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "managers"]
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "GET",
+                      "header": [
+                        {
+                          "key": "Authorization",
+                          "value": "Bearer {{token}}"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/managers",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "managers"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"_id\": \"507f1f77bcf86cd799439011\",\n      \"managerId\": \"MN001\",\n      \"name\": \"John Manager\",\n      \"email\": \"john@example.com\",\n      \"mobile\": \"9876543210\",\n      \"aadhar\": \"123456789012\",\n      \"address\": \"123 Manager Street, City\",\n      \"profilePicture\": \"{{base_url}}/uploads/manager-users/profile-9876543210.jpg\",\n      \"phase\": \"Phase 1\",\n      \"isVerified\": true,\n      \"location\": \"Location A\",\n      \"isSignedIn\": true,\n      \"signInTime\": \"2024-01-01T10:00:00.000Z\",\n      \"lastActive\": \"2024-01-01T12:00:00.000Z\",\n      \"status\": \"active\",\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n      \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  ]\n}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Get Manager by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/managers/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "managers", ":id"],
+                  "variable": [
+                    { "key": "id", "value": "manager_id_here" }
+                  ]
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "GET",
+                      "header": [
+                        {
+                          "key": "Authorization",
+                          "value": "Bearer {{token}}"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/managers/:id",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "managers", ":id"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"507f1f77bcf86cd799439011\",\n    \"managerId\": \"MN001\",\n    \"name\": \"John Manager\",\n    \"email\": \"john@example.com\",\n    \"mobile\": \"9876543210\",\n    \"aadhar\": \"123456789012\",\n    \"address\": \"123 Manager Street, City\",\n    \"profilePicture\": \"{{base_url}}/uploads/manager-users/profile-9876543210.jpg\",\n    \"phase\": \"Phase 1\",\n    \"isVerified\": true,\n    \"location\": \"Location A\",\n    \"isSignedIn\": true,\n    \"signInTime\": \"2024-01-01T10:00:00.000Z\",\n    \"lastActive\": \"2024-01-01T12:00:00.000Z\",\n    \"status\": \"active\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n    \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Update Manager",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/managers/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "managers", ":id"],
+                  "variable": [
+                    { "key": "id", "value": "manager_id_here" }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Manager Name\",\n  \"email\": \"updated@example.com\",\n  \"address\": \"456 Updated Street, City\",\n  \"phase\": \"Phase 2\",\n  \"location\": \"Location B\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "PUT",
+                      "header": [
+                        {
+                          "key": "Authorization",
+                          "value": "Bearer {{token}}"
+                        },
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/managers/:id",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "managers", ":id"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"507f1f77bcf86cd799439011\",\n    \"managerId\": \"MN001\",\n    \"name\": \"Updated Manager Name\",\n    \"email\": \"updated@example.com\",\n    \"mobile\": \"9876543210\",\n    \"aadhar\": \"123456789012\",\n    \"address\": \"456 Updated Street, City\",\n    \"profilePicture\": \"{{base_url}}/uploads/manager-users/profile-9876543210.jpg\",\n    \"phase\": \"Phase 2\",\n    \"isVerified\": true,\n    \"location\": \"Location B\",\n    \"isSignedIn\": true,\n    \"signInTime\": \"2024-01-01T10:00:00.000Z\",\n    \"lastActive\": \"2024-01-01T12:00:00.000Z\",\n    \"status\": \"active\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n    \"updatedAt\": \"2024-01-01T13:00:00.000Z\"\n  }\n}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Delete Manager",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/managers/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "managers", ":id"],
+                  "variable": [
+                    { "key": "id", "value": "manager_id_here" }
+                  ]
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "DELETE",
+                      "header": [
+                        {
+                          "key": "Authorization",
+                          "value": "Bearer {{token}}"
+                        }
+                      ],
+                      "url": {
+                        "raw": "{{base_url}}/api/managers/:id",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "managers", ":id"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"Manager deleted successfully\"\n}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Get Signed-in Managers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/managers/signed-in",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "managers", "signed-in"]
+                },
+                "response": [
+                  {
+                    "name": "Success Response",
+                    "originalRequest": {
+                      "method": "GET",
+                      "header": [],
+                      "url": {
+                        "raw": "{{base_url}}/api/managers/signed-in",
+                        "host": ["{{base_url}}"],
+                        "path": ["api", "managers", "signed-in"]
+                      }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"John Manager\",\n      \"email\": \"john@example.com\",\n      \"mobile\": \"9876543210\",\n      \"location\": \"Location A\",\n      \"signInTime\": \"2024-01-01T10:00:00.000Z\",\n      \"lastActive\": \"2024-01-01T12:00:00.000Z\"\n    }\n  ]\n}"
+                  }
+                ]
+              }
             }
-          }
+          ]
         },
         {
           "name": "Update Paper",

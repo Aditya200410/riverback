@@ -78,6 +78,61 @@ const managerSchema = new mongoose.Schema({
     type: String,
     enum: ['active', 'inactive', 'deleted'],
     default: 'active'
+  },
+  // Additional fields for sikari-like structure
+  dateOfJoining: {
+    type: Date
+  },
+  smargId: {
+    type: String,
+    trim: true
+  },
+  bankAccountNumber: {
+    type: String,
+    trim: true
+  },
+  ifscCode: {
+    type: String,
+    trim: true
+  },
+  madhayamName: {
+    type: String,
+    trim: true
+  },
+  madhayamMobileNumber: {
+    type: String,
+    trim: true
+  },
+  madhayamAddress: {
+    type: String,
+    trim: true
+  },
+  boatNumber: {
+    type: String,
+    trim: true
+  },
+  boatId: {
+    type: String,
+    trim: true
+  },
+  boatType: {
+    type: String,
+    enum: ['company boat', 'self boat'],
+    trim: true
+  },
+  position: {
+    type: String,
+    enum: ['personal duty', 'government register fisherman', 'illegal'],
+    trim: true
+  },
+  bannerPhoto: {
+    type: String
+  },
+  adharCardPhoto: {
+    type: String
+  },
+  bankPassbookPhoto: {
+    type: String
   }
 }, {
   timestamps: true

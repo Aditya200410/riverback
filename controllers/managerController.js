@@ -12,9 +12,19 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 exports.getAllManagers = async (req, res) => {
   try {
     const managers = await Manager.find().select('-password -resetPasswordToken -resetPasswordExpires');
+    
+    // Convert profile picture paths to full URLs
+    const managersWithUrls = managers.map(manager => {
+      const managerObj = manager.toObject();
+      if (managerObj.profilePicture) {
+        managerObj.profilePicture = `${req.protocol}://${req.get('host')}/${managerObj.profilePicture}`;
+      }
+      return managerObj;
+    });
+    
     res.status(200).json({
       success: true,
-      data: managers
+      data: managersWithUrls
     });
   } catch (error) {
     res.status(500).json({
@@ -41,9 +51,16 @@ exports.getManagerById = async (req, res) => {
         }
       });
     }
+    
+    // Convert profile picture path to full URL
+    const managerObj = manager.toObject();
+    if (managerObj.profilePicture) {
+      managerObj.profilePicture = `${req.protocol}://${req.get('host')}/${managerObj.profilePicture}`;
+    }
+    
     res.status(200).json({
       success: true,
-      data: manager
+      data: managerObj
     });
   } catch (error) {
     res.status(500).json({
@@ -98,9 +115,16 @@ exports.updateManager = async (req, res) => {
         }
       });
     }
+    
+    // Convert profile picture path to full URL
+    const managerObj = manager.toObject();
+    if (managerObj.profilePicture) {
+      managerObj.profilePicture = `${req.protocol}://${req.get('host')}/${managerObj.profilePicture}`;
+    }
+    
     res.status(200).json({
       success: true,
-      data: manager
+      data: managerObj
     });
   } catch (error) {
     res.status(400).json({
