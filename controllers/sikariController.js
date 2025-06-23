@@ -1,4 +1,5 @@
 const Sikari = require('../models/Sikari');
+const Collection = require('../models/Collection');
 
 // Get all sikaris
 const getAllSikaris = async () => {
@@ -14,7 +15,26 @@ const getAllSikaris = async () => {
 // Get sikari by ID
 const getSikariById = async (sikariId) => {
     try {
-        return await Sikari.findOne({ _id: sikariId, status: 'active' });
+        // Get sikari details
+        const sikari = await Sikari.findOne({ _id: sikariId, status: 'active' });
+        if (!sikari) {
+            return null;
+        }
+
+        // Get collection history for this sikari
+        const collectionHistory = await Collection.find({ 
+            sikahriName: sikari.name,
+            phoneNumber: sikari.mobileNumber 
+        }).sort({ createdAt: -1 });
+
+        // Create response object with all required data
+        const response = {
+            sikari: sikari,
+            paymentHistory: [], // Empty array for now as payment history is not implemented yet
+            collectionHistory: collectionHistory
+        };
+
+        return response;
     } catch (error) {
         console.error('Error in getSikariById:', error);
         throw error;
