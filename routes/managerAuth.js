@@ -147,13 +147,6 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
 
     await user.save();
 
-    // Generate token
-    const token = jwt.sign(
-      { userId: user._id, role: 'manager' },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
     // Convert profile picture path to full URL
     let profilePictureUrl = user.profilePicture;
     if (profilePictureUrl) {
@@ -164,7 +157,6 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
       success: true,
       message: 'User registered successfully',
       data: {
-        token,
         user: {
           _id: user._id,
           managerId: user.managerId,
@@ -221,13 +213,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Generate token
-    const token = jwt.sign(
-      { userId: user._id, role: 'manager' },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
     // Convert profile picture path to full URL
     let profilePictureUrl = user.profilePicture;
     if (profilePictureUrl) {
@@ -238,7 +223,6 @@ router.post('/login', async (req, res) => {
       success: true,
       message: 'Login successful',
       data: {
-        token,
         user: {
           _id: user._id,
           managerId: user.managerId,
