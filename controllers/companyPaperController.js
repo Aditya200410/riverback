@@ -44,7 +44,13 @@ exports.createPaper = async (req, res) => {
   try {
     const paper = new CompanyPaper(req.body);
     const newPaper = await paper.save();
-    res.status(201).json(newPaper);
+    // Add public link to the paper (absolute URL)
+    const baseUrl = req.protocol + '://' + req.get('host');
+    const paperWithLink = {
+      ...newPaper.toObject(),
+      pdfUrl: `${baseUrl}/uploads/company-papers/${newPaper.fileName}`
+    };
+    res.status(201).json(paperWithLink);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -61,7 +67,13 @@ exports.updatePaper = async (req, res) => {
     if (!paper) {
       return res.status(404).json({ message: 'Paper not found' });
     }
-    res.status(200).json(paper);
+    // Add public link to the paper (absolute URL)
+    const baseUrl = req.protocol + '://' + req.get('host');
+    const paperWithLink = {
+      ...paper.toObject(),
+      pdfUrl: `${baseUrl}/uploads/company-papers/${paper.fileName}`
+    };
+    res.status(200).json(paperWithLink);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
