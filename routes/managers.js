@@ -41,7 +41,7 @@ const upload = multer({
 });
 
 // Get all managers
-router.get('/', auth, managerController.getAllManagers);
+router.get('/', managerController.getAllManagers);
 
 // Get manager by ID
 router.get('/:id', auth, managerController.getManagerById);
