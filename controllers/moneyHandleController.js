@@ -54,17 +54,22 @@ exports.getTransactionById = async (req, res) => {
 // Create new transaction
 exports.createTransaction = async (req, res) => {
     try {
-        const { amount, type, description } = req.body;
-
+        const { amount, type, description, username } = req.body;
+        if (!username) {
+            return res.status(400).json({
+                success: false,
+                error: 'USERNAME_REQUIRED',
+                message: 'Username is required'
+            });
+        }
         const transaction = new MoneyHandle({
             amount,
             type,
             description,
+            username,
             companyId: null
         });
-
         await transaction.save();
-
         res.status(201).json({
             success: true,
             data: transaction
@@ -82,21 +87,17 @@ exports.createTransaction = async (req, res) => {
 // Update transaction
 exports.updateTransaction = async (req, res) => {
     try {
-        const { amount, type, description } = req.body;
-
+        const { amount, type, description, username } = req.body;
+        const updateData = { amount, type, description };
+        if (username) updateData.username = username;
         const transaction = await MoneyHandle.findOneAndUpdate(
             {
                 _id: req.params.id,
                 status: 'active'
             },
-            {
-                amount,
-                type,
-                description
-            },
+            updateData,
             { new: true }
         );
-
         if (!transaction) {
             return res.status(404).json({
                 success: false,
@@ -104,7 +105,6 @@ exports.updateTransaction = async (req, res) => {
                 message: 'Transaction not found'
             });
         }
-
         res.json({
             success: true,
             data: transaction

@@ -57,6 +57,11 @@ const moneyHandleSchema = new mongoose.Schema({
     type: String,
     enum: ['active', 'deleted'],
     default: 'active'
+  },
+  username: {
+    type: String,
+    required: true,
+    trim: true
   }
 }, {
   timestamps: true
