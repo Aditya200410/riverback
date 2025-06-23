@@ -303,17 +303,6 @@ router.post('/add', upload.fields([
       });
     }
     
-    // Handle other specific errors
-    if (err.message) {
-      return res.status(500).json({
-        success: false,
-        error: {
-          code: 'SERVER_ERROR',
-          message: 'Error adding sikari: ' + err.message
-        }
-      });
-    }
-    
     res.status(500).json({
       success: false,
       error: {

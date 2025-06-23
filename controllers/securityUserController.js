@@ -6,9 +6,17 @@ const bcrypt = require('bcryptjs');
 exports.getAllSecurityUsers = async (req, res) => {
   try {
     const securityUsers = await SecurityUser.find().select('-password -resetPasswordToken -resetPasswordExpires');
+    const baseUrl = req.protocol + '://' + req.get('host');
+    const usersWithUrls = securityUsers.map(user => {
+      const userObj = user.toObject();
+      if (userObj.profilePicture) {
+        userObj.profilePicture = `${baseUrl}/uploads/security-users/${userObj.profilePicture}`;
+      }
+      return userObj;
+    });
     res.status(200).json({
       success: true,
-      data: securityUsers
+      data: usersWithUrls
     });
   } catch (error) {
     res.status(500).json({
@@ -35,9 +43,14 @@ exports.getSecurityUserById = async (req, res) => {
         }
       });
     }
+    const baseUrl = req.protocol + '://' + req.get('host');
+    const userObj = securityUser.toObject();
+    if (userObj.profilePicture) {
+      userObj.profilePicture = `${baseUrl}/uploads/security-users/${userObj.profilePicture}`;
+    }
     res.status(200).json({
       success: true,
-      data: securityUser
+      data: userObj
     });
   } catch (error) {
     res.status(500).json({

@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const managerController = require('../controllers/managerController');
-const auth = require('../middleware/auth');
 const Manager = require('../models/Manager');
 const multer = require('multer');
 const path = require('path');
@@ -44,13 +43,13 @@ const upload = multer({
 router.get('/', managerController.getAllManagers);
 
 // Get manager by ID
-router.get('/:id', auth, managerController.getManagerById);
+router.get('/:id', managerController.getManagerById);
 
 // Update manager
-router.put('/:id', auth, managerController.updateManager);
+router.put('/:id', managerController.updateManager);
 
 // Delete manager
-router.delete('/:id', auth, managerController.deleteManager);
+router.delete('/:id', managerController.deleteManager);
 
 // Get all signed-in managers
 router.get('/signed-in', async (req, res) => {

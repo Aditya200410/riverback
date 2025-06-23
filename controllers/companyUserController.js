@@ -5,7 +5,15 @@ const jwt = require('jsonwebtoken');
 exports.getAllCompanyUsers = async (req, res) => {
   try {
     const companyUsers = await CompanyUser.find().select('-password -resetPasswordToken -resetPasswordExpires');
-    res.status(200).json(companyUsers);
+    const baseUrl = req.protocol + '://' + req.get('host');
+    const usersWithUrls = companyUsers.map(user => {
+      const userObj = user.toObject();
+      if (userObj.profilePicture) {
+        userObj.profilePicture = `${baseUrl}/uploads/company-users/${userObj.profilePicture}`;
+      }
+      return userObj;
+    });
+    res.status(200).json(usersWithUrls);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -19,7 +27,12 @@ exports.getCompanyUserById = async (req, res) => {
     if (!companyUser) {
       return res.status(404).json({ message: 'Company user not found' });
     }
-    res.status(200).json(companyUser);
+    const baseUrl = req.protocol + '://' + req.get('host');
+    const userObj = companyUser.toObject();
+    if (userObj.profilePicture) {
+      userObj.profilePicture = `${baseUrl}/uploads/company-users/${userObj.profilePicture}`;
+    }
+    res.status(200).json(userObj);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

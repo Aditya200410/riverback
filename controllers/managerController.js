@@ -11,16 +11,24 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 exports.getAllManagers = async (req, res) => {
   try {
     const managers = await Manager.find().select('-password -resetPasswordToken -resetPasswordExpires');
-    
-    // Convert profile picture paths to full URLs
+    const baseUrl = req.protocol + '://' + req.get('host');
+    // Convert file paths to full URLs
     const managersWithUrls = managers.map(manager => {
       const managerObj = manager.toObject();
       if (managerObj.profilePicture) {
-        managerObj.profilePicture = `${req.protocol}://${req.get('host')}/${managerObj.profilePicture}`;
+        managerObj.profilePicture = `${baseUrl}/uploads/manager-users/${managerObj.profilePicture}`;
+      }
+      if (managerObj.bannerPhoto) {
+        managerObj.bannerPhoto = `${baseUrl}/uploads/manager-users/${managerObj.bannerPhoto}`;
+      }
+      if (managerObj.adharCardPhoto) {
+        managerObj.adharCardPhoto = `${baseUrl}/uploads/manager-users/${managerObj.adharCardPhoto}`;
+      }
+      if (managerObj.bankPassbookPhoto) {
+        managerObj.bankPassbookPhoto = `${baseUrl}/uploads/manager-users/${managerObj.bankPassbookPhoto}`;
       }
       return managerObj;
     });
-    
     res.status(200).json({
       success: true,
       data: managersWithUrls
@@ -50,13 +58,20 @@ exports.getManagerById = async (req, res) => {
         }
       });
     }
-    
-    // Convert profile picture path to full URL
+    const baseUrl = req.protocol + '://' + req.get('host');
     const managerObj = manager.toObject();
     if (managerObj.profilePicture) {
-      managerObj.profilePicture = `${req.protocol}://${req.get('host')}/${managerObj.profilePicture}`;
+      managerObj.profilePicture = `${baseUrl}/uploads/manager-users/${managerObj.profilePicture}`;
     }
-    
+    if (managerObj.bannerPhoto) {
+      managerObj.bannerPhoto = `${baseUrl}/uploads/manager-users/${managerObj.bannerPhoto}`;
+    }
+    if (managerObj.adharCardPhoto) {
+      managerObj.adharCardPhoto = `${baseUrl}/uploads/manager-users/${managerObj.adharCardPhoto}`;
+    }
+    if (managerObj.bankPassbookPhoto) {
+      managerObj.bankPassbookPhoto = `${baseUrl}/uploads/manager-users/${managerObj.bankPassbookPhoto}`;
+    }
     res.status(200).json({
       success: true,
       data: managerObj
