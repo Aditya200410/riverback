@@ -129,6 +129,23 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
     const { description, companyName, companyId } = req.body;
 
+    // Look up the actual CompanyUser by companyId (string)
+    let companyUserObjectId = null;
+    if (companyId) {
+      const CompanyUser = require('../models/CompanyUser');
+      const companyUser = await CompanyUser.findOne({ companyId: companyId });
+      if (!companyUser) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_COMPANY_ID',
+            message: 'No company user found for the provided companyId.'
+          }
+        });
+      }
+      companyUserObjectId = companyUser._id;
+    }
+
     // Create uploads directory if it doesn't exist
     const uploadDir = path.join(__dirname, '..', 'uploads', 'company-papers');
     if (!fs.existsSync(uploadDir)) {
@@ -163,7 +180,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       fileType: finalMimeType,
       fileSize: compressedBuffer.length,
       uploadedBy: null,
-      companyId: companyId || null,
+      companyId: companyUserObjectId,
       companyName: companyName || 'Unknown Company',
       description: description || '',
       category: 'other'

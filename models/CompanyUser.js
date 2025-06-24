@@ -49,11 +49,12 @@ const companyUserSchema = new mongoose.Schema({
   },
   aadhar_no: {
     type: String,
-    required: true,
+    required: false,
     unique: true
   },
   profilePicture: {
-    type: String
+    type: String,
+    required: false
   },
   isVerified: {
     type: Boolean,
