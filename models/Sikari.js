@@ -42,12 +42,12 @@ const sikariSchema = new mongoose.Schema({
   },
   smargId: {
     type: String,
-    required: true,
+    required: false,
     unique: true
   },
   adharCardNumber: {
     type: String,
-    required: true,
+    required: false,
     unique: true
   },
   adharCardPhoto: {
