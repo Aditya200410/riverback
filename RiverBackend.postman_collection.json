@@ -1956,9 +1956,59 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"data\": \"Collection data here\"\n}"
+              "raw": "{\n  \"sikahriName\": \"John Doe\",\n  \"phoneNumber\": \"9876543210\",\n  \"fishes\": [\n    {\n      \"fishName\": \"Rohu\",\n      \"fishRate\": 200,\n      \"fishWeight\": 5\n    },\n    {\n      \"fishName\": \"Catla\",\n      \"fishRate\": 250,\n      \"fishWeight\": 3\n    }\n  ],\n  \"totalRupees\": 1750,\n  \"netRupees\": 1500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Add a new collection with sikahri details and fish collection data"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/collection"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"65c4e8b8f3c1234567890123\",\n    \"sikahriName\": \"John Doe\",\n    \"phoneNumber\": \"9876543210\",\n    \"fishes\": [\n      {\n        \"fishName\": \"Rohu\",\n        \"fishRate\": 200,\n        \"fishWeight\": 5\n      },\n      {\n        \"fishName\": \"Catla\",\n        \"fishRate\": 250,\n        \"fishWeight\": 3\n      }\n    ],\n    \"totalRupees\": 1750,\n    \"netRupees\": 1500,\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
+            },
+            {
+              "name": "Error - Missing Fields",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/collection"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Missing required fields\"\n}"
             }
-          }
+          ]
         },
         {
           "name": "Get All Collections",
@@ -1969,8 +2019,32 @@
               "raw": "{{base_url}}/api/collection",
               "host": ["{{base_url}}"],
               "path": ["api", "collection"]
+            },
+            "description": "Get all collections sorted by creation date (newest first)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/collection"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"_id\": \"65c4e8b8f3c1234567890123\",\n      \"sikahriName\": \"John Doe\",\n      \"phoneNumber\": \"9876543210\",\n      \"fishes\": [\n        {\n          \"fishName\": \"Rohu\",\n          \"fishRate\": 200,\n          \"fishWeight\": 5\n        },\n        {\n          \"fishName\": \"Catla\",\n          \"fishRate\": 250,\n          \"fishWeight\": 3\n        }\n      ],\n      \"totalRupees\": 1750,\n      \"netRupees\": 1500,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  ]\n}"
             }
-          }
+          ]
         }
       ]
     },
