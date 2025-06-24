@@ -11,7 +11,7 @@ const reportSchema = new mongoose.Schema({
     },
     notice: {
         type: String,
-        required: true
+        required: false
     },
     photo: {
         type: String,
