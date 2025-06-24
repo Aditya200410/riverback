@@ -70,4 +70,31 @@ exports.deleteFishType = async (id) => {
     console.error('Error in deleteFishType:', err);
     throw err;
   }
+};
+
+// Bulk add fish types
+exports.bulkAddFishTypes = async (fishTypesArray) => {
+  try {
+    const results = [];
+    for (const fishTypeData of fishTypesArray) {
+      // Avoid duplicates by name
+      const existing = await FishType.findOne({ name: fishTypeData.name, status: 'active' });
+      if (!existing) {
+        const fishType = new FishType({
+          name: fishTypeData.name,
+          description: fishTypeData.description || '',
+          pricePerKg: fishTypeData.pricePerKg || 0,
+          status: 'active'
+        });
+        const saved = await fishType.save();
+        results.push(saved);
+      } else {
+        results.push(existing); // Optionally, just return the existing
+      }
+    }
+    return results;
+  } catch (err) {
+    console.error('Error in bulkAddFishTypes:', err);
+    throw err;
+  }
 }; 

@@ -8,10 +8,14 @@ exports.getAllPapers = async (req, res) => {
       .populate('companyId', 'name');
     // Add public link to each paper (absolute URL)
     const baseUrl = req.protocol + '://' + req.get('host');
-    const papersWithLink = papers.map(paper => ({
-      ...paper.toObject(),
-      pdfUrl: `${baseUrl}/uploads/company-papers/${paper.fileName}`
-    }));
+    const papersWithLink = papers.map(paper => {
+      const obj = paper.toObject();
+      return {
+        ...obj,
+        companyName: obj.companyId && obj.companyId.name ? obj.companyId.name : (obj.companyName || 'Unknown Company'),
+        pdfUrl: `${baseUrl}/uploads/company-papers/${paper.fileName}`
+      };
+    });
     res.status(200).json(papersWithLink);
   } catch (error) {
     res.status(500).json({ message: error.message });

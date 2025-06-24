@@ -199,4 +199,50 @@ router.delete('/delete/:id', async (req, res) => {
   }
 });
 
+// Bulk add fish types
+router.post('/bulk-add', async (req, res) => {
+  try {
+    // Default fish types in Hindi if not provided in body
+    const defaultFishTypes = [
+      { name: 'रेहू' },
+      { name: 'कलवट' },
+      { name: 'कतला' },
+      { name: 'बड़ी मच्छी' },
+      { name: 'छोटी मच्छी' },
+      { name: 'सिंघाड़ बड़ी' },
+      { name: 'पड़ेन बड़ी' },
+      { name: 'सिंघाड़ छोटी' },
+      { name: 'बाम' },
+      { name: 'सावल' },
+      { name: 'काबरा' },
+      { name: 'मीनोर' },
+      { name: 'विशेष मच्छी' },
+      { name: 'ब्लू गिरी' },
+      { name: 'मिक्स' },
+      { name: 'अन्य।' }
+    ];
+    const fishTypesArray = req.body.fishTypes || defaultFishTypes;
+    const results = await fishTypeController.bulkAddFishTypes(fishTypesArray);
+    res.status(201).json({
+      success: true,
+      message: 'Fish types added successfully',
+      data: results.map(fishType => ({
+        id: fishType._id,
+        name: fishType.name,
+        description: fishType.description,
+        pricePerKg: fishType.pricePerKg
+      }))
+    });
+  } catch (err) {
+    console.error('Error bulk adding fish types:', err);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error bulk adding fish types'
+      }
+    });
+  }
+});
+
 module.exports = router; 
