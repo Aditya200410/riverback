@@ -8,6 +8,7 @@ const fishSchema = new mongoose.Schema({
 }, { _id: false });
 
 const collectionSchema = new mongoose.Schema({
+  sikahriId: { type: String, required: true },
   sikahriName: { type: String, required: true },
   phoneNumber: { type: String, required: true },
   fishes: [fishSchema],

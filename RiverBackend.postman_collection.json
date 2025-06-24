@@ -2187,7 +2187,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"sikahriName\": \"John Doe\",\n  \"phoneNumber\": \"9876543210\",\n  \"fishes\": [\n    {\n      \"fishName\": \"Rohu\",\n      \"fishRate\": 200,\n      \"fishWeight\": 5,\n      \"pricePerKg\": 40\n    },\n    {\n      \"fishName\": \"Catla\",\n      \"fishRate\": 250,\n      \"fishWeight\": 3,\n      \"pricePerKg\": 83.33\n    }\n  ],\n  \"totalRupees\": 1750,\n  \"netRupees\": 1500\n}",
+              "raw": "{\n  \"sikahriId\": \"SKH001\",\n  \"sikahriName\": \"John Doe\",\n  \"phoneNumber\": \"9876543210\",\n  \"fishes\": [\n    {\n      \"fishName\": \"Rohu\",\n      \"fishRate\": 200,\n      \"fishWeight\": 5,\n      \"pricePerKg\": 40\n    },\n    {\n      \"fishName\": \"Catla\",\n      \"fishRate\": 250,\n      \"fishWeight\": 3,\n      \"pricePerKg\": 83.33\n    }\n  ],\n  \"totalRupees\": 1750,\n  \"netRupees\": 1500\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2216,7 +2216,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"65c4e8b8f3c1234567890123\",\n    \"sikahriName\": \"John Doe\",\n    \"phoneNumber\": \"9876543210\",\n    \"fishes\": [\n      {\n        \"fishName\": \"Rohu\",\n        \"fishRate\": 200,\n        \"fishWeight\": 5,\n        \"pricePerKg\": 40\n      },\n      {\n        \"fishName\": \"Catla\",\n        \"fishRate\": 250,\n        \"fishWeight\": 3,\n        \"pricePerKg\": 83.33\n      }\n    ],\n    \"totalRupees\": 1750,\n    \"netRupees\": 1500,\n    \"date\": \"2024-01-01T00:00:00.000Z\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"65c4e8b8f3c1234567890123\",\n    \"sikahriId\": \"SKH001\",\n    \"sikahriName\": \"John Doe\",\n    \"phoneNumber\": \"9876543210\",\n    \"fishes\": [\n      {\n        \"fishName\": \"Rohu\",\n        \"fishRate\": 200,\n        \"fishWeight\": 5,\n        \"pricePerKg\": 40\n      },\n      {\n        \"fishName\": \"Catla\",\n        \"fishRate\": 250,\n        \"fishWeight\": 3,\n        \"pricePerKg\": 83.33\n      }\n    ],\n    \"totalRupees\": 1750,\n    \"netRupees\": 1500,\n    \"date\": \"2024-01-01T00:00:00.000Z\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
             },
             {
               "name": "Error - Missing Fields",
@@ -2273,7 +2273,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"_id\": \"65c4e8b8f3c1234567890123\",\n      \"sikahriName\": \"John Doe\",\n      \"phoneNumber\": \"9876543210\",\n      \"fishes\": [\n        {\n          \"fishName\": \"Rohu\",\n          \"fishRate\": 200,\n          \"fishWeight\": 5,\n          \"pricePerKg\": 40\n        },\n        {\n          \"fishName\": \"Catla\",\n          \"fishRate\": 250,\n          \"fishWeight\": 3,\n          \"pricePerKg\": 83.33\n        }\n      ],\n      \"totalRupees\": 1750,\n      \"netRupees\": 1500,\n      \"date\": \"2024-01-01T00:00:00.000Z\",\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  ]\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"_id\": \"65c4e8b8f3c1234567890123\",\n      \"sikahriId\": \"SKH001\",\n      \"sikahriName\": \"John Doe\",\n      \"phoneNumber\": \"9876543210\",\n      \"fishes\": [\n        {\n          \"fishName\": \"Rohu\",\n          \"fishRate\": 200,\n          \"fishWeight\": 5,\n          \"pricePerKg\": 40\n        },\n        {\n          \"fishName\": \"Catla\",\n          \"fishRate\": 250,\n          \"fishWeight\": 3,\n          \"pricePerKg\": 83.33\n        }\n      ],\n      \"totalRupees\": 1750,\n      \"netRupees\": 1500,\n      \"date\": \"2024-01-01T00:00:00.000Z\",\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  ]\n}"
             }
           ]
         }

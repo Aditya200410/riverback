@@ -3,8 +3,8 @@ const Collection = require('../models/Collection');
 // Add a new collection
 exports.addCollection = async (req, res) => {
   try {
-    const { sikahriName, phoneNumber, fishes, totalRupees, netRupees } = req.body;
-    if (!sikahriName || !phoneNumber || !Array.isArray(fishes) || fishes.length === 0 || totalRupees == null || netRupees == null) {
+    const { sikahriId, sikahriName, phoneNumber, fishes, totalRupees, netRupees } = req.body;
+    if (!sikahriId || !sikahriName || !phoneNumber || !Array.isArray(fishes) || fishes.length === 0 || totalRupees == null || netRupees == null) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
     // Validate all fish entries
@@ -13,7 +13,7 @@ exports.addCollection = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Each fish must have fishName, fishRate, fishWeight, and pricePerKg' });
       }
     }
-    const collection = new Collection({ sikahriName, phoneNumber, fishes, totalRupees, netRupees });
+    const collection = new Collection({ sikahriId, sikahriName, phoneNumber, fishes, totalRupees, netRupees });
     await collection.save();
 
     const collectionObj = collection.toObject();
