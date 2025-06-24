@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const SecurityMember = require('../models/SecurityMember');
 const { generateFileUrl } = require('../utils/urlGenerator');
+const { addSecurityMember } = require('../controllers/securityMemberController');
 
 // Test route to check if the router is working
 router.get('/test', (req, res) => {
@@ -36,122 +37,26 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, 'security-' + uniqueSuffix + path.extname(file.originalname));
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
-const upload = multer({ 
+const upload = multer({
     storage: storage,
-    limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
-    },
     fileFilter: function (req, file, cb) {
-        const filetypes = /jpeg|jpg|png/;
-        const mimetype = filetypes.test(file.mimetype);
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-
-        if (mimetype && extname) {
-            return cb(null, true);
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Not an image! Please upload an image.'), false);
         }
-        cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
     }
 });
 
-// Create a new security member
-router.post('/add', upload.fields([
+// Add new security member with multiple file uploads
+router.post('/', upload.fields([
     { name: 'aadharPhoto', maxCount: 1 },
     { name: 'photo', maxCount: 1 }
-]), async (req, res) => {
-    try {
-        const {
-            idNumber,
-            name,
-            address,
-            mobile,
-            phase,
-            accountNumber,
-            ifscCode,
-            bankName
-        } = req.body;
-
-        // Validate required fields
-        if (!idNumber || !name || !address || !mobile || !phase || !accountNumber || !ifscCode || !bankName) {
-            return res.status(400).json({
-                success: false,
-                error: {
-                    code: 'MISSING_FIELDS',
-                    message: 'All fields are required'
-                }
-            });
-        }
-
-        // Validate file uploads
-        if (!req.files || !req.files['aadharPhoto'] || !req.files['photo']) {
-            return res.status(400).json({
-                success: false,
-                error: {
-                    code: 'MISSING_FILES',
-                    message: 'Both aadhar photo and profile photo are required'
-                }
-            });
-        }
-
-        // Check if member already exists
-        const existingMember = await SecurityMember.findOne({
-            $or: [
-                { idNumber },
-                { mobile }
-            ]
-        });
-
-        if (existingMember) {
-            return res.status(400).json({
-                success: false,
-                error: {
-                    code: 'MEMBER_EXISTS',
-                    message: 'Member with this ID number or mobile already exists'
-                }
-            });
-        }
-
-        // Create new member
-        const member = new SecurityMember({
-            idNumber,
-            name,
-            address,
-            mobile,
-            phase,
-            aadharPhoto: req.files['aadharPhoto'][0].filename,
-            photo: req.files['photo'][0].filename,
-            bankDetails: {
-                accountNumber,
-                ifscCode,
-                bankName
-            }
-        });
-
-        await member.save();
-
-        res.status(201).json({
-            success: true,
-            message: 'Security member added successfully',
-            data: {
-                ...member.toObject(),
-                aadharPhoto: generateFileUrl(req, `uploads/security-members/${member.aadharPhoto}`),
-                photo: generateFileUrl(req, `uploads/security-members/${member.photo}`)
-            }
-        });
-    } catch (error) {
-        console.error('Error adding security member:', error);
-        res.status(500).json({
-            success: false,
-            error: {
-                code: 'INTERNAL_SERVER_ERROR',
-                message: 'Error adding security member'
-            }
-        });
-    }
-});
+]), addSecurityMember);
 
 // Get all security members
 router.get('/', async (req, res) => {

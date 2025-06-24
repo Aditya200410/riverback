@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const securityMemberSchema = new mongoose.Schema({
     idNumber: {
@@ -28,6 +29,10 @@ const securityMemberSchema = new mongoose.Schema({
             },
             message: props => `${props.value} is not a valid mobile number!`
         }
+    },
+    password: {
+        type: String,
+        required: true
     },
     phase: {
         type: String,
@@ -66,6 +71,24 @@ const securityMemberSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+// Hash password before saving
+securityMemberSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) return next();
+    
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Method to compare password
+securityMemberSchema.methods.comparePassword = async function(candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
+};
 
 // Add error handling for the model
 securityMemberSchema.post('save', function(error, doc, next) {

@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const SecurityUser = require('../models/SecurityUser');
+const SecurityMember = require('../models/SecurityMember');
 const { upload } = require('../middleware/upload');
 const { loginLimiter } = require('../middleware/rateLimiter');
 const { validate, validationRules } = require('../middleware/validator');
@@ -197,50 +198,84 @@ router.post('/login', async (req, res) => {
   try {
     const { mobile, password, phase } = req.body;
 
-    // Find user with both mobile and phase
-    const user = await SecurityUser.findOne({ mobile, phase });
+    // First try to find a security member
+    let user = await SecurityMember.findOne({ mobile });
+    let isSecurityMember = true;
+
+    // If not found, try to find a security user
+    if (!user) {
+      user = await SecurityUser.findOne({ mobile });
+      isSecurityMember = false;
+    }
+
+    // If no user found at all
     if (!user) {
       return res.status(401).json({
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid mobile number, phase or password'
+          message: 'Invalid credentials'
         }
       });
     }
 
-    // Check password
+    // Verify password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid mobile number, phase or password'
+          message: 'Invalid credentials'
         }
       });
     }
 
-    res.json({
+    // For security users, check phase and verification
+    if (!isSecurityMember) {
+      if (user.phase !== phase) {
+        return res.status(401).json({
+          success: false,
+          error: {
+            code: 'INVALID_PHASE',
+            message: 'Invalid phase'
+          }
+        });
+      }
+
+      if (!user.isVerified) {
+        return res.status(401).json({
+          success: false,
+          error: {
+            code: 'NOT_VERIFIED',
+            message: 'Account not verified'
+          }
+        });
+      }
+    }
+
+    // Create response object based on user type
+    const responseData = {
       success: true,
-      message: 'Login successful',
       data: {
         user: {
           _id: user._id,
-          securityId: user.securityId,
           name: user.name,
           mobile: user.mobile,
-          aadhar: user.aadhar,
-          address: user.address,
           phase: user.phase,
-          profilePicture: generateFileUrl(req, user.profilePicture),
-          isVerified: user.isVerified,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-          role: 'security'
+          role: isSecurityMember ? 'security_member' : 'security',
+          ...(isSecurityMember ? {
+            idNumber: user.idNumber,
+            isActive: user.isActive
+          } : {
+            securityId: user.securityId,
+            isVerified: user.isVerified
+          })
         }
       }
-    });
+    };
+
+    res.json(responseData);
   } catch (error) {
     console.error('Error in login:', error);
     res.status(500).json({
