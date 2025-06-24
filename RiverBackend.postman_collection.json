@@ -1554,90 +1554,167 @@
       "name": "Reports",
       "item": [
         {
-          "name": "Get All Reports",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/reports",
-              "host": ["{{base_url}}"],
-              "path": ["api", "reports"]
-            }
-          }
-        },
-        {
-          "name": "Get Report by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/reports/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "reports", ":id"],
-              "variable": [
-                { "key": "id", "value": "report_id_here" }
-              ]
-            }
-          }
-        },
-        {
           "name": "Add Report",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/reports/add",
               "host": ["{{base_url}}"],
               "path": ["api", "reports", "add"]
             },
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "title", "value": "Test Report", "type": "text" },
-                { "key": "description", "value": "Test report description", "type": "text" },
-                { "key": "reportedBy", "value": "John Doe", "type": "text" },
-                { "key": "reporterId", "value": "507f1f77bcf86cd799439011", "type": "text" },
-                { "key": "photo", "type": "file", "src": "/path/to/report/photo.jpg" }
-              ]
+              "mode": "raw",
+              "raw": "{\n    \"reportType\": \"daily\",\n    \"startDate\": \"2024-03-20\",\n    \"endDate\": \"2024-03-20\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Add a new report"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/reports/add",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "reports", "add"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Report generated successfully\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"reportType\": \"daily\",\n    \"startDate\": \"2024-03-20T00:00:00.000Z\",\n    \"endDate\": \"2024-03-20T00:00:00.000Z\",\n    \"createdAt\": \"2024-03-20T12:00:00.000Z\",\n    \"financial\": {\n      \"totalIncome\": 50000,\n      \"totalExpense\": 30000,\n      \"netProfit\": 20000\n    },\n    \"summary\": {\n      \"totalBoats\": 10,\n      \"totalSikaris\": 20,\n      \"totalMadhayams\": 5\n    }\n  }\n}"
             }
-          }
+          ]
         },
         {
-          "name": "Update Report",
+          "name": "Generate Report",
           "request": {
-            "method": "PUT",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/api/reports/update/:id",
+              "raw": "{{base_url}}/api/reports/generate",
               "host": ["{{base_url}}"],
-              "path": ["api", "reports", "update", ":id"],
-              "variable": [
-                { "key": "id", "value": "report_id_here" }
-              ]
+              "path": ["api", "reports", "generate"]
             },
             "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "title", "value": "Updated Report", "type": "text" },
-                { "key": "description", "value": "Updated report description", "type": "text" },
-                { "key": "photo", "type": "file", "src": "/path/to/new/report/photo.jpg" }
-              ]
+              "mode": "raw",
+              "raw": "{\n    \"reportType\": \"daily\",\n    \"startDate\": \"2024-03-20\",\n    \"endDate\": \"2024-03-20\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Generate a new report"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/reports/generate",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "reports", "generate"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Report generated successfully\",\n  \"data\": {\n    \"id\": \"507f1f77bcf86cd799439011\",\n    \"reportType\": \"daily\",\n    \"startDate\": \"2024-03-20T00:00:00.000Z\",\n    \"endDate\": \"2024-03-20T00:00:00.000Z\",\n    \"createdAt\": \"2024-03-20T12:00:00.000Z\",\n    \"financial\": {\n      \"totalIncome\": 50000,\n      \"totalExpense\": 30000,\n      \"netProfit\": 20000\n    },\n    \"summary\": {\n      \"totalBoats\": 10,\n      \"totalSikaris\": 20,\n      \"totalMadhayams\": 5\n    }\n  }\n}"
             }
+          ]
+        },
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports"]
+            },
+            "description": "Get all reports"
           }
         },
         {
-          "name": "Delete Report",
+          "name": "Get Report by ID",
           "request": {
-            "method": "DELETE",
-            "header": [],
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/api/reports/delete/:id",
+              "raw": "{{base_url}}/api/reports/:id",
               "host": ["{{base_url}}"],
-              "path": ["api", "reports", "delete", ":id"],
+              "path": ["api", "reports", ":id"],
               "variable": [
-                { "key": "id", "value": "report_id_here" }
+                {
+                  "key": "id",
+                  "value": "507f1f77bcf86cd799439011"
+                }
               ]
-            }
+            },
+            "description": "Get a specific report by ID"
           }
         }
       ]

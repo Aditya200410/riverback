@@ -196,6 +196,152 @@ router.post('/generate', async (req, res) => {
   }
 });
 
+// Add new report (mirrors generate functionality)
+router.post('/add', express.json(), async (req, res) => {
+  try {
+    console.log('Headers:', req.headers);
+    console.log('Raw Body:', req.body);
+    console.log('Content-Type:', req.get('Content-Type'));
+
+    // Ensure the content type is application/json
+    if (!req.is('application/json')) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_CONTENT_TYPE',
+          message: 'Content-Type must be application/json'
+        }
+      });
+    }
+
+    // Check if body is empty
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_REQUEST',
+          message: 'Request body is empty or not properly formatted JSON'
+        }
+      });
+    }
+
+    const { reportType, startDate, endDate } = req.body;
+    console.log('Extracted fields:', { reportType, startDate, endDate });
+
+    // Validate required fields
+    const requiredFields = ['reportType', 'startDate', 'endDate'];
+    const missingFields = requiredFields.filter(field => !req.body[field]);
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_FIELDS',
+          message: `Missing required fields: ${missingFields.join(', ')}`
+        }
+      });
+    }
+
+    // Validate dates
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_DATES',
+          message: 'Invalid date format'
+        }
+      });
+    }
+
+    if (start > end) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_DATE_RANGE',
+          message: 'Start date must be before end date'
+        }
+      });
+    }
+
+    // Validate report type
+    const validTypes = ['daily', 'weekly', 'monthly', 'yearly', 'custom'];
+    if (!validTypes.includes(reportType)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_REPORT_TYPE',
+          message: `Report type must be one of: ${validTypes.join(', ')}`
+        }
+      });
+    }
+
+    const report = await reportController.generateReport({
+      reportType,
+      startDate: start,
+      endDate: end,
+      generatedBy: null,
+      companyId: null
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Report generated successfully',
+      data: {
+        id: report._id,
+        reportType: report.reportType,
+        startDate: report.startDate,
+        endDate: report.endDate,
+        createdAt: report.createdAt,
+        financial: {
+          totalIncome: report.reportData.financial.totalIncome,
+          totalExpense: report.reportData.financial.totalExpense,
+          netProfit: report.reportData.financial.netProfit
+        },
+        summary: {
+          totalBoats: report.reportData.boats.total,
+          totalSikaris: report.reportData.sikaris.total,
+          totalMadhayams: report.reportData.madhayams.total
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Error in /add route:', err);
+    
+    // Handle specific error types
+    if (err.name === 'ValidationError') {
+      const validationErrors = Object.values(err.errors).map(error => error.message);
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Validation failed',
+          details: validationErrors
+        }
+      });
+    }
+
+    if (err.message === 'Invalid report type') {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_REPORT_TYPE',
+          message: 'Invalid report type provided'
+        }
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error generating report',
+        details: err.message
+      }
+    });
+  }
+});
+
 // Archive report
 router.delete('/archive/:id', async (req, res) => {
   try {
