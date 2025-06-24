@@ -97,16 +97,17 @@ router.post('/add', async (req, res) => {
       receiverId, 
       pay, 
       received, 
-      description 
+      description,
+      username 
     } = req.body;
 
     // Validate required fields
-    if (!amount || !type || !toWhom || !sendTo || !receiverName || !description) {
+    if (!amount || !type || !toWhom || !sendTo || !receiverName || !description || !username) {
       return res.status(400).json({
         success: false,
         error: {
           code: 'MISSING_FIELDS',
-          message: 'Required fields: amount, type, toWhom, sendTo, receiverName, description'
+          message: 'Required fields: amount, type, toWhom, sendTo, receiverName, description, username'
         }
       });
     }
@@ -159,6 +160,7 @@ router.post('/add', async (req, res) => {
       pay: payBool,
       received: receivedBool,
       description,
+      username,
       companyId: null
     });
 
@@ -178,6 +180,7 @@ router.post('/add', async (req, res) => {
         pay: transaction.pay,
         received: transaction.received,
         description: transaction.description,
+        username: transaction.username,
         date: transaction.date
       }
     });

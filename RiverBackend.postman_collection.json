@@ -2323,15 +2323,38 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 1000,\n  \"type\": \"pay\",\n  \"toWhom\": \"John Doe\",\n  \"sendTo\": \"Manager\",\n  \"receiverName\": \"John Doe\",\n  \"receiverId\": \"12345\",\n  \"pay\": true,\n  \"received\": false,\n  \"description\": \"Salary payment\"\n}",
+              "raw": "{\n  \"amount\": 1000,\n  \"type\": \"pay\",\n  \"toWhom\": \"John Doe\",\n  \"sendTo\": \"Manager\",\n  \"receiverName\": \"John Doe\",\n  \"receiverId\": \"12345\",\n  \"pay\": true,\n  \"received\": false,\n  \"description\": \"Salary payment\",\n  \"username\": \"admin\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "description": "Add a new money transaction"
-          }
+            "description": "Add a new money transaction. Required fields: amount (positive number), type (pay/take), toWhom, sendTo (Company/Manager/Sikari/Security), receiverName, description, username. The username field is required and must be included in the request body."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/money-handles/add"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Transaction added successfully\",\n  \"data\": {\n    \"id\": \"65c4e8b8f3c1234567890123\",\n    \"amount\": 1000,\n    \"type\": \"pay\",\n    \"toWhom\": \"John Doe\",\n    \"sendTo\": \"Manager\",\n    \"receiverName\": \"John Doe\",\n    \"receiverId\": \"12345\",\n    \"pay\": true,\n    \"received\": false,\n    \"description\": \"Salary payment\",\n    \"username\": \"admin\",\n    \"date\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
+            }
+          ]
         },
         {
           "name": "Get Transactions by Type",
