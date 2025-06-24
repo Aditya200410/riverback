@@ -13,6 +13,7 @@ exports.getAllPapers = async (req, res) => {
       return {
         ...obj,
         companyName: obj.companyId && obj.companyId.name ? obj.companyId.name : (obj.companyName || 'Unknown Company'),
+        ownerName: obj.companyId && obj.companyId.name ? obj.companyId.name : '',
         pdfUrl: `${baseUrl}/uploads/company-papers/${paper.fileName}`
       };
     });
