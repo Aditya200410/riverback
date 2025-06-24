@@ -29,6 +29,18 @@ const sikariSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  workLocation: {
+    type: String,
+    required: false,
+    trim: true,
+    default: ''
+  },
+  homeAddress: {
+    type: String,
+    required: false,
+    trim: true,
+    default: ''
+  },
   dateOfJoining: {
     type: Date,
     required: false

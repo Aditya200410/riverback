@@ -134,6 +134,8 @@ router.post('/add', upload.fields([
       sikariName,
       mobileNumber,
       location,
+      workLocation,
+      homeAddress,
       dateOfJoining,
       smargId,
       adharCardNumber,
@@ -206,6 +208,8 @@ router.post('/add', upload.fields([
       sikariName,
       mobileNumber,
       location,
+      workLocation,
+      homeAddress,
       dateOfJoining: dateOfJoining ? new Date(dateOfJoining) : undefined,
       smargId,
       adharCardNumber,
@@ -224,7 +228,6 @@ router.post('/add', upload.fields([
       bankPassbookPhoto: req.files?.bankPassbookPhoto?.[0]?.filename
     });
 
-    const baseUrl = req.protocol + '://' + req.get('host');
     res.status(201).json({
       success: true,
       message: 'Sikari added successfully',
@@ -234,6 +237,8 @@ router.post('/add', upload.fields([
         sikariName: sikari.sikariName,
         mobileNumber: sikari.mobileNumber,
         location: sikari.location,
+        workLocation: sikari.workLocation,
+        homeAddress: sikari.homeAddress,
         dateOfJoining: sikari.dateOfJoining,
         smargId: sikari.smargId,
         adharCardNumber: sikari.adharCardNumber,
@@ -246,10 +251,10 @@ router.post('/add', upload.fields([
         boatId: sikari.boatId,
         boatType: sikari.boatType,
         position: sikari.position,
-        profilePhoto: sikari.profilePhoto ? `${baseUrl}/uploads/sikaris/${sikari.profilePhoto}` : null,
-        bannerPhoto: sikari.bannerPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bannerPhoto}` : null,
-        adharCardPhoto: sikari.adharCardPhoto ? `${baseUrl}/uploads/sikaris/${sikari.adharCardPhoto}` : null,
-        bankPassbookPhoto: sikari.bankPassbookPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bankPassbookPhoto}` : null
+        profilePhoto: generateFileUrl(req, sikari.profilePhoto),
+        bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
+        adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
+        bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto)
       }
     });
   } catch (err) {
