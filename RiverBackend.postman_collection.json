@@ -1935,6 +1935,266 @@
           }
         }
       ]
+    },
+    {
+      "name": "Collection",
+      "item": [
+        {
+          "name": "Add Collection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/collection",
+              "host": ["{{base_url}}"],
+              "path": ["api", "collection"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": \"Collection data here\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Collections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/collection",
+              "host": ["{{base_url}}"],
+              "path": ["api", "collection"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Company Summary",
+      "item": [
+        {
+          "name": "Get Company Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-summary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-summary"]
+            },
+            "description": "Get summary of company statistics including fish types, managers, security, boats, and sikaris"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/company-summary"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"totals\": {\n      \"fishTypes\": 10,\n      \"managers\": 50,\n      \"security\": 30,\n      \"boats\": 20,\n      \"sikaris\": 40\n    },\n    \"active\": {\n      \"managers\": 45,\n      \"security\": 28,\n      \"boats\": 18,\n      \"sikaris\": 35\n    },\n    \"recent\": {\n      \"managers\": 5,\n      \"security\": 3,\n      \"sikaris\": 4\n    },\n    \"fishTypes\": [\n      {\n        \"name\": \"Fish Type 1\",\n        \"description\": \"Description 1\",\n        \"pricePerKg\": 100\n      }\n    ]\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Company Papers",
+      "item": [
+        {
+          "name": "Test Router",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/test",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "test"]
+            }
+          }
+        },
+        {
+          "name": "Upload Paper",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/upload",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "upload"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "PDF file to upload (max 10MB)"
+                },
+                {
+                  "key": "description",
+                  "value": "Sample paper description",
+                  "type": "text"
+                },
+                {
+                  "key": "companyName",
+                  "value": "Sample Company",
+                  "type": "text"
+                },
+                {
+                  "key": "companyId",
+                  "value": "COMP001",
+                  "type": "text"
+                }
+              ]
+            },
+            "description": "Upload a new company paper (PDF only, max 10MB)"
+          }
+        },
+        {
+          "name": "Get All Papers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers"]
+            },
+            "description": "Get all active company papers"
+          }
+        },
+        {
+          "name": "Get All Papers (Including Inactive)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers/all",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers", "all"]
+            },
+            "description": "Get all papers including inactive ones (for debugging)"
+          }
+        },
+        {
+          "name": "Get Paper by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "paper_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Download Paper",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers/:id/download",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers", ":id", "download"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "paper_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Paper",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "paper_id_here"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"description\": \"Updated description\",\n    \"category\": \"legal\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Paper",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "paper_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Papers by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/company-papers/papers/category/:category",
+              "host": ["{{base_url}}"],
+              "path": ["api", "company-papers", "papers", "category", ":category"],
+              "variable": [
+                {
+                  "key": "category",
+                  "value": "legal"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
