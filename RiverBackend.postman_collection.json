@@ -1676,7 +1676,12 @@
           "name": "Add Security Member",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/security-members/add",
               "host": ["{{base_url}}"],
@@ -1685,52 +1690,155 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "name", "value": "Test Security Member", "type": "text" },
-                { "key": "mobile", "value": "1234567890", "type": "text" },
-                { "key": "aadhar", "value": "123456789012", "type": "text" },
-                { "key": "address", "value": "123 Test Street", "type": "text" },
-                { "key": "phase", "value": "Phase 1", "type": "text" },
-                { "key": "photo", "type": "file", "src": "/path/to/security/member/photo.jpg" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Security Member",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/security-members/update/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "security-members", "update", ":id"],
-              "variable": [
-                { "key": "id", "value": "security_member_id_here" }
+                {
+                  "key": "idNumber",
+                  "value": "SEC001",
+                  "type": "text",
+                  "description": "Unique ID number for the security member"
+                },
+                {
+                  "key": "name",
+                  "value": "John Doe",
+                  "type": "text",
+                  "description": "Full name of the security member"
+                },
+                {
+                  "key": "address",
+                  "value": "123 Security Street, City",
+                  "type": "text",
+                  "description": "Complete address of the security member"
+                },
+                {
+                  "key": "mobile",
+                  "value": "9876543210",
+                  "type": "text",
+                  "description": "Mobile number of the security member"
+                },
+                {
+                  "key": "phase",
+                  "value": "Phase 1",
+                  "type": "text",
+                  "description": "Phase assignment for the security member"
+                },
+                {
+                  "key": "accountNumber",
+                  "value": "1234567890",
+                  "type": "text",
+                  "description": "Bank account number"
+                },
+                {
+                  "key": "ifscCode",
+                  "value": "BANK0001234",
+                  "type": "text",
+                  "description": "Bank IFSC code"
+                },
+                {
+                  "key": "bankName",
+                  "value": "Sample Bank",
+                  "type": "text",
+                  "description": "Name of the bank"
+                },
+                {
+                  "key": "aadharPhoto",
+                  "type": "file",
+                  "src": "",
+                  "description": "Aadhar card photo (JPG/JPEG/PNG, max 5MB)"
+                },
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "",
+                  "description": "Profile photo (JPG/JPEG/PNG, max 5MB)"
+                }
               ]
             },
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "name", "value": "Updated Security Member", "type": "text" },
-                { "key": "address", "value": "456 Updated Street", "type": "text" },
-                { "key": "photo", "type": "file", "src": "/path/to/new/security/member/photo.jpg" }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Security Member",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/security-members/delete/:id",
-              "host": ["{{base_url}}"],
-              "path": ["api", "security-members", "delete", ":id"],
-              "variable": [
-                { "key": "id", "value": "security_member_id_here" }
-              ]
-            }
+            "description": "Add a new security member with their details and required documents",
+            "response": [
+              {
+                "name": "Success Response",
+                "originalRequest": {
+                  "method": "POST",
+                  "header": [],
+                  "url": {
+                    "raw": "{{base_url}}/api/security-members/add"
+                  }
+                },
+                "status": "Created",
+                "code": 201,
+                "_postman_previewlanguage": "json",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "cookie": [],
+                "body": "{\n    \"success\": true,\n    \"message\": \"Security member added successfully\",\n    \"data\": {\n        \"_id\": \"65c4e8b8f3c1234567890123\",\n        \"idNumber\": \"SEC001\",\n        \"name\": \"John Doe\",\n        \"address\": \"123 Security Street, City\",\n        \"mobile\": \"9876543210\",\n        \"phase\": \"Phase 1\",\n        \"bankDetails\": {\n            \"accountNumber\": \"1234567890\",\n            \"ifscCode\": \"BANK0001234\",\n            \"bankName\": \"Sample Bank\"\n        },\n        \"aadharPhoto\": \"{{base_url}}/uploads/security-members/security-1234567890-123456.jpg\",\n        \"photo\": \"{{base_url}}/uploads/security-members/security-1234567890-654321.jpg\",\n        \"createdAt\": \"2024-01-01T00:00:00.000Z\",\n        \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n}"
+              },
+              {
+                "name": "Error - Missing Fields",
+                "originalRequest": {
+                  "method": "POST",
+                  "header": [],
+                  "url": {
+                    "raw": "{{base_url}}/api/security-members/add"
+                  }
+                },
+                "status": "Bad Request",
+                "code": 400,
+                "_postman_previewlanguage": "json",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "cookie": [],
+                "body": "{\n    \"success\": false,\n    \"error\": {\n        \"code\": \"MISSING_FIELDS\",\n        \"message\": \"All fields are required\"\n    }\n}"
+              },
+              {
+                "name": "Error - Missing Files",
+                "originalRequest": {
+                  "method": "POST",
+                  "header": [],
+                  "url": {
+                    "raw": "{{base_url}}/api/security-members/add"
+                  }
+                },
+                "status": "Bad Request",
+                "code": 400,
+                "_postman_previewlanguage": "json",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "cookie": [],
+                "body": "{\n    \"success\": false,\n    \"error\": {\n        \"code\": \"MISSING_FILES\",\n        \"message\": \"Both aadhar photo and profile photo are required\"\n    }\n}"
+              },
+              {
+                "name": "Error - Member Exists",
+                "originalRequest": {
+                  "method": "POST",
+                  "header": [],
+                  "url": {
+                    "raw": "{{base_url}}/api/security-members/add"
+                  }
+                },
+                "status": "Bad Request",
+                "code": 400,
+                "_postman_previewlanguage": "json",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "cookie": [],
+                "body": "{\n    \"success\": false,\n    \"error\": {\n        \"code\": \"MEMBER_EXISTS\",\n        \"message\": \"Member with this ID number or mobile already exists\"\n    }\n}"
+              }
+            ]
           }
         }
       ]
