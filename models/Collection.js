@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const fishSchema = new mongoose.Schema({
   fishName: { type: String, required: true },
   fishRate: { type: Number, required: true },
-  fishWeight: { type: Number, required: true }
+  fishWeight: { type: Number, required: true },
+  pricePerKg: { type: Number, required: true }
 }, { _id: false });
 
 const collectionSchema = new mongoose.Schema({

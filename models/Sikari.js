@@ -24,12 +24,7 @@ const sikariSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  location: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  workLocation: {
+  workAddress: {
     type: String,
     required: false,
     trim: true,

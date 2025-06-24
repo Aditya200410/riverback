@@ -4,8 +4,24 @@ const Collection = require('../models/Collection');
 // Get all sikaris
 const getAllSikaris = async () => {
     try {
-        return await Sikari.find({ status: 'active' })
-            .sort({ dateOfJoining: -1 });
+        const sikaris = await Sikari.find({ status: 'active' })
+            .sort({ dateOfJoining: -1 })
+            .select({
+                sikariId: 1,
+                sikariName: 1,
+                mobileNumber: 1,
+                workAddress: 1,
+                homeAddress: 1,
+                dateOfJoining: 1,
+                smargId: 1,
+                adharCardNumber: 1,
+                madhayamName: 1,
+                boatNumber: 1,
+                position: 1,
+                profilePhoto: 1
+            });
+        
+        return sikaris;
     } catch (error) {
         console.error('Error in getAllSikaris:', error);
         throw error;
@@ -15,22 +31,25 @@ const getAllSikaris = async () => {
 // Get sikari by ID
 const getSikariById = async (sikariId) => {
     try {
-        // Get sikari details
         const sikari = await Sikari.findOne({ _id: sikariId, status: 'active' });
         if (!sikari) {
             return null;
         }
 
-        // Get collection history for this sikari
         const collectionHistory = await Collection.find({ 
             sikahriName: sikari.name,
             phoneNumber: sikari.mobileNumber 
         }).sort({ createdAt: -1 });
 
-        // Create response object with all required data
         const response = {
-            sikari: sikari,
-            paymentHistory: [], // Empty array for now as payment history is not implemented yet
+            sikari: {
+                ...sikari.toObject(),
+                addresses: {
+                    home: sikari.homeAddress || '',
+                    work: sikari.workAddress || ''
+                }
+            },
+            paymentHistory: [],
             collectionHistory: collectionHistory
         };
 
@@ -45,7 +64,6 @@ const getSikariById = async (sikariId) => {
 const findDuplicateSikari = async (data) => {
     try {
         const { mobileNumber, sikariId, smargId, adharCardNumber } = data;
-        console.log('Checking for duplicates with:', { mobileNumber, sikariId, smargId, adharCardNumber });
         
         const duplicate = await Sikari.findOne({
             status: 'active',
@@ -57,12 +75,6 @@ const findDuplicateSikari = async (data) => {
             ]
         });
         
-        if (duplicate) {
-            console.log('Duplicate found:', duplicate._id);
-        } else {
-            console.log('No duplicates found');
-        }
-        
         return duplicate;
     } catch (error) {
         console.error('Error in findDuplicateSikari:', error);
@@ -73,18 +85,22 @@ const findDuplicateSikari = async (data) => {
 // Create new sikari
 const createSikari = async (sikariData) => {
     try {
-        console.log('Creating sikari with data:', sikariData);
-        
         const sikari = new Sikari({
             ...sikariData,
+            workAddress: sikariData.workAddress || '',
+            homeAddress: sikariData.homeAddress || '',
             status: 'active'
         });
         
-        console.log('Sikari model created, saving...');
         const savedSikari = await sikari.save();
-        console.log('Sikari saved successfully:', savedSikari._id);
         
-        return savedSikari;
+        return {
+            ...savedSikari.toObject(),
+            addresses: {
+                home: savedSikari.homeAddress || '',
+                work: savedSikari.workAddress || ''
+            }
+        };
     } catch (error) {
         console.error('Error in createSikari:', error);
         throw error;
@@ -94,11 +110,26 @@ const createSikari = async (sikariData) => {
 // Update sikari
 const updateSikari = async (sikariId, updateData) => {
     try {
-        return await Sikari.findOneAndUpdate(
+        const updatedSikari = await Sikari.findOneAndUpdate(
             { _id: sikariId, status: 'active' },
             { $set: updateData },
             { new: true, runValidators: true }
         );
+
+        if (!updatedSikari) {
+            return null;
+        }
+
+        const sikariObject = updatedSikari.toObject();
+        const response = {
+            ...sikariObject,
+            addresses: {
+                home: sikariObject.homeAddress || '',
+                work: sikariObject.workAddress || ''
+            }
+        };
+
+        return response;
     } catch (error) {
         console.error('Error in updateSikari:', error);
         throw error;

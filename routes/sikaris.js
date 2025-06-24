@@ -150,59 +150,6 @@ router.post('/add', upload.fields([
       position
     } = req.body;
 
-    // Validate required fields
-    const requiredFields = ['sikariId', 'sikariName', 'mobileNumber', 'location', 'smargId', 'adharCardNumber'];
-    const missingFields = requiredFields.filter(field => !req.body[field]);
-    
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'MISSING_FIELDS',
-          message: `Missing required fields: ${missingFields.join(', ')}`
-        }
-      });
-    }
-
-    // Validate boat type if provided
-    if (boatType && !['company boat', 'self boat'].includes(boatType)) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_BOAT_TYPE',
-          message: 'Boat type must be either "company boat" or "self boat"'
-        }
-      });
-    }
-
-    // Validate position if provided
-    if (position && !['personal duty', 'government register fisherman', 'illegal'].includes(position)) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'INVALID_POSITION',
-          message: 'Position must be one of: personal duty, government register fisherman, illegal'
-        }
-      });
-    }
-
-    // Only check for duplicate mobileNumber, sikariId, smargId, adharCardNumber
-    const duplicate = await sikariController.findDuplicateSikari({
-      mobileNumber,
-      sikariId,
-      smargId,
-      adharCardNumber
-    });
-    if (duplicate) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'DUPLICATE_FIELD',
-          message: 'A sikari with the same mobile number, sikari ID, smarg ID, or adhar card number already exists.'
-        }
-      });
-    }
-
     const sikari = await sikariController.createSikari({
       sikariId,
       sikariName,
@@ -271,30 +218,6 @@ router.post('/add', upload.fields([
       });
     }
     
-    // Handle validation errors
-    if (err.name === 'ValidationError') {
-      const validationErrors = Object.values(err.errors).map(error => error.message);
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'VALIDATION_ERROR',
-          message: 'Validation failed: ' + validationErrors.join(', ')
-        }
-      });
-    }
-    
-    // Handle duplicate field errors
-    if (err.code === 11000) {
-      const field = Object.keys(err.keyPattern)[0];
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'DUPLICATE_FIELD',
-          message: `A sikari with this ${field} already exists`
-        }
-      });
-    }
-    
     res.status(500).json({
       success: false,
       error: {
@@ -345,30 +268,8 @@ router.put('/update/:id', upload.fields([
     if (madhayamAddress) updateData.madhayamAddress = madhayamAddress;
     if (boatNumber) updateData.boatNumber = boatNumber;
     if (boatId) updateData.boatId = boatId;
-    if (boatType) {
-      if (!['company boat', 'self boat'].includes(boatType)) {
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: 'INVALID_BOAT_TYPE',
-            message: 'Boat type must be either "company boat" or "self boat"'
-          }
-        });
-      }
-      updateData.boatType = boatType;
-    }
-    if (position) {
-      if (!['personal duty', 'government register fisherman', 'illegal'].includes(position)) {
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: 'INVALID_POSITION',
-            message: 'Position must be one of: personal duty, government register fisherman, illegal'
-          }
-        });
-      }
-      updateData.position = position;
-    }
+    if (boatType) updateData.boatType = boatType;
+    if (position) updateData.position = position;
 
     // Add photo updates if provided
     if (req.files?.profilePhoto?.[0]) updateData.profilePhoto = req.files.profilePhoto[0].filename;
@@ -392,19 +293,11 @@ router.put('/update/:id', upload.fields([
       success: true,
       message: 'Sikari updated successfully',
       data: {
-        id: sikari._id,
-        sikariId: sikari.sikariId,
-        sikariName: sikari.sikariName,
-        mobileNumber: sikari.mobileNumber,
-        location: sikari.location,
-        dateOfJoining: sikari.dateOfJoining,
-        smargId: sikari.smargId,
-        boatNumber: sikari.boatNumber,
-        boatId: sikari.boatId,
-        boatType: sikari.boatType,
-        position: sikari.position,
-        profilePhoto: sikari.profilePhoto,
-        bannerPhoto: sikari.bannerPhoto
+        ...sikari,
+        profilePhoto: generateFileUrl(req, sikari.profilePhoto),
+        bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
+        adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
+        bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto)
       }
     });
   } catch (err) {
@@ -419,18 +312,6 @@ router.put('/update/:id', upload.fields([
             fs.unlinkSync(filePath);
           }
         });
-      });
-    }
-
-    // Handle duplicate field errors
-    if (err.code === 11000) {
-      const field = Object.keys(err.keyPattern)[0];
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'DUPLICATE_FIELD',
-          message: `A sikari with this ${field} already exists`
-        }
       });
     }
 

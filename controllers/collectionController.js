@@ -9,13 +9,28 @@ exports.addCollection = async (req, res) => {
     }
     // Validate all fish entries
     for (const fish of fishes) {
-      if (!fish.fishName || fish.fishRate == null || fish.fishWeight == null) {
-        return res.status(400).json({ success: false, message: 'Each fish must have fishName, fishRate, and fishWeight' });
+      if (!fish.fishName || fish.fishRate == null || fish.fishWeight == null || fish.pricePerKg == null) {
+        return res.status(400).json({ success: false, message: 'Each fish must have fishName, fishRate, fishWeight, and pricePerKg' });
       }
     }
     const collection = new Collection({ sikahriName, phoneNumber, fishes, totalRupees, netRupees });
     await collection.save();
-    res.status(201).json({ success: true, data: collection });
+
+    const collectionObj = collection.toObject();
+    res.status(201).json({ 
+      success: true, 
+      data: {
+        ...collectionObj,
+        fishes: collectionObj.fishes.map(fish => ({
+          fishName: fish.fishName,
+          fishRate: fish.fishRate,
+          fishWeight: fish.fishWeight,
+          pricePerKg: fish.pricePerKg
+        })),
+        date: collectionObj.createdAt,
+        createdAt: collectionObj.createdAt
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -25,7 +40,23 @@ exports.addCollection = async (req, res) => {
 exports.getAllCollections = async (req, res) => {
   try {
     const collections = await Collection.find().sort({ createdAt: -1 });
-    res.status(200).json({ success: true, data: collections });
+    res.status(200).json({ 
+      success: true, 
+      data: collections.map(collection => {
+        const collectionObj = collection.toObject();
+        return {
+          ...collectionObj,
+          fishes: collectionObj.fishes.map(fish => ({
+            fishName: fish.fishName,
+            fishRate: fish.fishRate,
+            fishWeight: fish.fishWeight,
+            pricePerKg: fish.pricePerKg
+          })),
+          date: collectionObj.createdAt,
+          createdAt: collectionObj.createdAt
+        };
+      })
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

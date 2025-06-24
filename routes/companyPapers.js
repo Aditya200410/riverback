@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const CompanyPaper = require('../models/CompanyPaper');
 const pdf = require('pdf-lib');
+const sharp = require('sharp');
 const { promisify } = require('util');
 const writeFileAsync = promisify(fs.writeFile);
 const unlinkAsync = promisify(fs.unlink);
@@ -47,15 +48,23 @@ router.get('/test-file/:filename', (req, res) => {
   }
 });
 
-// Configure multer for PDF storage with memory storage for better performance
+// Configure multer for file storage with memory storage for better performance
 const storage = multer.memoryStorage();
 
-// File filter to only allow PDFs
+// File filter to allow PDFs and images
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'application/pdf') {
+  const allowedMimeTypes = [
+    'application/pdf',
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'image/webp'
+  ];
+  
+  if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only PDF files are allowed!'), false);
+    cb(new Error('Only PDF and image files (JPEG, PNG, WebP) are allowed!'), false);
   }
 };
 
@@ -82,7 +91,24 @@ async function compressPDF(buffer) {
   }
 }
 
-// Upload a new company paper
+// Function to compress and optimize image
+async function compressImage(buffer, mimetype) {
+  try {
+    let sharpInstance = sharp(buffer);
+    
+    // Convert all images to WebP for better compression while maintaining quality
+    const compressedBuffer = await sharpInstance
+      .webp({ quality: 80 }) // Adjust quality as needed (0-100)
+      .toBuffer();
+    
+    return compressedBuffer;
+  } catch (error) {
+    console.error('Error compressing image:', error);
+    return buffer; // Return original buffer if compression fails
+  }
+}
+
+// Upload a new company paper or image
 router.post('/upload', upload.single('file'), async (req, res) => {
   let tempFilePath = null;
   
@@ -109,24 +135,32 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    // Generate unique filename
+    // Generate unique filename with appropriate extension
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const filename = 'paper-' + uniqueSuffix + '.pdf';
+    let filename;
+    let compressedBuffer;
+    let finalMimeType = req.file.mimetype;
+
+    if (req.file.mimetype === 'application/pdf') {
+      filename = 'paper-' + uniqueSuffix + '.pdf';
+      compressedBuffer = await compressPDF(req.file.buffer);
+    } else {
+      // For images, convert to WebP for better compression
+      filename = 'paper-' + uniqueSuffix + '.webp';
+      compressedBuffer = await compressImage(req.file.buffer);
+      finalMimeType = 'image/webp';
+    }
+
     tempFilePath = path.join(uploadDir, filename);
 
-    console.log('Compressing PDF...');
-    // Compress PDF
-    const compressedBuffer = await compressPDF(req.file.buffer);
-
     console.log('Writing file...');
-    // Write compressed file
     await writeFileAsync(tempFilePath, compressedBuffer);
 
     console.log('Creating paper record...');
     const paper = new CompanyPaper({
       fileName: filename,
       originalName: req.file.originalname,
-      fileType: req.file.mimetype,
+      fileType: finalMimeType,
       fileSize: compressedBuffer.length,
       uploadedBy: null,
       companyId: companyId || null,
@@ -141,7 +175,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     const baseUrl = req.protocol + '://' + req.get('host');
     res.status(201).json({
       success: true,
-      message: 'Paper uploaded successfully',
+      message: 'File uploaded successfully',
       data: {
         id: paper._id,
         fileName: paper.fileName,
@@ -150,13 +184,14 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         category: paper.category,
         description: paper.description,
         fileSize: paper.fileSize,
+        fileType: paper.fileType,
         companyName: paper.companyName,
         companyId: paper.companyId,
-        pdfUrl: `${baseUrl}/uploads/company-papers/${paper.fileName}`
+        fileUrl: `${baseUrl}/uploads/company-papers/${paper.fileName}`
       }
     });
   } catch (err) {
-    console.error('Error uploading paper:', err);
+    console.error('Error uploading file:', err);
     
     // Clean up temporary file if it exists
     if (tempFilePath && fs.existsSync(tempFilePath)) {
@@ -171,7 +206,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       success: false,
       error: {
         code: 'SERVER_ERROR',
-        message: 'Error uploading paper: ' + err.message
+        message: 'Error uploading file: ' + err.message
       }
     });
   }

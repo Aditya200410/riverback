@@ -1850,88 +1850,319 @@
           "name": "Get All Sikaris",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/sikaris",
               "host": ["{{base_url}}"],
               "path": ["api", "sikaris"]
-            }
+            },
+            "description": "Get all active sikaris"
           }
         },
         {
           "name": "Get Sikari by ID",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/sikaris/:id",
               "host": ["{{base_url}}"],
               "path": ["api", "sikaris", ":id"],
               "variable": [
-                { "key": "id", "value": "sikari_id_here" }
+                {
+                  "key": "id",
+                  "value": "sikari_id_here",
+                  "description": "Sikari ID"
+                }
               ]
-            }
+            },
+            "description": "Get a specific sikari by ID"
           }
         },
         {
-          "name": "Add Sikari",
+          "name": "Create Sikari",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/api/sikaris/add",
+              "raw": "{{base_url}}/api/sikaris",
               "host": ["{{base_url}}"],
-              "path": ["api", "sikaris", "add"]
+              "path": ["api", "sikaris"]
             },
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "name", "value": "Test Sikari", "type": "text" },
-                { "key": "mobile", "value": "1234567890", "type": "text" },
-                { "key": "aadhar", "value": "123456789012", "type": "text" },
-                { "key": "address", "value": "123 Test Street", "type": "text" },
-                { "key": "phase", "value": "Phase 1", "type": "text" },
-                { "key": "photo", "type": "file", "src": "/path/to/sikari/photo.jpg" }
+                {
+                  "key": "profilePhoto",
+                  "type": "file",
+                  "src": "",
+                  "description": "Profile photo (optional)"
+                },
+                {
+                  "key": "bannerPhoto",
+                  "type": "file",
+                  "src": "",
+                  "description": "Banner photo (optional)"
+                },
+                {
+                  "key": "sikariId",
+                  "value": "SK001",
+                  "type": "text",
+                  "description": "Unique sikari ID (required)"
+                },
+                {
+                  "key": "sikariName",
+                  "value": "John Doe",
+                  "type": "text",
+                  "description": "Full name (required)"
+                },
+                {
+                  "key": "mobileNumber",
+                  "value": "9876543210",
+                  "type": "text",
+                  "description": "Mobile number (required)"
+                },
+                {
+                  "key": "workAddress",
+                  "value": "Work location address",
+                  "type": "text",
+                  "description": "Work address (optional)"
+                },
+                {
+                  "key": "homeAddress",
+                  "value": "Home address",
+                  "type": "text",
+                  "description": "Home address (optional)"
+                },
+                {
+                  "key": "dateOfJoining",
+                  "value": "2024-01-01",
+                  "type": "text",
+                  "description": "Date of joining (optional)"
+                },
+                {
+                  "key": "smargId",
+                  "value": "SM001",
+                  "type": "text",
+                  "description": "Smarg ID (required)"
+                },
+                {
+                  "key": "adharCardNumber",
+                  "value": "123456789012",
+                  "type": "text",
+                  "description": "Aadhar card number (required)"
+                },
+                {
+                  "key": "adharCardPhoto",
+                  "type": "file",
+                  "src": "",
+                  "description": "Aadhar card photo (optional)"
+                },
+                {
+                  "key": "bankAccountNumber",
+                  "value": "1234567890",
+                  "type": "text",
+                  "description": "Bank account number (optional)"
+                },
+                {
+                  "key": "ifscCode",
+                  "value": "BANK0001234",
+                  "type": "text",
+                  "description": "Bank IFSC code (optional)"
+                },
+                {
+                  "key": "bankPassbookPhoto",
+                  "type": "file",
+                  "src": "",
+                  "description": "Bank passbook photo (optional)"
+                },
+                {
+                  "key": "madhayamName",
+                  "value": "Madhayam Name",
+                  "type": "text",
+                  "description": "Madhayam name (optional)"
+                },
+                {
+                  "key": "madhayamMobileNumber",
+                  "value": "9876543211",
+                  "type": "text",
+                  "description": "Madhayam mobile number (optional)"
+                },
+                {
+                  "key": "madhayamAddress",
+                  "value": "Madhayam address",
+                  "type": "text",
+                  "description": "Madhayam address (optional)"
+                },
+                {
+                  "key": "boatNumber",
+                  "value": "BT001",
+                  "type": "text",
+                  "description": "Boat number (optional)"
+                },
+                {
+                  "key": "boatId",
+                  "value": "BOAT001",
+                  "type": "text",
+                  "description": "Boat ID (optional)"
+                },
+                {
+                  "key": "boatType",
+                  "value": "company boat",
+                  "type": "text",
+                  "description": "Boat type (optional, 'company boat' or 'self boat')"
+                },
+                {
+                  "key": "position",
+                  "value": "personal duty",
+                  "type": "text",
+                  "description": "Position (optional, 'personal duty', 'government register fisherman', or 'illegal')"
+                }
               ]
-            }
+            },
+            "description": "Create a new sikari"
           }
         },
         {
           "name": "Update Sikari",
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/api/sikaris/update/:id",
+              "raw": "{{base_url}}/api/sikaris/:id",
               "host": ["{{base_url}}"],
-              "path": ["api", "sikaris", "update", ":id"],
+              "path": ["api", "sikaris", ":id"],
               "variable": [
-                { "key": "id", "value": "sikari_id_here" }
+                {
+                  "key": "id",
+                  "value": "sikari_id_here",
+                  "description": "Sikari ID"
+                }
               ]
             },
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "name", "value": "Updated Sikari", "type": "text" },
-                { "key": "address", "value": "456 Updated Street", "type": "text" },
-                { "key": "photo", "type": "file", "src": "/path/to/new/sikari/photo.jpg" }
+                {
+                  "key": "profilePhoto",
+                  "type": "file",
+                  "src": "",
+                  "description": "Profile photo (optional)"
+                },
+                {
+                  "key": "bannerPhoto",
+                  "type": "file",
+                  "src": "",
+                  "description": "Banner photo (optional)"
+                },
+                {
+                  "key": "sikariName",
+                  "value": "Updated Name",
+                  "type": "text",
+                  "description": "Full name (optional)"
+                },
+                {
+                  "key": "mobileNumber",
+                  "value": "9876543210",
+                  "type": "text",
+                  "description": "Mobile number (optional)"
+                },
+                {
+                  "key": "workAddress",
+                  "value": "Updated work address",
+                  "type": "text",
+                  "description": "Work address (optional)"
+                },
+                {
+                  "key": "homeAddress",
+                  "value": "Updated home address",
+                  "type": "text",
+                  "description": "Home address (optional)"
+                },
+                {
+                  "key": "madhayamName",
+                  "value": "Updated Madhayam",
+                  "type": "text",
+                  "description": "Madhayam name (optional)"
+                },
+                {
+                  "key": "madhayamMobileNumber",
+                  "value": "9876543211",
+                  "type": "text",
+                  "description": "Madhayam mobile number (optional)"
+                },
+                {
+                  "key": "madhayamAddress",
+                  "value": "Updated madhayam address",
+                  "type": "text",
+                  "description": "Madhayam address (optional)"
+                },
+                {
+                  "key": "boatNumber",
+                  "value": "BT002",
+                  "type": "text",
+                  "description": "Boat number (optional)"
+                },
+                {
+                  "key": "boatType",
+                  "value": "self boat",
+                  "type": "text",
+                  "description": "Boat type (optional, 'company boat' or 'self boat')"
+                },
+                {
+                  "key": "position",
+                  "value": "government register fisherman",
+                  "type": "text",
+                  "description": "Position (optional, 'personal duty', 'government register fisherman', or 'illegal')"
+                }
               ]
-            }
+            },
+            "description": "Update an existing sikari"
           }
         },
         {
           "name": "Delete Sikari",
           "request": {
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/api/sikaris/delete/:id",
+              "raw": "{{base_url}}/api/sikaris/:id",
               "host": ["{{base_url}}"],
-              "path": ["api", "sikaris", "delete", ":id"],
+              "path": ["api", "sikaris", ":id"],
               "variable": [
-                { "key": "id", "value": "sikari_id_here" }
+                {
+                  "key": "id",
+                  "value": "sikari_id_here",
+                  "description": "Sikari ID"
+                }
               ]
-            }
+            },
+            "description": "Delete a sikari (soft delete)"
           }
         }
       ]
@@ -1956,7 +2187,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"sikahriName\": \"John Doe\",\n  \"phoneNumber\": \"9876543210\",\n  \"fishes\": [\n    {\n      \"fishName\": \"Rohu\",\n      \"fishRate\": 200,\n      \"fishWeight\": 5\n    },\n    {\n      \"fishName\": \"Catla\",\n      \"fishRate\": 250,\n      \"fishWeight\": 3\n    }\n  ],\n  \"totalRupees\": 1750,\n  \"netRupees\": 1500\n}",
+              "raw": "{\n  \"sikahriName\": \"John Doe\",\n  \"phoneNumber\": \"9876543210\",\n  \"fishes\": [\n    {\n      \"fishName\": \"Rohu\",\n      \"fishRate\": 200,\n      \"fishWeight\": 5,\n      \"pricePerKg\": 40\n    },\n    {\n      \"fishName\": \"Catla\",\n      \"fishRate\": 250,\n      \"fishWeight\": 3,\n      \"pricePerKg\": 83.33\n    }\n  ],\n  \"totalRupees\": 1750,\n  \"netRupees\": 1500\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1985,7 +2216,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"65c4e8b8f3c1234567890123\",\n    \"sikahriName\": \"John Doe\",\n    \"phoneNumber\": \"9876543210\",\n    \"fishes\": [\n      {\n        \"fishName\": \"Rohu\",\n        \"fishRate\": 200,\n        \"fishWeight\": 5\n      },\n      {\n        \"fishName\": \"Catla\",\n        \"fishRate\": 250,\n        \"fishWeight\": 3\n      }\n    ],\n    \"totalRupees\": 1750,\n    \"netRupees\": 1500,\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"_id\": \"65c4e8b8f3c1234567890123\",\n    \"sikahriName\": \"John Doe\",\n    \"phoneNumber\": \"9876543210\",\n    \"fishes\": [\n      {\n        \"fishName\": \"Rohu\",\n        \"fishRate\": 200,\n        \"fishWeight\": 5,\n        \"pricePerKg\": 40\n      },\n      {\n        \"fishName\": \"Catla\",\n        \"fishRate\": 250,\n        \"fishWeight\": 3,\n        \"pricePerKg\": 83.33\n      }\n    ],\n    \"totalRupees\": 1750,\n    \"netRupees\": 1500,\n    \"date\": \"2024-01-01T00:00:00.000Z\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
             },
             {
               "name": "Error - Missing Fields",
@@ -2006,7 +2237,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": false,\n  \"message\": \"Missing required fields\"\n}"
+              "body": "{\n  \"success\": false,\n  \"message\": \"Each fish must have fishName, fishRate, fishWeight, and pricePerKg\"\n}"
             }
           ]
         },
@@ -2042,7 +2273,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"_id\": \"65c4e8b8f3c1234567890123\",\n      \"sikahriName\": \"John Doe\",\n      \"phoneNumber\": \"9876543210\",\n      \"fishes\": [\n        {\n          \"fishName\": \"Rohu\",\n          \"fishRate\": 200,\n          \"fishWeight\": 5\n        },\n        {\n          \"fishName\": \"Catla\",\n          \"fishRate\": 250,\n          \"fishWeight\": 3\n        }\n      ],\n      \"totalRupees\": 1750,\n      \"netRupees\": 1500,\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  ]\n}"
+              "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"_id\": \"65c4e8b8f3c1234567890123\",\n      \"sikahriName\": \"John Doe\",\n      \"phoneNumber\": \"9876543210\",\n      \"fishes\": [\n        {\n          \"fishName\": \"Rohu\",\n          \"fishRate\": 200,\n          \"fishWeight\": 5,\n          \"pricePerKg\": 40\n        },\n        {\n          \"fishName\": \"Catla\",\n          \"fishRate\": 250,\n          \"fishWeight\": 3,\n          \"pricePerKg\": 83.33\n        }\n      ],\n      \"totalRupees\": 1750,\n      \"netRupees\": 1500,\n      \"date\": \"2024-01-01T00:00:00.000Z\",\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  ]\n}"
             }
           ]
         }
