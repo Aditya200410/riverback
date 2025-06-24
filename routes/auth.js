@@ -1,7 +1,6 @@
 // Improved Express Auth Routes with better structure, security, and async handling
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const CompanyUser = require('../models/CompanyUser');
@@ -12,36 +11,46 @@ const { validate, validationRules } = require('../middleware/validator');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
-const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/config');
 const { generateCompanyId } = require('../utils/idGenerator');
 
 // Middleware to protect routes
-const auth = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ 
-    success: false,
-    error: {
-      code: 'NO_TOKEN',
-      message: 'No token, authorization denied'
-    }
-  });
+const auth = async (req, res, next) => {
+  const userId = req.header('X-User-Id');
+  if (!userId) {
+    return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'NO_USER_ID',
+        message: 'No user ID provided, authorization denied'
+      }
+    });
+  }
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    const user = await CompanyUser.findById(userId);
+    if (!user) {
+      return res.status(401).json({ 
+        success: false,
+        error: {
+          code: 'INVALID_USER',
+          message: 'Invalid user'
+        }
+      });
+    }
+    req.user = { id: user._id, role: 'company' };
     next();
   } catch {
     return res.status(401).json({ 
       success: false,
       error: {
-        code: 'INVALID_TOKEN',
-        message: 'Invalid token'
+        code: 'INVALID_USER',
+        message: 'Invalid user'
       }
     });
   }
 };
 
-// Validate Token
-router.get('/validate-token', auth, async (req, res) => {
+// Validate User
+router.get('/validate-user', auth, async (req, res) => {
   try {
     const user = await CompanyUser.findById(req.user.id).select('-password');
     if (!user) return res.status(401).json({ 
@@ -167,13 +176,6 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
 
     await user.save();
 
-    // Generate token
-    const token = jwt.sign(
-      { id: user._id, role: 'company' },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
     // Construct the full URL for profile picture
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
@@ -182,7 +184,6 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
       success: true,
       message: 'User registered successfully',
       data: {
-        token,
         user: {
           _id: user._id,
           companyId: user.companyId,
@@ -195,31 +196,18 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
           profilePicture: profilePictureUrl,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
-          updatedAt: user.updatedAt
+          updatedAt: user.updatedAt,
+          role: 'company'
         }
       }
     });
   } catch (error) {
-    console.error('Error in signup:', error);
-    
-    // Handle specific MongoDB errors
-    if (error.code === 11000) {
-      // Duplicate key error
-      const field = Object.keys(error.keyPattern)[0];
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'DUPLICATE_FIELD',
-          message: `${field} already exists in the system`
-        }
-      });
-    }
-    
+    console.error('Signup error:', error);
     res.status(500).json({
       success: false,
       error: {
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Error in signup process'
+        code: 'REGISTRATION_FAILED',
+        message: 'Failed to register user. Please try again.'
       }
     });
   }
@@ -254,17 +242,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Generate token with consistent payload structure
-    const token = jwt.sign(
-      { 
-        id: user._id,
-        role: 'company',
-        companyId: user._id
-      },
-      JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
-    );
-
     // Construct the full URL for profile picture
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
@@ -273,7 +250,6 @@ router.post('/login', async (req, res) => {
       success: true,
       message: 'Login successful',
       data: {
-        token,
         user: {
           _id: user._id,
           companyId: user.companyId,

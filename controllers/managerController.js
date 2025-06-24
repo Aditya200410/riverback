@@ -1,11 +1,8 @@
 const Manager = require('../models/Manager');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 const { generateOTP } = require('../utils/otpGenerator');
 const { storeTempData, getTempData, removeTempData } = require('../utils/tempStorage');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 // Get all managers
 exports.getAllManagers = async (req, res) => {
@@ -231,26 +228,16 @@ exports.login = async (req, res, next) => {
             });
         }
 
-        // Generate JWT token
-        const token = jwt.sign(
-            { id: user._id, role: 'manager' },
-            JWT_SECRET,
-            { expiresIn: '24h' }
-        );
-
         res.status(200).json({
             success: true,
             message: 'Login successful',
             data: {
-                token,
                 user: {
                     _id: user._id,
                     name: user.name,
                     mobile: user.mobile,
                     email: user.email,
-                    aadharNumber: user.aadharNumber,
-                    address: user.address,
-                    isVerified: true
+                    role: 'manager'
                 }
             }
         });
@@ -396,18 +383,10 @@ exports.verifyOTP = async (req, res, next) => {
         // Remove temporary data
         removeTempData(mobile);
 
-        // Generate JWT token
-        const token = jwt.sign(
-            { id: user._id, role: 'manager' },
-            JWT_SECRET,
-            { expiresIn: '24h' }
-        );
-
         res.status(200).json({
             success: true,
             message: 'Mobile number verified and account created successfully',
             data: {
-                token,
                 user: {
                     _id: user._id,
                     name: user.name,

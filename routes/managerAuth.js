@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const Manager = require('../models/Manager');
@@ -12,35 +11,44 @@ const multer = require('multer');
 const fs = require('fs');
 const { generateManagerId } = require('../utils/idGenerator');
 
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
-
 // Middleware to protect routes
-const auth = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ 
-    success: false,
-    error: {
-      code: 'NO_TOKEN',
-      message: 'No token, authorization denied'
-    }
-  });
+const auth = async (req, res, next) => {
+  const userId = req.header('X-User-Id');
+  if (!userId) {
+    return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'NO_USER_ID',
+        message: 'No user ID provided, authorization denied'
+      }
+    });
+  }
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    const user = await Manager.findById(userId);
+    if (!user) {
+      return res.status(401).json({ 
+        success: false,
+        error: {
+          code: 'INVALID_USER',
+          message: 'Invalid user'
+        }
+      });
+    }
+    req.user = { id: user._id, role: 'manager' };
     next();
   } catch {
     return res.status(401).json({ 
       success: false,
       error: {
-        code: 'INVALID_TOKEN',
-        message: 'Invalid token'
+        code: 'INVALID_USER',
+        message: 'Invalid user'
       }
     });
   }
 };
 
-// Validate token
-router.get('/validate-token', auth, async (req, res) => {
+// Validate user
+router.get('/validate-user', auth, async (req, res) => {
   try {
     const manager = await Manager.findById(req.user.id).select('-password');
     if (!manager) return res.status(401).json({ 
@@ -168,7 +176,8 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
           profilePicture: profilePictureUrl,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
-          updatedAt: user.updatedAt
+          updatedAt: user.updatedAt,
+          role: 'manager'
         }
       }
     });

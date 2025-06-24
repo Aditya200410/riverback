@@ -3,9 +3,7 @@ const router = express.Router();
 const smargController = require('../controllers/smargController');
 const multer = require('multer');
 const path = require('path');
-const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const Smarg = require('../models/Smarg');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -35,15 +33,38 @@ const upload = multer({
 });
 
 // Middleware to protect routes
-const auth = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ message: 'No token, authorization denied' });
+const auth = async (req, res, next) => {
+  const userId = req.header('X-User-Id');
+  if (!userId) {
+    return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'NO_USER_ID',
+        message: 'No user ID provided, authorization denied'
+      }
+    });
+  }
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    const user = await Smarg.findById(userId);
+    if (!user) {
+      return res.status(401).json({ 
+        success: false,
+        error: {
+          code: 'INVALID_USER',
+          message: 'Invalid user'
+        }
+      });
+    }
+    req.user = { id: user._id };
     next();
   } catch {
-    return res.status(401).json({ message: 'Invalid token' });
+    return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'INVALID_USER',
+        message: 'Invalid user'
+      }
+    });
   }
 };
 

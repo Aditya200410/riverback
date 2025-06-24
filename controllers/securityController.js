@@ -118,18 +118,10 @@ exports.verifyOTP = async (req, res, next) => {
 
         await user.save();
 
-        // Generate JWT token
-        const token = jwt.sign(
-            { id: user._id, role: 'security' },
-            JWT_SECRET,
-            { expiresIn: '24h' }
-        );
-
         res.status(200).json({
             success: true,
             message: 'Mobile number verified and account created successfully',
             data: {
-                token,
                 user: {
                     _id: user._id,
                     name: user.name,
@@ -137,7 +129,8 @@ exports.verifyOTP = async (req, res, next) => {
                     email: user.email,
                     aadharNumber: user.aadharNumber,
                     address: user.address,
-                    isVerified: true
+                    isVerified: true,
+                    role: 'security'
                 }
             }
         });

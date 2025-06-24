@@ -1,5 +1,4 @@
 const CompanyUser = require('../models/CompanyUser');
-const jwt = require('jsonwebtoken');
 
 // Get all company users
 exports.getAllCompanyUsers = async (req, res) => {
@@ -103,15 +102,8 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: companyUser._id, role: 'company' },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
     res.status(200).json({
-      token,
+      success: true,
       user: {
         id: companyUser._id,
         companyName: companyUser.companyName,

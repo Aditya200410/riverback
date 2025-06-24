@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const SecurityUser = require('../models/SecurityUser');
@@ -12,35 +11,44 @@ const multer = require('multer');
 const fs = require('fs');
 const { generateSecurityId } = require('../utils/idGenerator');
 
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
-
 // Middleware to protect routes
-const auth = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ 
-    success: false,
-    error: {
-      code: 'NO_TOKEN',
-      message: 'No token, authorization denied'
-    }
-  });
+const auth = async (req, res, next) => {
+  const userId = req.header('X-User-Id');
+  if (!userId) {
+    return res.status(401).json({ 
+      success: false,
+      error: {
+        code: 'NO_USER_ID',
+        message: 'No user ID provided, authorization denied'
+      }
+    });
+  }
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    const user = await SecurityUser.findById(userId);
+    if (!user) {
+      return res.status(401).json({ 
+        success: false,
+        error: {
+          code: 'INVALID_USER',
+          message: 'Invalid user'
+        }
+      });
+    }
+    req.user = { id: user._id, role: 'security' };
     next();
   } catch {
     return res.status(401).json({ 
       success: false,
       error: {
-        code: 'INVALID_TOKEN',
-        message: 'Invalid token'
+        code: 'INVALID_USER',
+        message: 'Invalid user'
       }
     });
   }
 };
 
-// Validate token
-router.get('/validate-token', auth, async (req, res) => {
+// Validate user
+router.get('/validate-user', auth, async (req, res) => {
   try {
     const securityUser = await SecurityUser.findById(req.user.id).select('-password');
     if (!securityUser) return res.status(401).json({ 
@@ -151,13 +159,6 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
 
     await user.save();
 
-    // Generate token
-    const token = jwt.sign(
-      { userId: user._id, role: 'security' },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
     // Construct the full URL for profile picture
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
@@ -166,7 +167,6 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
       success: true,
       message: 'User registered successfully',
       data: {
-        token,
         user: {
           _id: user._id,
           securityId: user.securityId,
@@ -178,7 +178,8 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
           profilePicture: profilePictureUrl,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
-          updatedAt: user.updatedAt
+          updatedAt: user.updatedAt,
+          role: 'security'
         }
       }
     });
@@ -223,13 +224,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Generate token
-    const token = jwt.sign(
-      { userId: user._id, role: 'security' },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
     // Construct the full URL for profile picture
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
@@ -238,7 +232,6 @@ router.post('/login', async (req, res) => {
       success: true,
       message: 'Login successful',
       data: {
-        token,
         user: {
           _id: user._id,
           securityId: user.securityId,
@@ -250,7 +243,8 @@ router.post('/login', async (req, res) => {
           profilePicture: profilePictureUrl,
           isVerified: user.isVerified,
           createdAt: user.createdAt,
-          updatedAt: user.updatedAt
+          updatedAt: user.updatedAt,
+          role: 'security'
         }
       }
     });

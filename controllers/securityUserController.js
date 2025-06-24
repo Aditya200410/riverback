@@ -1,5 +1,4 @@
 const SecurityUser = require('../models/SecurityUser');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 // Get all security users
@@ -177,24 +176,17 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: securityUser._id, role: 'security' },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
     res.status(200).json({
       success: true,
       data: {
-        token,
         user: {
           id: securityUser._id,
           name: securityUser.name,
           mobile: securityUser.mobile,
           aadhar: securityUser.aadhar,
           securityCompany: securityUser.securityCompany,
-          hasProfilePicture: !!securityUser.profilePicture
+          hasProfilePicture: !!securityUser.profilePicture,
+          role: 'security'
         }
       }
     });
