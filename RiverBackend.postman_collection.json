@@ -2269,6 +2269,324 @@
           }
         }
       ]
+    },
+    {
+      "name": "Money Handles",
+      "item": [
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles"]
+            },
+            "description": "Get all active money transactions sorted by date"
+          }
+        },
+        {
+          "name": "Get Transaction by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Transaction ID"
+                }
+              ]
+            },
+            "description": "Get a specific transaction by its ID"
+          }
+        },
+        {
+          "name": "Add Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "add"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"type\": \"pay\",\n  \"toWhom\": \"John Doe\",\n  \"sendTo\": \"Manager\",\n  \"receiverName\": \"John Doe\",\n  \"receiverId\": \"12345\",\n  \"pay\": true,\n  \"received\": false,\n  \"description\": \"Salary payment\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Add a new money transaction"
+          }
+        },
+        {
+          "name": "Get Transactions by Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/type/:type",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "type", ":type"],
+              "variable": [
+                {
+                  "key": "type",
+                  "value": "pay",
+                  "description": "Transaction type (pay/take)"
+                }
+              ]
+            },
+            "description": "Get transactions by type (pay/take)"
+          }
+        },
+        {
+          "name": "Get Transactions by SendTo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/sendto/:sendTo",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "sendto", ":sendTo"],
+              "variable": [
+                {
+                  "key": "sendTo",
+                  "value": "Manager",
+                  "description": "SendTo type (Company/Manager/Sikari/Security)"
+                }
+              ]
+            },
+            "description": "Get transactions by sendTo type"
+          }
+        },
+        {
+          "name": "Get Transactions by Person",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/person/:toWhom",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "person", ":toWhom"],
+              "variable": [
+                {
+                  "key": "toWhom",
+                  "value": "",
+                  "description": "Person name"
+                }
+              ]
+            },
+            "description": "Get transactions by person name"
+          }
+        },
+        {
+          "name": "Get Transactions by Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/status/:status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "status", ":status"],
+              "variable": [
+                {
+                  "key": "status",
+                  "value": "pay",
+                  "description": "Status (pay/received)"
+                }
+              ]
+            },
+            "description": "Get transactions by pay/received status"
+          }
+        },
+        {
+          "name": "Update Transaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "update", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Transaction ID"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"type\": \"pay\",\n  \"toWhom\": \"John Doe\",\n  \"sendTo\": \"Manager\",\n  \"receiverName\": \"John Doe\",\n  \"receiverId\": \"12345\",\n  \"pay\": true,\n  \"received\": false,\n  \"description\": \"Updated salary payment\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Update an existing transaction"
+          }
+        },
+        {
+          "name": "Delete Transaction",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/money-handles/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "money-handles", "delete", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Transaction ID"
+                }
+              ]
+            },
+            "description": "Delete a transaction"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phases",
+      "item": [
+        {
+          "name": "Get All Phases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/phases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases"]
+            },
+            "description": "Get all phases"
+          }
+        },
+        {
+          "name": "Get Phase by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/phases/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Phase ID"
+                }
+              ]
+            },
+            "description": "Get a specific phase by its ID"
+          }
+        },
+        {
+          "name": "Create Phase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/phases",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Phase 1\",\n  \"description\": \"First phase of the project\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a new phase"
+          }
+        },
+        {
+          "name": "Update Phase",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/phases/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Phase ID"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Phase 1\",\n  \"description\": \"Updated description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Update an existing phase"
+          }
+        },
+        {
+          "name": "Delete Phase",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/phases/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "phases", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Phase ID"
+                }
+              ]
+            },
+            "description": "Delete a phase"
+          }
+        }
+      ]
     }
   ],
   "variable": [
