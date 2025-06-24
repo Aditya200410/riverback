@@ -1,0 +1,334 @@
+{
+  "info": {
+    "name": "River Backend - Reports API",
+    "description": "API collection for River Backend Reports",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Reports",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/reports",
+          "host": ["{{base_url}}"],
+          "path": ["api", "reports"]
+        }
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"report_id_here\",\n      \"shopName\": \"Shop Name\",\n      \"location\": \"Shop Location\",\n      \"notice\": \"Important Notice\",\n      \"photo\": \"photo_url_here\",\n      \"video\": \"video_url_here\",\n      \"generatedDate\": \"2024-01-01T00:00:00.000Z\",\n      \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Report by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/reports/:id",
+          "host": ["{{base_url}}"],
+          "path": ["api", "reports", ":id"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "report_id_here",
+              "description": "ID of the report to fetch"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", ":id"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"report_id_here\",\n    \"shopName\": \"Shop Name\",\n    \"location\": \"Shop Location\",\n    \"notice\": \"Important Notice\",\n    \"photo\": \"photo_url_here\",\n    \"video\": \"video_url_here\",\n    \"generatedDate\": \"2024-01-01T00:00:00.000Z\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
+        },
+        {
+          "name": "Error - Report Not Found",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", ":id"]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"REPORT_NOT_FOUND\",\n    \"message\": \"Report not found\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Generate Report",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "multipart/form-data"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/reports/generate",
+          "host": ["{{base_url}}"],
+          "path": ["api", "reports", "generate"]
+        },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "shopName",
+              "value": "Shop Name",
+              "type": "text",
+              "description": "Name of the shop"
+            },
+            {
+              "key": "location",
+              "value": "Shop Location",
+              "type": "text",
+              "description": "Location of the shop"
+            },
+            {
+              "key": "notice",
+              "value": "Important Notice",
+              "type": "text",
+              "description": "Any important notice or remarks"
+            },
+            {
+              "key": "photo",
+              "type": "file",
+              "src": "",
+              "description": "Photo file"
+            },
+            {
+              "key": "video",
+              "type": "file",
+              "src": "",
+              "description": "Video file"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports/generate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "generate"]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": true,\n  \"message\": \"Report generated successfully\",\n  \"data\": {\n    \"id\": \"report_id_here\",\n    \"shopName\": \"Shop Name\",\n    \"location\": \"Shop Location\",\n    \"notice\": \"Important Notice\",\n    \"photo\": \"photo_url_here\",\n    \"video\": \"video_url_here\",\n    \"generatedDate\": \"2024-01-01T00:00:00.000Z\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Add Report",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "multipart/form-data"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/reports/add",
+          "host": ["{{base_url}}"],
+          "path": ["api", "reports", "add"]
+        },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "shopName",
+              "value": "Shop Name",
+              "type": "text",
+              "description": "Name of the shop"
+            },
+            {
+              "key": "location",
+              "value": "Shop Location",
+              "type": "text",
+              "description": "Location of the shop"
+            },
+            {
+              "key": "notice",
+              "value": "Important Notice",
+              "type": "text",
+              "description": "Any important notice or remarks"
+            },
+            {
+              "key": "photo",
+              "type": "file",
+              "src": "",
+              "description": "Photo file"
+            },
+            {
+              "key": "video",
+              "type": "file",
+              "src": "",
+              "description": "Video file"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "add"]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": true,\n  \"message\": \"Report added successfully\",\n  \"data\": {\n    \"id\": \"report_id_here\",\n    \"shopName\": \"Shop Name\",\n    \"location\": \"Shop Location\",\n    \"notice\": \"Important Notice\",\n    \"photo\": \"photo_url_here\",\n    \"video\": \"video_url_here\",\n    \"generatedDate\": \"2024-01-01T00:00:00.000Z\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Archive Report",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/reports/archive/:id",
+          "host": ["{{base_url}}"],
+          "path": ["api", "reports", "archive", ":id"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "report_id_here",
+              "description": "ID of the report to archive"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Success Response",
+          "originalRequest": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports/archive/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "archive", ":id"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": true,\n  \"message\": \"Report archived successfully\"\n}"
+        },
+        {
+          "name": "Error - Report Not Found",
+          "originalRequest": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/reports/archive/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "archive", ":id"]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"REPORT_NOT_FOUND\",\n    \"message\": \"Report not found\"\n  }\n}"
+        }
+      ]
+    }
+  ]
+} 

@@ -9,8 +9,7 @@ exports.getAllReports = async (companyId) => {
   try {
     const query = companyId ? { companyId, status: 'active' } : { status: 'active' };
     return await Report.find(query)
-      .sort({ createdAt: -1 })
-      .populate('generatedBy', 'name email');
+      .sort({ createdAt: -1 });
   } catch (err) {
     console.error('Error in getAllReports:', err);
     throw err;
@@ -20,8 +19,7 @@ exports.getAllReports = async (companyId) => {
 // Get report by ID
 exports.getReportById = async (id) => {
   try {
-    return await Report.findOne({ _id: id, status: 'active' })
-      .populate('generatedBy', 'name email');
+    return await Report.findOne({ _id: id, status: 'active' });
   } catch (err) {
     console.error('Error in getReportById:', err);
     throw err;
@@ -32,89 +30,24 @@ exports.getReportById = async (id) => {
 exports.generateReport = async (reportData) => {
   try {
     const {
-      reportType,
-      startDate,
-      endDate,
-      generatedBy,
+      shopName,
+      location,
+      notice,
+      photo,
+      video,
       companyId
     } = reportData;
 
-    // Calculate report data based on type
-    let calculatedReportData = {};
-    
-    switch (reportType) {
-      case 'daily':
-      case 'weekly':
-      case 'monthly':
-      case 'yearly':
-      case 'custom':
-        // Get financial data
-        const financialQuery = companyId ? 
-          { companyId, date: { $gte: startDate, $lte: endDate }, status: 'active' } :
-          { date: { $gte: startDate, $lte: endDate }, status: 'active' };
-        const financialData = await MoneyHandle.find(financialQuery);
-
-        // Get boat data
-        const boatQuery = companyId ? 
-          { companyId, createdAt: { $gte: startDate, $lte: endDate }, status: 'active' } :
-          { createdAt: { $gte: startDate, $lte: endDate }, status: 'active' };
-        const boatData = await Boat.find(boatQuery);
-
-        // Get sikari data
-        const sikariQuery = companyId ? 
-          { companyId, createdAt: { $gte: startDate, $lte: endDate }, status: 'active' } :
-          { createdAt: { $gte: startDate, $lte: endDate }, status: 'active' };
-        const sikariData = await Sikari.find(sikariQuery);
-
-        // Get madhayam data
-        const madhayamQuery = companyId ? 
-          { companyId, createdAt: { $gte: startDate, $lte: endDate }, status: 'active' } :
-          { createdAt: { $gte: startDate, $lte: endDate }, status: 'active' };
-        const madhayamData = await Madhayam.find(madhayamQuery);
-
-        // Calculate totals
-        const totalIncome = financialData
-          .filter(transaction => transaction.type === 'pay')
-          .reduce((sum, transaction) => sum + transaction.amount, 0);
-
-        const totalExpense = financialData
-          .filter(transaction => transaction.type === 'take')
-          .reduce((sum, transaction) => sum + transaction.amount, 0);
-
-        calculatedReportData = {
-          financial: {
-            totalIncome,
-            totalExpense,
-            netProfit: totalIncome - totalExpense,
-            transactions: financialData
-          },
-          boats: {
-            total: boatData.length,
-            details: boatData
-          },
-          sikaris: {
-            total: sikariData.length,
-            details: sikariData
-          },
-          madhayams: {
-            total: madhayamData.length,
-            details: madhayamData
-          }
-        };
-        break;
-
-      default:
-        throw new Error('Invalid report type');
-    }
-
     // Create and save report
     const report = new Report({
-      reportType,
-      startDate,
-      endDate,
-      reportData: calculatedReportData,
-      generatedBy,
-      companyId
+      shopName,
+      location,
+      notice,
+      photo,
+      video,
+      generatedDate: new Date(),
+      companyId,
+      status: 'active'
     });
 
     return await report.save();
@@ -160,7 +93,7 @@ exports.getReportsByShop = async (req, res) => {
 // Create new report
 exports.createReport = async (req, res) => {
     try {
-        const { shopName, notice } = req.body;
+        const { shopName, location, notice } = req.body;
         
         // Handle file uploads if present
         const photo = req.files?.photo ? req.files.photo[0].path : null;
@@ -168,9 +101,11 @@ exports.createReport = async (req, res) => {
 
         const report = new Report({
             shopName,
+            location,
             notice,
             photo,
             video,
+            generatedDate: new Date(),
             status: 'active'
         });
 
@@ -184,7 +119,7 @@ exports.createReport = async (req, res) => {
 // Update report
 exports.updateReport = async (req, res) => {
     try {
-        const { shopName, notice } = req.body;
+        const { shopName, location, notice } = req.body;
         
         // Handle file uploads if present
         const photo = req.files?.photo ? req.files.photo[0].path : undefined;
@@ -192,6 +127,7 @@ exports.updateReport = async (req, res) => {
 
         const updateData = {
             shopName,
+            location,
             notice,
             ...(photo && { photo }),
             ...(video && { video })

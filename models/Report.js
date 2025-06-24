@@ -1,34 +1,39 @@
 const mongoose = require('mongoose');
 
 const reportSchema = new mongoose.Schema({
-    reportType: {
+    shopName: {
         type: String,
+        required: true
+    },
+    location: {
+        type: String,
+        required: true
+    },
+    notice: {
+        type: String,
+        required: true
+    },
+    photo: {
+        type: String,
+        required: false
+    },
+    video: {
+        type: String,
+        required: false
+    },
+    generatedDate: {
+        type: Date,
         required: true,
-        enum: ['daily', 'weekly', 'monthly', 'yearly', 'custom']
-    },
-    startDate: {
-        type: Date,
-        required: true
-    },
-    endDate: {
-        type: Date,
-        required: true
-    },
-    reportData: {
-        type: mongoose.Schema.Types.Mixed,
-        required: true
-    },
-    generatedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        default: Date.now
     },
     companyId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Company'
+        ref: 'Company',
+        required: false
     },
     status: {
         type: String,
-        enum: ['active', 'archived'],
+        enum: ['active', 'archived', 'deleted'],
         default: 'active'
     }
 }, {
@@ -36,11 +41,10 @@ const reportSchema = new mongoose.Schema({
 });
 
 // Create indexes for faster queries
-reportSchema.index({ reportType: 1 });
-reportSchema.index({ startDate: 1 });
-reportSchema.index({ endDate: 1 });
+reportSchema.index({ shopName: 1 });
+reportSchema.index({ location: 1 });
+reportSchema.index({ generatedDate: 1 });
 reportSchema.index({ companyId: 1 });
-reportSchema.index({ generatedBy: 1 });
 reportSchema.index({ status: 1 });
 
 const Report = mongoose.model('Report', reportSchema);

@@ -1,6 +1,26 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const reportController = require('../controllers/reportController');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/reports/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 50 * 1024 * 1024 // 50MB limit
+  }
+});
 
 // Get all reports for a company
 router.get('/', async (req, res) => {
@@ -71,9 +91,16 @@ router.get('/:id', async (req, res) => {
 });
 
 // Generate new report
-router.post('/generate', async (req, res) => {
+router.post('/generate', upload.fields([
+  { name: 'photo', maxCount: 1 },
+  { name: 'video', maxCount: 1 }
+]), async (req, res) => {
   try {
-    const { shopName, location, notice, photo, video } = req.body;
+    const { shopName, location, notice } = req.body;
+
+    // Get file paths if files were uploaded
+    const photo = req.files?.photo ? req.files.photo[0].path : null;
+    const video = req.files?.video ? req.files.video[0].path : null;
 
     const report = await reportController.generateReport({
       shopName,
@@ -113,9 +140,16 @@ router.post('/generate', async (req, res) => {
 });
 
 // Add new report
-router.post('/add', express.json(), async (req, res) => {
+router.post('/add', upload.fields([
+  { name: 'photo', maxCount: 1 },
+  { name: 'video', maxCount: 1 }
+]), async (req, res) => {
   try {
-    const { shopName, location, notice, photo, video } = req.body;
+    const { shopName, location, notice } = req.body;
+
+    // Get file paths if files were uploaded
+    const photo = req.files?.photo ? req.files.photo[0].path : null;
+    const video = req.files?.video ? req.files.video[0].path : null;
 
     const report = await reportController.generateReport({
       shopName,
