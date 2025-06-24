@@ -10,6 +10,7 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const { generateSecurityId } = require('../utils/idGenerator');
+const { generateFileUrl } = require('../utils/urlGenerator');
 
 // Middleware to protect routes
 const auth = async (req, res, next) => {
@@ -58,15 +59,11 @@ router.get('/validate-user', auth, async (req, res) => {
         message: 'Invalid security user'
       }
     });
-
-    // Construct the full URL for profile picture
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const profilePictureUrl = securityUser.profilePicture ? `${baseUrl}/${securityUser.profilePicture}` : null;
     
     // Create a user object with the proper profile picture URL
     const userWithUrl = {
       ...securityUser.toObject(),
-      profilePicture: profilePictureUrl
+      profilePicture: generateFileUrl(req, securityUser.profilePicture)
     };
 
     res.json({ 
@@ -224,10 +221,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Construct the full URL for profile picture
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
-
     res.json({
       success: true,
       message: 'Login successful',
@@ -240,7 +233,7 @@ router.post('/login', async (req, res) => {
           aadhar: user.aadhar,
           address: user.address,
           phase: user.phase,
-          profilePicture: profilePictureUrl,
+          profilePicture: generateFileUrl(req, user.profilePicture),
           isVerified: user.isVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,

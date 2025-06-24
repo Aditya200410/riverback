@@ -12,6 +12,7 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const { generateCompanyId } = require('../utils/idGenerator');
+const { generateFileUrl } = require('../utils/urlGenerator');
 
 // Middleware to protect routes
 const auth = async (req, res, next) => {
@@ -61,14 +62,10 @@ router.get('/validate-user', auth, async (req, res) => {
       }
     });
 
-    // Construct the full URL for profile picture
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
-    
     // Create a user object with the proper profile picture URL
     const userWithUrl = {
       ...user.toObject(),
-      profilePicture: profilePictureUrl
+      profilePicture: generateFileUrl(req, user.profilePicture)
     };
 
     res.json({ 
@@ -176,10 +173,6 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
 
     await user.save();
 
-    // Construct the full URL for profile picture
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
-
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
@@ -193,7 +186,7 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
           companyName: user.companyName,
           companyAddress: user.companyAddress,
           aadhar_no: user.aadhar_no,
-          profilePicture: profilePictureUrl,
+          profilePicture: generateFileUrl(req, user.profilePicture),
           isVerified: user.isVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
@@ -242,10 +235,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Construct the full URL for profile picture
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const profilePictureUrl = user.profilePicture ? `${baseUrl}/${user.profilePicture}` : null;
-
     res.json({
       success: true,
       message: 'Login successful',
@@ -259,7 +248,7 @@ router.post('/login', async (req, res) => {
           companyName: user.companyName,
           companyAddress: user.companyAddress,
           aadhar_no: user.aadhar_no,
-          profilePicture: profilePictureUrl,
+          profilePicture: generateFileUrl(req, user.profilePicture),
           isVerified: user.isVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt

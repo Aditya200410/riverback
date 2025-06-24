@@ -10,6 +10,7 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const { generateManagerId } = require('../utils/idGenerator');
+const { generateFileUrl } = require('../utils/urlGenerator');
 
 // Middleware to protect routes
 const auth = async (req, res, next) => {
@@ -58,16 +59,16 @@ router.get('/validate-user', auth, async (req, res) => {
         message: 'Invalid manager'
       }
     });
-
-    // Convert profile picture path to full URL
-    const managerObj = manager.toObject();
-    if (managerObj.profilePicture) {
-      managerObj.profilePicture = `${req.protocol}://${req.get('host')}/${managerObj.profilePicture}`;
-    }
+    
+    // Create a user object with the proper profile picture URL
+    const userWithUrl = {
+      ...manager.toObject(),
+      profilePicture: generateFileUrl(req, manager.profilePicture)
+    };
 
     res.json({ 
       success: true,
-      data: { manager: managerObj }
+      data: { manager: userWithUrl }
     });
   } catch (err) {
     res.status(500).json({ 
@@ -196,16 +197,16 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
 // Login
 router.post('/login', async (req, res) => {
   try {
-    const { mobile, password, phase } = req.body;
+    const { mobile, password } = req.body;
 
-    // Find user with both mobile and phase
-    const user = await Manager.findOne({ mobile, phase });
+    // Find user
+    const user = await Manager.findOne({ mobile });
     if (!user) {
       return res.status(401).json({
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid mobile number, phase or password'
+          message: 'Invalid mobile number or password'
         }
       });
     }
@@ -217,15 +218,9 @@ router.post('/login', async (req, res) => {
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid mobile number, phase or password'
+          message: 'Invalid mobile number or password'
         }
       });
-    }
-
-    // Convert profile picture path to full URL
-    let profilePictureUrl = user.profilePicture;
-    if (profilePictureUrl) {
-      profilePictureUrl = `${req.protocol}://${req.get('host')}/${profilePictureUrl}`;
     }
 
     res.json({
@@ -237,13 +232,14 @@ router.post('/login', async (req, res) => {
           managerId: user.managerId,
           name: user.name,
           mobile: user.mobile,
-          aadhar: user.aadhar,
+          email: user.email,
           address: user.address,
           phase: user.phase,
-          profilePicture: profilePictureUrl,
+          profilePicture: generateFileUrl(req, user.profilePicture),
           isVerified: user.isVerified,
           createdAt: user.createdAt,
-          updatedAt: user.updatedAt
+          updatedAt: user.updatedAt,
+          role: 'manager'
         }
       }
     });

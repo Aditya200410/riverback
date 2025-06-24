@@ -4,6 +4,7 @@ const sikariController = require('../controllers/sikariController');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { generateFileUrl } = require('../utils/urlGenerator');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -42,32 +43,19 @@ const upload = multer({
 router.get('/', async (req, res) => {
   try {
     const sikaris = await sikariController.getAllSikaris();
-    const baseUrl = req.protocol + '://' + req.get('host');
-    res.json({
+    
+    // Convert file paths to full URLs
+    const sikarisWithUrls = sikaris.map(sikari => ({
+      ...sikari.toObject(),
+      profilePhoto: generateFileUrl(req, sikari.profilePhoto),
+      bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
+      adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
+      bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto)
+    }));
+
+    res.status(200).json({
       success: true,
-      data: sikaris.map(sikari => ({
-        id: sikari._id,
-        sikariId: sikari.sikariId,
-        sikariName: sikari.sikariName,
-        mobileNumber: sikari.mobileNumber,
-        location: sikari.location,
-        dateOfJoining: sikari.dateOfJoining,
-        smargId: sikari.smargId,
-        adharCardNumber: sikari.adharCardNumber,
-        bankAccountNumber: sikari.bankAccountNumber,
-        ifscCode: sikari.ifscCode,
-        madhayamName: sikari.madhayamName,
-        madhayamMobileNumber: sikari.madhayamMobileNumber,
-        madhayamAddress: sikari.madhayamAddress,
-        boatNumber: sikari.boatNumber,
-        boatId: sikari.boatId,
-        boatType: sikari.boatType,
-        position: sikari.position,
-        profilePhoto: sikari.profilePhoto ? `${baseUrl}/uploads/sikaris/${sikari.profilePhoto}` : null,
-        bannerPhoto: sikari.bannerPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bannerPhoto}` : null,
-        adharCardPhoto: sikari.adharCardPhoto ? `${baseUrl}/uploads/sikaris/${sikari.adharCardPhoto}` : null,
-        bankPassbookPhoto: sikari.bankPassbookPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bankPassbookPhoto}` : null
-      }))
+      data: sikarisWithUrls
     });
   } catch (err) {
     console.error('Error fetching sikaris:', err);
@@ -94,35 +82,19 @@ router.get('/:id', async (req, res) => {
       });
     }
 
-    const baseUrl = req.protocol + '://' + req.get('host');
-    const sikari = result.sikari;
-    
-    res.json({
+    // Convert file paths to full URLs
+    const sikariWithUrls = {
+      ...result.sikari.toObject(),
+      profilePhoto: generateFileUrl(req, result.sikari.profilePhoto),
+      bannerPhoto: generateFileUrl(req, result.sikari.bannerPhoto),
+      adharCardPhoto: generateFileUrl(req, result.sikari.adharCardPhoto),
+      bankPassbookPhoto: generateFileUrl(req, result.sikari.bankPassbookPhoto)
+    };
+
+    res.status(200).json({
       success: true,
       data: {
-        sikari: {
-          id: sikari._id,
-          sikariId: sikari.sikariId,
-          sikariName: sikari.sikariName,
-          mobileNumber: sikari.mobileNumber,
-          location: sikari.location,
-          dateOfJoining: sikari.dateOfJoining,
-          smargId: sikari.smargId,
-          adharCardNumber: sikari.adharCardNumber,
-          bankAccountNumber: sikari.bankAccountNumber,
-          ifscCode: sikari.ifscCode,
-          madhayamName: sikari.madhayamName,
-          madhayamMobileNumber: sikari.madhayamMobileNumber,
-          madhayamAddress: sikari.madhayamAddress,
-          boatNumber: sikari.boatNumber,
-          boatId: sikari.boatId,
-          boatType: sikari.boatType,
-          position: sikari.position,
-          profilePhoto: sikari.profilePhoto ? `${baseUrl}/uploads/sikaris/${sikari.profilePhoto}` : null,
-          bannerPhoto: sikari.bannerPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bannerPhoto}` : null,
-          adharCardPhoto: sikari.adharCardPhoto ? `${baseUrl}/uploads/sikaris/${sikari.adharCardPhoto}` : null,
-          bankPassbookPhoto: sikari.bankPassbookPhoto ? `${baseUrl}/uploads/sikaris/${sikari.bankPassbookPhoto}` : null
-        },
+        sikari: sikariWithUrls,
         paymentHistory: result.paymentHistory,
         collectionHistory: result.collectionHistory.map(collection => ({
           id: collection._id,

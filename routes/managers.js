@@ -5,6 +5,7 @@ const Manager = require('../models/Manager');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { generateFileUrl } = require('../utils/urlGenerator');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -40,10 +41,73 @@ const upload = multer({
 });
 
 // Get all managers
-router.get('/', managerController.getAllManagers);
+router.get('/', async (req, res) => {
+  try {
+    const managers = await Manager.find().select('-password');
+    
+    // Convert file paths to full URLs
+    const managersWithUrls = managers.map(manager => ({
+      ...manager.toObject(),
+      profilePhoto: generateFileUrl(req, manager.profilePicture),
+      bannerPhoto: generateFileUrl(req, manager.bannerPhoto),
+      adharCardPhoto: generateFileUrl(req, manager.adharCardPhoto),
+      bankPassbookPhoto: generateFileUrl(req, manager.bankPassbookPhoto)
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: managersWithUrls
+    });
+  } catch (err) {
+    console.error('Error fetching managers:', err);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error fetching managers'
+      }
+    });
+  }
+});
 
 // Get manager by ID
-router.get('/:id', managerController.getManagerById);
+router.get('/:id', async (req, res) => {
+  try {
+    const manager = await Manager.findById(req.params.id).select('-password');
+    if (!manager) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Manager not found'
+        }
+      });
+    }
+
+    // Convert file paths to full URLs
+    const managerWithUrls = {
+      ...manager.toObject(),
+      profilePhoto: generateFileUrl(req, manager.profilePicture),
+      bannerPhoto: generateFileUrl(req, manager.bannerPhoto),
+      adharCardPhoto: generateFileUrl(req, manager.adharCardPhoto),
+      bankPassbookPhoto: generateFileUrl(req, manager.bankPassbookPhoto)
+    };
+
+    res.status(200).json({
+      success: true,
+      data: managerWithUrls
+    });
+  } catch (err) {
+    console.error('Error fetching manager:', err);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'SERVER_ERROR',
+        message: 'Error fetching manager'
+      }
+    });
+  }
+});
 
 // Update manager
 router.put('/:id', managerController.updateManager);
