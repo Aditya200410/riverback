@@ -24,6 +24,8 @@
     "password-validator": "^5.3.0",
     "pdf-lib": "^1.17.1",
     "sharp": "^0.33.5",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

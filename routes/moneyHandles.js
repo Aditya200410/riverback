@@ -88,6 +88,8 @@ router.get('/:id', async (req, res) => {
 // Add new money transaction
 router.post('/add', async (req, res) => {
   try {
+    console.log('Received new transaction request:', req.body);
+    
     const { 
       amount, 
       type, 
@@ -103,6 +105,7 @@ router.post('/add', async (req, res) => {
 
     // Validate required fields
     if (!amount || !type || !toWhom || !sendTo || !receiverName || !description || !username) {
+      console.log('Missing required fields:', { amount, type, toWhom, sendTo, receiverName, description, username });
       return res.status(400).json({
         success: false,
         error: {
@@ -166,23 +169,33 @@ router.post('/add', async (req, res) => {
 
     await transaction.save();
 
+    // Prepare transaction data for response and WebSocket
+    const transactionData = {
+      id: transaction._id,
+      amount: transaction.amount,
+      type: transaction.type,
+      toWhom: transaction.toWhom,
+      sendTo: transaction.sendTo,
+      receiverName: transaction.receiverName,
+      receiverId: transaction.receiverId,
+      pay: transaction.pay,
+      received: transaction.received,
+      description: transaction.description,
+      username: transaction.username,
+      date: transaction.date
+    };
+
+    // Emit WebSocket event for real-time update
+    const io = req.app.get('io');
+    io.to('money-updates').emit('new-transaction', {
+      type: 'ADD',
+      data: transactionData
+    });
+
     res.status(201).json({
       success: true,
       message: 'Transaction added successfully',
-      data: {
-        id: transaction._id,
-        amount: transaction.amount,
-        type: transaction.type,
-        toWhom: transaction.toWhom,
-        sendTo: transaction.sendTo,
-        receiverName: transaction.receiverName,
-        receiverId: transaction.receiverId,
-        pay: transaction.pay,
-        received: transaction.received,
-        description: transaction.description,
-        username: transaction.username,
-        date: transaction.date
-      }
+      data: transactionData
     });
   } catch (err) {
     console.error('Error adding transaction:', err);
