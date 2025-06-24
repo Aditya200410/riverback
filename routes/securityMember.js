@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const SecurityMember = require('../models/SecurityMember');
+const { generateFileUrl } = require('../utils/urlGenerator');
 
 // Test route to check if the router is working
 router.get('/test', (req, res) => {
@@ -34,23 +35,30 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'security-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
 const upload = multer({ 
     storage: storage,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    },
     fileFilter: function (req, file, cb) {
-        if (file.mimetype.startsWith('image/')) {
-            cb(null, true);
-        } else {
-            cb(new Error('Not an image! Please upload an image.'), false);
+        const filetypes = /jpeg|jpg|png/;
+        const mimetype = filetypes.test(file.mimetype);
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+        if (mimetype && extname) {
+            return cb(null, true);
         }
+        cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
     }
 });
 
 // Create a new security member
-router.post('/', upload.fields([
+router.post('/add', upload.fields([
     { name: 'aadharPhoto', maxCount: 1 },
     { name: 'photo', maxCount: 1 }
 ]), async (req, res) => {
@@ -113,8 +121,8 @@ router.post('/', upload.fields([
             address,
             mobile,
             phase,
-            aadharPhoto: req.files['aadharPhoto'][0].path,
-            photo: req.files['photo'][0].path,
+            aadharPhoto: req.files['aadharPhoto'][0].filename,
+            photo: req.files['photo'][0].filename,
             bankDetails: {
                 accountNumber,
                 ifscCode,
@@ -124,14 +132,13 @@ router.post('/', upload.fields([
 
         await member.save();
 
-        const baseUrl = req.protocol + '://' + req.get('host');
         res.status(201).json({
             success: true,
             message: 'Security member added successfully',
             data: {
                 ...member.toObject(),
-                aadharPhoto: member.aadharPhoto ? `${baseUrl}/${member.aadharPhoto}` : null,
-                photo: member.photo ? `${baseUrl}/${member.photo}` : null
+                aadharPhoto: generateFileUrl(req, `uploads/security-members/${member.aadharPhoto}`),
+                photo: generateFileUrl(req, `uploads/security-members/${member.photo}`)
             }
         });
     } catch (error) {
