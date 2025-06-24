@@ -198,13 +198,23 @@ router.post('/login', async (req, res) => {
   try {
     const { mobile, password, phase } = req.body;
 
+    if (!mobile || !password || !phase) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'MISSING_FIELDS',
+          message: 'Mobile, password and phase are required'
+        }
+      });
+    }
+
     // First try to find a security member
-    let user = await SecurityMember.findOne({ mobile });
+    let user = await SecurityMember.findOne({ mobile, phase });
     let isSecurityMember = true;
 
     // If not found, try to find a security user
     if (!user) {
-      user = await SecurityUser.findOne({ mobile });
+      user = await SecurityUser.findOne({ mobile, phase });
       isSecurityMember = false;
     }
 
@@ -214,7 +224,7 @@ router.post('/login', async (req, res) => {
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid credentials'
+          message: 'Invalid mobile number, password or phase'
         }
       });
     }
@@ -226,37 +236,26 @@ router.post('/login', async (req, res) => {
         success: false,
         error: {
           code: 'INVALID_CREDENTIALS',
-          message: 'Invalid credentials'
+          message: 'Invalid mobile number, password or phase'
         }
       });
     }
 
-    // For security users, check phase and verification
-    if (!isSecurityMember) {
-      if (user.phase !== phase) {
-        return res.status(401).json({
-          success: false,
-          error: {
-            code: 'INVALID_PHASE',
-            message: 'Invalid phase'
-          }
-        });
-      }
-
-      if (!user.isVerified) {
-        return res.status(401).json({
-          success: false,
-          error: {
-            code: 'NOT_VERIFIED',
-            message: 'Account not verified'
-          }
-        });
-      }
+    // For security users, check verification
+    if (!isSecurityMember && !user.isVerified) {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'NOT_VERIFIED',
+          message: 'Account not verified'
+        }
+      });
     }
 
     // Create response object based on user type
     const responseData = {
       success: true,
+      message: 'Login successful',
       data: {
         user: {
           _id: user._id,
@@ -266,10 +265,13 @@ router.post('/login', async (req, res) => {
           role: isSecurityMember ? 'security_member' : 'security',
           ...(isSecurityMember ? {
             idNumber: user.idNumber,
-            isActive: user.isActive
+            isActive: user.isActive,
+            address: user.address
           } : {
             securityId: user.securityId,
-            isVerified: user.isVerified
+            isVerified: user.isVerified,
+            aadhar: user.aadhar,
+            profilePicture: generateFileUrl(req, user.profilePicture)
           })
         }
       }

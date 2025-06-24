@@ -19,6 +19,16 @@ exports.addSecurityMember = async (req, res, next) => {
 
         const { name, mobile, address, phase } = req.body;
 
+        if (!phase) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'MISSING_PHASE',
+                    message: 'Phase is required'
+                }
+            });
+        }
+
         // Check if member exists
         const existingMember = await SecurityMember.findOne({ mobile });
         if (existingMember) {
@@ -34,9 +44,9 @@ exports.addSecurityMember = async (req, res, next) => {
         // Generate unique ID
         const idNumber = await generateSecurityId();
 
-        // Generate password (username@first3numbers)
-        const firstThreeDigits = mobile.substring(0, 3);
-        const generatedPassword = `${name.toLowerCase().replace(/\s+/g, '')}@${firstThreeDigits}`;
+        // Generate password (username@123)
+        const username = name.toLowerCase().replace(/\s+/g, '');
+        const generatedPassword = `${username}@123`;
 
         // Create new security member
         const securityMember = new SecurityMember({
@@ -72,7 +82,8 @@ exports.addSecurityMember = async (req, res, next) => {
                 },
                 credentials: {
                     phoneNumber: mobile,
-                    password: generatedPassword
+                    password: generatedPassword,
+                    phase: phase
                 }
             }
         });

@@ -53,7 +53,7 @@ const upload = multer({
 });
 
 // Add new security member with multiple file uploads
-router.post('/', upload.fields([
+router.post('/add', upload.fields([
     { name: 'aadharPhoto', maxCount: 1 },
     { name: 'photo', maxCount: 1 }
 ]), addSecurityMember);
