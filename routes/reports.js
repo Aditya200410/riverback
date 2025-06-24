@@ -4,32 +4,6 @@ const multer = require('multer');
 const path = require('path');
 const reportController = require('../controllers/reportController');
 
-// Middleware to protect routes
-const auth = async (req, res, next) => {
-  const userId = req.header('X-User-Id');
-  if (!userId) {
-    return res.status(401).json({ 
-      success: false,
-      error: {
-        code: 'NO_USER_ID',
-        message: 'No user ID provided, authorization denied'
-      }
-    });
-  }
-  try {
-    req.user = { id: userId };
-    next();
-  } catch {
-    return res.status(401).json({ 
-      success: false,
-      error: {
-        code: 'INVALID_USER',
-        message: 'Invalid user'
-      }
-    });
-  }
-};
-
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -49,9 +23,9 @@ const upload = multer({
 });
 
 // Get all reports for a company
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const reports = await reportController.getAllReports(req.user.id);
+    const reports = await reportController.getAllReports(null);
     res.json({
       success: true,
       data: reports.map(report => ({
@@ -78,7 +52,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Get report by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const report = await reportController.getReportById(req.params.id);
     if (!report) {
@@ -117,7 +91,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Generate new report
-router.post('/generate', auth, upload.fields([
+router.post('/generate', upload.fields([
   { name: 'photo', maxCount: 1 },
   { name: 'video', maxCount: 1 }
 ]), async (req, res) => {
@@ -135,7 +109,7 @@ router.post('/generate', auth, upload.fields([
       photo,
       video,
       generatedDate: new Date(),
-      companyId: req.user.id
+      companyId: null
     });
 
     res.status(201).json({
@@ -166,7 +140,7 @@ router.post('/generate', auth, upload.fields([
 });
 
 // Add new report
-router.post('/add', auth, upload.fields([
+router.post('/add', upload.fields([
   { name: 'photo', maxCount: 1 },
   { name: 'video', maxCount: 1 }
 ]), async (req, res) => {
@@ -184,7 +158,7 @@ router.post('/add', auth, upload.fields([
       photo,
       video,
       generatedDate: new Date(),
-      companyId: req.user.id
+      companyId: null
     });
 
     res.status(201).json({
@@ -215,7 +189,7 @@ router.post('/add', auth, upload.fields([
 });
 
 // Archive report
-router.delete('/archive/:id', auth, async (req, res) => {
+router.delete('/archive/:id', async (req, res) => {
   try {
     const report = await reportController.getReportById(req.params.id);
     if (!report) {
