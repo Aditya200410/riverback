@@ -7,18 +7,11 @@
 const generateFileUrl = (req, filePath) => {
   if (!filePath) return null;
   
-  // Get the protocol (http/https)
-  const protocol = process.env.NODE_ENV === 'production' 
-    ? 'https'
-    : req.protocol;
+  // Always use production URL in production
+  const baseUrl = process.env.NODE_ENV === 'production'
+    ? 'https://riverfish.deltospark.com'
+    : req.protocol + '://' + req.get('host');
 
-  // Get the host
-  const host = process.env.PRODUCTION_HOST || req.get('host');
-
-  // Combine to form the base URL
-  const baseUrl = `${protocol}://${host}`;
-
-  // Return the full URL
   return `${baseUrl}/${filePath}`;
 };
 
