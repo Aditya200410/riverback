@@ -19,16 +19,12 @@ const securityUserSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
-    minlength: 10,
-    maxlength: 10
   },
   aadhar: {
     type: String,
     required: true,
     unique: true,
     trim: true,
-    minlength: 12,
-    maxlength: 12
   },
   address: {
     type: String,

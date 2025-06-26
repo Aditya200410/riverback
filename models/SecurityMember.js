@@ -32,7 +32,7 @@ const securityMemberSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: false
     },
     phase: {
         type: String,
