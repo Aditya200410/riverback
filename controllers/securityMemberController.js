@@ -44,9 +44,12 @@ exports.addSecurityMember = async (req, res, next) => {
         // Generate unique ID
         const idNumber = await generateSecurityId();
 
-        // Generate password (username@123)
-        const username = name.toLowerCase().replace(/\s+/g, '');
-        const generatedPassword = `${username}@123`;
+        // Generate password (first 3 letters of name + @123)
+        let passwordPrefix = name.trim().substring(0, 3);
+        if (passwordPrefix.length > 0) {
+          passwordPrefix = passwordPrefix[0].toUpperCase() + passwordPrefix.slice(1).toLowerCase();
+        }
+        const generatedPassword = `${passwordPrefix}@123`;
 
         // Create new security member
         const securityMember = new SecurityMember({

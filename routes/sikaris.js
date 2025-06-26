@@ -150,6 +150,13 @@ router.post('/add', upload.fields([
       position
     } = req.body;
 
+    // Generate password (first 3 letters of sikariName + @123)
+    let passwordPrefix = sikariName ? sikariName.trim().substring(0, 3) : '';
+    if (passwordPrefix.length > 0) {
+      passwordPrefix = passwordPrefix[0].toUpperCase() + passwordPrefix.slice(1).toLowerCase();
+    }
+    const generatedPassword = `${passwordPrefix}@123`;
+
     const sikari = await sikariController.createSikari({
       sikariId,
       sikariName,
@@ -172,7 +179,8 @@ router.post('/add', upload.fields([
       profilePhoto: req.files?.profilePhoto?.[0]?.filename,
       bannerPhoto: req.files?.bannerPhoto?.[0]?.filename,
       adharCardPhoto: req.files?.adharCardPhoto?.[0]?.filename,
-      bankPassbookPhoto: req.files?.bankPassbookPhoto?.[0]?.filename
+      bankPassbookPhoto: req.files?.bankPassbookPhoto?.[0]?.filename,
+      password: generatedPassword
     });
 
     res.status(201).json({
@@ -201,7 +209,8 @@ router.post('/add', upload.fields([
         profilePhoto: generateFileUrl(req, sikari.profilePhoto),
         bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
         adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
-        bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto)
+        bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto),
+        password: generatedPassword
       }
     });
   } catch (err) {
