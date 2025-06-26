@@ -1,6 +1,7 @@
 const Manager = require('../models/Manager');
 const CompanyUser = require('../models/CompanyUser');
 const SecurityUser = require('../models/SecurityUser');
+const SecurityMember = require('../models/SecurityMember');
 
 // Generate Manager ID (MN101, MN102, etc.)
 async function generateManagerId() {
@@ -87,18 +88,18 @@ async function generateSecurityId() {
   
   while (retries < maxRetries) {
     try {
-      const lastSecurity = await SecurityUser.findOne().sort({ securityId: -1 });
+      const lastSecurity = await SecurityMember.findOne().sort({ idNumber: -1 });
       let nextNumber = 1;
       
-      if (lastSecurity && lastSecurity.securityId) {
-        const lastNumber = parseInt(lastSecurity.securityId.replace('SCU', ''));
+      if (lastSecurity && lastSecurity.idNumber) {
+        const lastNumber = parseInt(lastSecurity.idNumber.replace('SCU', ''));
         nextNumber = lastNumber + 1;
       }
       
       const newId = `SCU${nextNumber.toString().padStart(3, '0')}`;
       
       // Check if this ID already exists (double-check for race conditions)
-      const existingSecurity = await SecurityUser.findOne({ securityId: newId });
+      const existingSecurity = await SecurityMember.findOne({ idNumber: newId });
       if (!existingSecurity) {
         return newId;
       }
