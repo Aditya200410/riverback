@@ -1,6 +1,5 @@
 const CompanyUser = require('../models/CompanyUser');
 
-// Get all company users
 exports.getAllCompanyUsers = async (req, res) => {
   try {
     const companyUsers = await CompanyUser.find().select('-password -resetPasswordToken -resetPasswordExpires');
