@@ -370,4 +370,37 @@ router.delete('/delete/:id', async (req, res) => {
   }
 });
 
+// Shikari login endpoint
+router.post('/login', async (req, res) => {
+  try {
+    const { mobileNumber, password } = req.body;
+    if (!mobileNumber || !password) {
+      return res.status(400).json({ success: false, message: 'mobileNumber and password are required' });
+    }
+    const sikari = await require('../models/Sikari').findOne({ mobileNumber, status: 'active' });
+    if (!sikari) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+    // Compare password (plain text for now, since Sikari model does not hash passwords)
+    if (sikari.password !== password) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        id: sikari._id,
+        sikariId: sikari.sikariId,
+        sikariName: sikari.sikariName,
+        mobileNumber: sikari.mobileNumber,
+        boatType: sikari.boatType,
+        position: sikari.position,
+        status: sikari.status
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router; 
