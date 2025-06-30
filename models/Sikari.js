@@ -19,6 +19,10 @@ const sikariSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  password: {
+    type: String,
+    required: true
+  },
   mobile: {
     type: String,
     required: true,
