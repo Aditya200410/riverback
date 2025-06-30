@@ -2209,6 +2209,415 @@
           }
         }
       ]
+    },
+    {
+      "name": "Sikari",
+      "item": [
+        {
+          "name": "Get All Sikari",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris"]
+            }
+          }
+        },
+        {
+          "name": "Get Sikari by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "sikari_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Sikari",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/sikaris/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "sikaris", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "sikariName",
+                  "value": "Test Sikari",
+                  "type": "text"
+                },
+                {
+                  "key": "mobile",
+                  "value": "1234567890",
+                  "type": "text"
+                },
+                {
+                  "key": "profilePhoto",
+                  "type": "file"
+                },
+                {
+                  "key": "bannerPhoto",
+                  "type": "file"
+                },
+                {
+                  "key": "adharCardPhoto",
+                  "type": "file"
+                },
+                {
+                  "key": "bankPassbookPhoto",
+                  "type": "file"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Collection",
+      "item": [
+        {
+          "name": "Add Collection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/collection",
+              "host": ["{{base_url}}"],
+              "path": ["api", "collection"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sikahriId\": \"\",\n  \"sikahriName\": \"\",\n  \"phoneNumber\": \"\",\n  \"fishes\": [],\n  \"totalRupees\": 0,\n  \"netRupees\": 0\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Collections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/collection",
+              "host": ["{{base_url}}"],
+              "path": ["api", "collection"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Manager Money",
+      "item": [
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/managerMoney",
+              "host": ["{{base_url}}"],
+              "path": ["api", "managerMoney"]
+            }
+          }
+        },
+        {
+          "name": "Get Transactions by Sikari",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/managerMoney/sikari",
+              "host": ["{{base_url}}"],
+              "path": ["api", "managerMoney", "sikari"]
+            }
+          }
+        },
+        {
+          "name": "Add Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/managerMoney/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "managerMoney", "add"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 0,\n  \"type\": \"pay\",\n  \"toWhom\": \"\",\n  \"description\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Transaction",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/managerMoney/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "managerMoney", "update", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "transaction_id_here"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 0,\n  \"type\": \"pay\",\n  \"toWhom\": \"\",\n  \"description\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Transaction",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/managerMoney/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "managerMoney", "delete", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "transaction_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notes",
+      "item": [
+        {
+          "name": "Add Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notes/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notes", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "note",
+                  "value": "Test note",
+                  "type": "text"
+                },
+                {
+                  "key": "photo",
+                  "type": "file"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Notes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/notes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notes"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Security Members",
+      "item": [
+        {
+          "name": "Test Route",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/security-members/test",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members", "test"]
+            }
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/security-members/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members", "health"]
+            }
+          }
+        },
+        {
+          "name": "Add Security Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/security-members/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members", "add"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Test Member",
+                  "type": "text"
+                },
+                {
+                  "key": "mobile",
+                  "value": "1234567890",
+                  "type": "text"
+                },
+                {
+                  "key": "aadharPhoto",
+                  "type": "file"
+                },
+                {
+                  "key": "photo",
+                  "type": "file"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Security Members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/security-members",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members"]
+            }
+          }
+        },
+        {
+          "name": "Get Security Member by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/security-members/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "security_member_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Security Member",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/security-members/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "security-members", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "security_member_id_here"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Updated Name",
+                  "type": "text"
+                },
+                {
+                  "key": "mobile",
+                  "value": "1234567890",
+                  "type": "text"
+                },
+                {
+                  "key": "aadharPhoto",
+                  "type": "file"
+                },
+                {
+                  "key": "photo",
+                  "type": "file"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
