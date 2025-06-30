@@ -86,6 +86,7 @@ app.use('/api/managers', require('./routes/managers'));
 app.use('/api/sikaris', require('./routes/sikaris'));
 app.use('/api/company-summary', require('./routes/companySummary'));
 app.use('/api/collection', require('./routes/collection'));
+app.use('/api/notes', require('./routes/notes'));
 
 // Handle upload errors
 app.use((err, req, res, next) => {

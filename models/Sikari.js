@@ -96,12 +96,10 @@ const sikariSchema = new mongoose.Schema({
   boatType: {
     type: String,
     required: false,
-    enum: ['company boat', 'self boat']
   },
   position: {
     type: String,
     required: false,
-    enum: ['personal duty', 'government register fisherman', 'illegal']
   },
   status: {
     type: String,

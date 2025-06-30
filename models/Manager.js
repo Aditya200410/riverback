@@ -11,13 +11,12 @@ const managerSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minlength: 2,
-    maxlength: 50
   },
   email: {
     type: String,
     unique: true,
     trim: true,
+    required:false,
     lowercase: true,
     sparse: true
   },
@@ -26,21 +25,16 @@ const managerSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
-    minlength: 10,
-    maxlength: 10
   },
   aadhar: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
     trim: true,
-    minlength: 12,
-    maxlength: 12
   },
   password: {
     type: String,
     required: true,
-    minlength: 8
   },
   address: {
     type: String,
@@ -133,6 +127,18 @@ const managerSchema = new mongoose.Schema({
   },
   bankPassbookPhoto: {
     type: String
+  },
+  workarea: {
+    type: String,
+    trim: true
+  },
+  role: {
+    type: String,
+    trim: true
+  },
+  experience: {
+    type: String,
+    trim: true
   }
 }, {
   timestamps: true

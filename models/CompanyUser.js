@@ -11,20 +11,16 @@ const companyUserSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minlength: 2,
-    maxlength: 50
   },
   mobile: {
     type: String,
     required: true,
     unique: true,
     trim: true,
-    minlength: 10,
-    maxlength: 10
   },
   email: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
     trim: true,
     lowercase: true
@@ -37,15 +33,11 @@ const companyUserSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    minlength: 2,
-    maxlength: 100
   },
   companyAddress: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
-    minlength: 5,
-    maxlength: 200
   },
   aadhar_no: {
     type: String,

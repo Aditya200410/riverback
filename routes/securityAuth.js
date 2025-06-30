@@ -115,7 +115,6 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
     const {
       name,
       mobile,
-      password,
       aadhar,
       address,
       phase
@@ -142,12 +141,19 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
     // Generate unique securityId using the ID generator
     const securityId = await generateSecurityId();
 
+    // Generate password (first 3 letters of name + @123)
+    let passwordPrefix = name ? name.trim().substring(0, 3) : '';
+    if (passwordPrefix.length > 0) {
+      passwordPrefix = passwordPrefix[0].toUpperCase() + passwordPrefix.slice(1).toLowerCase();
+    }
+    const generatedPassword = `${passwordPrefix}@123`;
+
     // Create new user in database
     const user = new SecurityUser({
       securityId,
       name,
       mobile,
-      password,
+      password: generatedPassword,
       aadhar,
       address,
       phase,
@@ -177,7 +183,8 @@ router.post('/signup', uploadMulter.single('profilePicture'), async (req, res) =
           isVerified: user.isVerified,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-          role: 'security'
+          role: 'security',
+          password: generatedPassword
         }
       }
     });
