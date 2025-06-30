@@ -132,7 +132,7 @@ router.post('/add', upload.fields([
     const {
       sikariId,
       sikariName,
-      mobileNumber,
+      mobile,
       location,
       workLocation,
       homeAddress,
@@ -160,7 +160,7 @@ router.post('/add', upload.fields([
     const sikari = await sikariController.createSikari({
       sikariId,
       sikariName,
-      mobileNumber,
+      mobile,
       location,
       workLocation,
       homeAddress,
@@ -190,7 +190,7 @@ router.post('/add', upload.fields([
         id: sikari._id,
         sikariId: sikari.sikariId,
         sikariName: sikari.sikariName,
-        mobileNumber: sikari.mobileNumber,
+        mobile: sikari.mobile,
         location: sikari.location,
         workLocation: sikari.workLocation,
         homeAddress: sikari.homeAddress,
@@ -247,7 +247,7 @@ router.put('/update/:id', upload.fields([
     const updateData = {};
     const {
       sikariName,
-      mobileNumber,
+      mobile,
       location,
       dateOfJoining,
       smargId,
@@ -265,7 +265,7 @@ router.put('/update/:id', upload.fields([
 
     // Add fields to update if provided
     if (sikariName) updateData.sikariName = sikariName;
-    if (mobileNumber) updateData.mobileNumber = mobileNumber;
+    if (mobile) updateData.mobile = mobile;
     if (location) updateData.location = location;
     if (dateOfJoining) updateData.dateOfJoining = new Date(dateOfJoining);
     if (smargId) updateData.smargId = smargId;
@@ -373,11 +373,11 @@ router.delete('/delete/:id', async (req, res) => {
 // Shikari login endpoint
 router.post('/login', async (req, res) => {
   try {
-    const { mobileNumber, password } = req.body;
-    if (!mobileNumber || !password) {
-      return res.status(400).json({ success: false, message: 'mobileNumber and password are required' });
+    const { mobile, password } = req.body;
+    if (!mobile || !password) {
+      return res.status(400).json({ success: false, message: 'mobile and password are required' });
     }
-    const sikari = await require('../models/Sikari').findOne({ mobileNumber, status: 'active' });
+    const sikari = await require('../models/Sikari').findOne({ mobile, status: 'active' });
     if (!sikari) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
@@ -392,7 +392,7 @@ router.post('/login', async (req, res) => {
         id: sikari._id,
         sikariId: sikari.sikariId,
         sikariName: sikari.sikariName,
-        mobileNumber: sikari.mobileNumber,
+        mobile: sikari.mobile,
         boatType: sikari.boatType,
         position: sikari.position,
         status: sikari.status

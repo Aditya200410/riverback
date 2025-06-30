@@ -19,7 +19,7 @@ const sikariSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  mobileNumber: {
+  mobile: {
     type: String,
     required: true,
     unique: true
