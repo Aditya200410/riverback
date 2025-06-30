@@ -9,7 +9,7 @@ const getAllSikaris = async () => {
             .select({
                 sikariId: 1,
                 sikariName: 1,
-                mobileNumber: 1,
+                mobile: 1,
                 workAddress: 1,
                 homeAddress: 1,
                 dateOfJoining: 1,
