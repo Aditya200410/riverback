@@ -2286,6 +2286,11 @@
                 {
                   "key": "bankPassbookPhoto",
                   "type": "file"
+                },
+                {
+                  "key": "sikariId",
+                  "value": "SK001",
+                  "type": "text"
                 }
               ]
             }
