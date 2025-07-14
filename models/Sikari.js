@@ -46,9 +46,7 @@ const sikariSchema = new mongoose.Schema({
   },
   smargId: {
     type: String,
-    required: false,
-    unique: true,
-    sparse: true
+    required: false
   },
   adharCardNumber: {
     type: String,

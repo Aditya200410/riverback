@@ -181,7 +181,7 @@ router.post('/add', upload.fields([
     } = req.body;
 
     // Validate required fields
-    const requiredFields = ['managerId', 'managerName', 'mobileNumber', 'location', 'smargId', 'adharCardNumber'];
+    const requiredFields = ['managerId', 'managerName', 'mobileNumber', 'location', 'adharCardNumber'];
     const missingFields = requiredFields.filter(field => !req.body[field]);
     
     if (missingFields.length > 0) {
@@ -216,7 +216,7 @@ router.post('/add', upload.fields([
       });
     }
 
-    // Check for duplicate mobileNumber, managerId, smargId, adharCardNumber
+    // Check for duplicate mobileNumber, managerId, adharCardNumber
     const duplicate = await Manager.findOne({
       $or: [
         { mobile: mobileNumber },
