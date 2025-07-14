@@ -2,108 +2,74 @@ const mongoose = require('mongoose');
 
 const sikariSchema = new mongoose.Schema({
   profilePhoto: {
-    type: String,
-    required: false
+    type: String
   },
   bannerPhoto: {
-    type: String,
-    required: false
+    type: String
   },
   sikariId: {
-    type: String,
-    required: true,
-    unique: true
+    type: String
   },
   sikariName: {
     type: String,
-    required: true,
     trim: true
   },
-  password: {
-    type: String,
-    required: true
-  },
   mobile: {
-    type: String,
-    required: true,
-    unique: true
+    type: String
   },
   workAddress: {
     type: String,
-    required: false,
     trim: true,
     default: ''
   },
   homeAddress: {
     type: String,
-    required: false,
     trim: true,
     default: ''
   },
   dateOfJoining: {
-    type: Date,
-    required: false
+    type: Date
   },
   smargId: {
-    type: String,
-    required: false,
-    unique: true,
-    sparse: true
+    type: String
   },
   adharCardNumber: {
-    type: String,
-    required: false,
-    unique: true
+    type: String
   },
   adharCardPhoto: {
-    type: String,
-    required: false
+    type: String
   },
   bankAccountNumber: {
-    type: String,
-    required: false,
-    unique: true,
-    sparse: true
+    type: String
   },
   ifscCode: {
-    type: String,
-    required: false
+    type: String
   },
   bankPassbookPhoto: {
-    type: String,
-    required: false
+    type: String
   },
   madhayamName: {
     type: String,
-    required: false,
     trim: true
   },
   madhayamMobileNumber: {
-    type: String,
-    required: false
+    type: String
   },
   madhayamAddress: {
     type: String,
-    required: false,
     trim: true
   },
   boatNumber: {
-    type: String,
-    required: false
+    type: String
   },
   boatId: {
-    type: String,
-    required: false,
-    unique: true,
-    sparse: true
+    type: String
   },
   boatType: {
-    type: String,
-    required: false,
+    type: String
   },
   position: {
-    type: String,
-    required: false,
+    type: String
   },
   status: {
     type: String,

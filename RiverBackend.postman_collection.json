@@ -2261,37 +2261,27 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                {
-                  "key": "sikariName",
-                  "value": "Test Sikari",
-                  "type": "text"
-                },
-                {
-                  "key": "mobile",
-                  "value": "1234567890",
-                  "type": "text"
-                },
-                {
-                  "key": "profilePhoto",
-                  "type": "file"
-                },
-                {
-                  "key": "bannerPhoto",
-                  "type": "file"
-                },
-                {
-                  "key": "adharCardPhoto",
-                  "type": "file"
-                },
-                {
-                  "key": "bankPassbookPhoto",
-                  "type": "file"
-                },
-                {
-                  "key": "sikariId",
-                  "value": "SK001",
-                  "type": "text"
-                }
+                { "key": "sikariId", "value": "SK001", "type": "text" },
+                { "key": "sikariName", "value": "Test Sikari", "type": "text" },
+                { "key": "mobile", "value": "1234567890", "type": "text" },
+                { "key": "workLocation", "value": "Work Address Example", "type": "text" },
+                { "key": "homeAddress", "value": "Home Address Example", "type": "text" },
+                { "key": "dateOfJoining", "value": "2024-01-01", "type": "text" },
+                { "key": "smargId", "value": "SMARG001", "type": "text" },
+                { "key": "adharCardNumber", "value": "123456789012", "type": "text" },
+                { "key": "bankAccountNumber", "value": "1234567890", "type": "text" },
+                { "key": "ifscCode", "value": "IFSC0001", "type": "text" },
+                { "key": "madhayamName", "value": "Madhayam Name", "type": "text" },
+                { "key": "madhayamMobileNumber", "value": "9876543210", "type": "text" },
+                { "key": "madhayamAddress", "value": "Madhayam Address", "type": "text" },
+                { "key": "boatNumber", "value": "B001", "type": "text" },
+                { "key": "boatId", "value": "BOAT001", "type": "text" },
+                { "key": "boatType", "value": "TypeA", "type": "text" },
+                { "key": "position", "value": "Fisherman", "type": "text" },
+                { "key": "profilePhoto", "type": "file" },
+                { "key": "bannerPhoto", "type": "file" },
+                { "key": "adharCardPhoto", "type": "file" },
+                { "key": "bankPassbookPhoto", "type": "file" }
               ]
             }
           }
