@@ -177,11 +177,12 @@ router.post('/add', upload.fields([
       position,
       email,
       address,
-      phase
+      phase,
+      password // <-- add password to destructure
     } = req.body;
 
     // Validate required fields
-    const requiredFields = ['managerId', 'managerName', 'mobileNumber', 'location', 'adharCardNumber'];
+    const requiredFields = ['managerId', 'managerName', 'mobileNumber', 'location', 'adharCardNumber', 'password'];
     const missingFields = requiredFields.filter(field => !req.body[field]);
     
     if (missingFields.length > 0) {
@@ -193,7 +194,7 @@ router.post('/add', upload.fields([
         }
       });
     }
-
+  
     // Validate boat type if provided
     if (boatType && !['company boat', 'self boat'].includes(boatType)) {
       return res.status(400).json({
@@ -235,17 +236,14 @@ router.post('/add', upload.fields([
       });
     }
 
-    // Create manager with hashed password
-    const salt = await require('bcryptjs').genSalt(10);
-    const hashedPassword = await require('bcryptjs').hash('defaultPassword123', salt);
-
+    // Remove manual hashing, use password from request
     const manager = new Manager({
       managerId,
       name: managerName,
       mobile: mobileNumber,
       email: email || undefined,
       aadhar: adharCardNumber,
-      password: hashedPassword,
+      password, // use plain password, will be hashed by pre-save hook
       address: address || madhayamAddress,
       profilePicture: req.files?.profilePhoto?.[0]?.filename,
       phase,
