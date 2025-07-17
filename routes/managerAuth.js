@@ -372,15 +372,20 @@ router.delete('/delete/:id', async (req, res) => {
   }
 });
 
-// Update Password by managerId (no validation)
-router.put('/update-password/:managerId', async (req, res) => {
-  const { managerId } = req.params;
+// Update Password by managerId or _id (no validation)
+router.put('/update-password/:identifier', async (req, res) => {
+  const { identifier } = req.params;
   const { newPassword } = req.body;
   if (!newPassword) {
     return res.status(400).json({ success: false, message: 'New password required' });
   }
   try {
-    const user = await Manager.findOne({ managerId });
+    // Try to find by managerId first
+    let user = await Manager.findOne({ managerId: identifier });
+    // If not found, try by _id
+    if (!user && identifier.match(/^[0-9a-fA-F]{24}$/)) {
+      user = await Manager.findById(identifier);
+    }
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }

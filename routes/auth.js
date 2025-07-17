@@ -420,30 +420,20 @@ router.put('/update-profile', async (req, res) => {
   }
 });
 
-// Update password by id (no validation)
-router.put('/update-password/:id', async (req, res) => {
-  try {
-    const user = await CompanyUser.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-    user.password = req.body.password;
-    await user.save();
-    res.json({ success: true, message: 'Password updated successfully' });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// Update Password by companyId (no validation)
-router.put('/update-password/:companyId', async (req, res) => {
-  const { companyId } = req.params;
+// Update Password by companyId or _id (no validation)
+router.put('/update-password/:identifier', async (req, res) => {
+  const { identifier } = req.params;
   const { newPassword } = req.body;
   if (!newPassword) {
     return res.status(400).json({ success: false, message: 'New password required' });
   }
   try {
-    const user = await CompanyUser.findOne({ companyId });
+    // Try to find by companyId first
+    let user = await CompanyUser.findOne({ companyId: identifier });
+    // If not found, try by _id
+    if (!user && identifier.match(/^[0-9a-fA-F]{24}$/)) {
+      user = await CompanyUser.findById(identifier);
+    }
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
