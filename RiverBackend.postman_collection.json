@@ -538,6 +538,29 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "Company Update Password",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/auth/update-password/:companyId",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "auth", "update-password", ":companyId"],
+                  "variable": [
+                    { "key": "companyId", "value": "CPM001" }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"newPassword\": \"NewPassword@123\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "response": []
+              }
             }
           ]
         },
@@ -1112,6 +1135,29 @@
                     "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"John Manager\",\n      \"email\": \"john@example.com\",\n      \"mobile\": \"9876543210\",\n      \"location\": \"Location A\",\n      \"signInTime\": \"2024-01-01T10:00:00.000Z\",\n      \"lastActive\": \"2024-01-01T12:00:00.000Z\"\n    }\n  ]\n}"
                   }
                 ]
+              }
+            },
+            {
+              "name": "Manager Update Password",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/manager-auth/update-password/:managerId",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "manager-auth", "update-password", ":managerId"],
+                  "variable": [
+                    { "key": "managerId", "value": "MN001" }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"newPassword\": \"NewPassword@123\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "response": []
               }
             }
           ]
@@ -2623,6 +2669,29 @@
           }
         }
       ]
+    },
+    {
+      "name": "Security Update Password",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/security-auth/update-password/:securityId",
+          "host": ["{{base_url}}"],
+          "path": ["api", "security-auth", "update-password", ":securityId"],
+          "variable": [
+            { "key": "securityId", "value": "SCU001" }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"newPassword\": \"NewPassword@123\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "response": []
+      }
     }
   ],
   "variable": [

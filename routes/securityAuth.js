@@ -455,4 +455,24 @@ router.get('/profile-picture/:id', async (req, res) => {
   }
 });
 
+// Update Password by securityId (no validation)
+router.put('/update-password/:securityId', async (req, res) => {
+  const { securityId } = req.params;
+  const { newPassword } = req.body;
+  if (!newPassword) {
+    return res.status(400).json({ success: false, message: 'New password required' });
+  }
+  try {
+    const user = await SecurityUser.findOne({ securityId });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    user.password = newPassword;
+    await user.save();
+    res.json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router; 
