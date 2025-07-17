@@ -2,74 +2,106 @@ const mongoose = require('mongoose');
 
 const sikariSchema = new mongoose.Schema({
   profilePhoto: {
-    type: String
+    type: String,
+    required: false
   },
   bannerPhoto: {
-    type: String
+    type: String,
+    required: false
   },
   sikariId: {
-    type: String
+    type: String,
+    required: true,
+    unique: true
   },
   sikariName: {
     type: String,
+    required: true,
     trim: true
   },
+  password: {
+    type: String,
+    required: true
+  },
   mobile: {
-    type: String
+    type: String,
+    required: true,
+    unique: true
   },
   workAddress: {
     type: String,
+    required: false,
     trim: true,
     default: ''
   },
   homeAddress: {
     type: String,
+    required: false,
     trim: true,
     default: ''
   },
   dateOfJoining: {
-    type: Date
+    type: Date,
+    required: false
   },
   smargId: {
-    type: String
+    type: String,
+    required: false
   },
   adharCardNumber: {
-    type: String
+    type: String,
+    required: false,
+    unique: true
   },
   adharCardPhoto: {
-    type: String
+    type: String,
+    required: false
   },
   bankAccountNumber: {
-    type: String
+    type: String,
+    required: false,
+    unique: true,
+    sparse: true
   },
   ifscCode: {
-    type: String
+    type: String,
+    required: false
   },
   bankPassbookPhoto: {
-    type: String
+    type: String,
+    required: false
   },
   madhayamName: {
     type: String,
+    required: false,
     trim: true
   },
   madhayamMobileNumber: {
-    type: String
+    type: String,
+    required: false
   },
   madhayamAddress: {
     type: String,
+    required: false,
     trim: true
   },
   boatNumber: {
-    type: String
+    type: String,
+    required: false
   },
   boatId: {
-    type: String
+    type: String,
+    required: false,
+    unique: true,
+    sparse: true
   },
   boatType: {
-    type: String
+    type: String,
+    required: false,
   },
   position: {
-    type: String
+    type: String,
+    required: false,
   },
   status: {
     type: String,

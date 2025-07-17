@@ -150,24 +150,6 @@ router.post('/add', upload.fields([
       position
     } = req.body;
 
-    // Duplicate check
-    const existing = await require('../models/Sikari').findOne({
-      $or: [
-        { sikariId },
-        { mobile }
-      ],
-      status: 'active'
-    });
-    if (existing) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          code: 'DUPLICATE_SIKARI',
-          message: 'A Sikari with this sikariId or mobile already exists.'
-        }
-      });
-    }
-
     // Generate password (first 3 letters of sikariName + @123)
     let passwordPrefix = sikariName ? sikariName.trim().substring(0, 3) : '';
     if (passwordPrefix.length > 0) {
@@ -198,7 +180,7 @@ router.post('/add', upload.fields([
       bannerPhoto: req.files?.bannerPhoto?.[0]?.filename,
       adharCardPhoto: req.files?.adharCardPhoto?.[0]?.filename,
       bankPassbookPhoto: req.files?.bankPassbookPhoto?.[0]?.filename,
-      
+      password: generatedPassword
     });
 
     res.status(201).json({
@@ -228,7 +210,7 @@ router.post('/add', upload.fields([
         bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
         adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
         bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto),
-       
+        password: generatedPassword
       }
     });
   } catch (err) {

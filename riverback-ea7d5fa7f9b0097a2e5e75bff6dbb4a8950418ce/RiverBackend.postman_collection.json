@@ -538,25 +538,6 @@
                   }
                 ]
               }
-            },
-            {
-              "name": "Security Update Password",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/api/security-auth/update-password/USER_ID_HERE",
-                  "host": ["{{base_url}}"],
-                  "path": ["api", "security-auth", "update-password", "USER_ID_HERE"]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"password\": \"NewPassword@123\"\n}",
-                  "options": { "raw": { "language": "json" } }
-                }
-              }
             }
           ]
         },
@@ -1131,25 +1112,6 @@
                     "body": "{\n  \"success\": true,\n  \"data\": [\n    {\n      \"id\": \"507f1f77bcf86cd799439011\",\n      \"name\": \"John Manager\",\n      \"email\": \"john@example.com\",\n      \"mobile\": \"9876543210\",\n      \"location\": \"Location A\",\n      \"signInTime\": \"2024-01-01T10:00:00.000Z\",\n      \"lastActive\": \"2024-01-01T12:00:00.000Z\"\n    }\n  ]\n}"
                   }
                 ]
-              }
-            },
-            {
-              "name": "Manager Update Password",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  { "key": "Content-Type", "value": "application/json" }
-                ],
-                "url": {
-                  "raw": "{{base_url}}/api/manager-auth/update-password/USER_ID_HERE",
-                  "host": ["{{base_url}}"],
-                  "path": ["api", "manager-auth", "update-password", "USER_ID_HERE"]
-                },
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"password\": \"NewPassword@123\"\n}",
-                  "options": { "raw": { "language": "json" } }
-                }
               }
             }
           ]
@@ -2299,27 +2261,37 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "sikariId", "value": "SK001", "type": "text" },
-                { "key": "sikariName", "value": "Test Sikari", "type": "text" },
-                { "key": "mobile", "value": "1234567890", "type": "text" },
-                { "key": "workLocation", "value": "Work Address Example", "type": "text" },
-                { "key": "homeAddress", "value": "Home Address Example", "type": "text" },
-                { "key": "dateOfJoining", "value": "2024-01-01", "type": "text" },
-                { "key": "smargId", "value": "SMARG001", "type": "text" },
-                { "key": "adharCardNumber", "value": "123456789012", "type": "text" },
-                { "key": "bankAccountNumber", "value": "1234567890", "type": "text" },
-                { "key": "ifscCode", "value": "IFSC0001", "type": "text" },
-                { "key": "madhayamName", "value": "Madhayam Name", "type": "text" },
-                { "key": "madhayamMobileNumber", "value": "9876543210", "type": "text" },
-                { "key": "madhayamAddress", "value": "Madhayam Address", "type": "text" },
-                { "key": "boatNumber", "value": "B001", "type": "text" },
-                { "key": "boatId", "value": "BOAT001", "type": "text" },
-                { "key": "boatType", "value": "TypeA", "type": "text" },
-                { "key": "position", "value": "Fisherman", "type": "text" },
-                { "key": "profilePhoto", "type": "file" },
-                { "key": "bannerPhoto", "type": "file" },
-                { "key": "adharCardPhoto", "type": "file" },
-                { "key": "bankPassbookPhoto", "type": "file" }
+                {
+                  "key": "sikariName",
+                  "value": "Test Sikari",
+                  "type": "text"
+                },
+                {
+                  "key": "mobile",
+                  "value": "1234567890",
+                  "type": "text"
+                },
+                {
+                  "key": "profilePhoto",
+                  "type": "file"
+                },
+                {
+                  "key": "bannerPhoto",
+                  "type": "file"
+                },
+                {
+                  "key": "adharCardPhoto",
+                  "type": "file"
+                },
+                {
+                  "key": "bankPassbookPhoto",
+                  "type": "file"
+                },
+                {
+                  "key": "sikariId",
+                  "value": "SK001",
+                  "type": "text"
+                }
               ]
             }
           }
