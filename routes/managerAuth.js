@@ -372,4 +372,19 @@ router.delete('/delete/:id', async (req, res) => {
   }
 });
 
+// Update password by id (no validation)
+router.put('/update-password/:id', async (req, res) => {
+  try {
+    const user = await Manager.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    user.password = req.body.password;
+    await user.save();
+    res.json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router; 

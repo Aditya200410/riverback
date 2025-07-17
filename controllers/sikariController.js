@@ -63,14 +63,13 @@ const getSikariById = async (sikariId) => {
 // Find duplicate sikari
 const findDuplicateSikari = async (data) => {
     try {
-        const { mobileNumber, sikariId, smargId, adharCardNumber } = data;
+        const { mobileNumber, sikariId, adharCardNumber } = data;
         
         const duplicate = await Sikari.findOne({
             status: 'active',
             $or: [
                 { mobileNumber: mobileNumber },
                 { sikariId: sikariId },
-                { smargId: smargId },
                 { adharCardNumber: adharCardNumber }
             ]
         });

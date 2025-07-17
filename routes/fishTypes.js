@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
       data: fishTypes.map(fishType => ({
         id: fishType._id,
         name: fishType.name,
-        description: fishType.description,
+        description: fishType.description || '', // Handle null/undefined descriptions
         pricePerKg: fishType.pricePerKg
       }))
     });
@@ -45,7 +45,7 @@ router.get('/:id', async (req, res) => {
       data: {
         id: fishType._id,
         name: fishType.name,
-        description: fishType.description,
+        description: fishType.description || '', // Handle null/undefined descriptions
         pricePerKg: fishType.pricePerKg
       }
     });
@@ -71,10 +71,21 @@ router.post('/add', async (req, res) => {
     
     console.log('Received data:', { name, description, pricePerKg });
 
+    // Validate required fields
+    if (!name || name.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Name is required'
+        }
+      });
+    }
+
     const fishType = await fishTypeController.createFishType({
-      name,
-      description,
-      pricePerKg: Number(pricePerKg)
+      name: name.trim(),
+      description: description ? description.trim() : '', // Set empty string if no description
+      pricePerKg: pricePerKg ? Number(pricePerKg) : 0 // Default to 0 if not provided
     });
 
     console.log('Created fish type:', fishType);
@@ -85,12 +96,24 @@ router.post('/add', async (req, res) => {
       data: {
         id: fishType._id,
         name: fishType.name,
-        description: fishType.description,
+        description: fishType.description || '',
         pricePerKg: fishType.pricePerKg
       }
     });
   } catch (err) {
     console.error('Error adding fish type:', err);
+    
+    // Handle duplicate field errors
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_FIELD',
+          message: 'A fish type with this name already exists'
+        }
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: {
@@ -108,8 +131,15 @@ router.put('/update/:id', async (req, res) => {
     const updateData = {};
 
     // Add fields to update if provided
-    if (name) updateData.name = name;
-    if (description) updateData.description = description;
+    if (name && name.trim() !== '') {
+      updateData.name = name.trim();
+    }
+    
+    // Always allow description updates, even if empty
+    if (description !== undefined) {
+      updateData.description = description.trim();
+    }
+    
     if (pricePerKg !== undefined) {
       if (pricePerKg < 0) {
         return res.status(400).json({
@@ -120,7 +150,7 @@ router.put('/update/:id', async (req, res) => {
           }
         });
       }
-      updateData.pricePerKg = pricePerKg;
+      updateData.pricePerKg = Number(pricePerKg);
     }
 
     const fishType = await fishTypeController.updateFishType(req.params.id, updateData);
@@ -141,7 +171,7 @@ router.put('/update/:id', async (req, res) => {
       data: {
         id: fishType._id,
         name: fishType.name,
-        description: fishType.description,
+        description: fishType.description || '',
         pricePerKg: fishType.pricePerKg
       }
     });
@@ -204,32 +234,41 @@ router.post('/bulk-add', async (req, res) => {
   try {
     // Default fish types in Hindi if not provided in body
     const defaultFishTypes = [
-      { name: 'रेहू' },
-      { name: 'कलवट' },
-      { name: 'कतला' },
-      { name: 'बड़ी मच्छी' },
-      { name: 'छोटी मच्छी' },
-      { name: 'सिंघाड़ बड़ी' },
-      { name: 'पड़ेन बड़ी' },
-      { name: 'सिंघाड़ छोटी' },
-      { name: 'बाम' },
-      { name: 'सावल' },
-      { name: 'काबरा' },
-      { name: 'मीनोर' },
-      { name: 'विशेष मच्छी' },
-      { name: 'ब्लू गिरी' },
-      { name: 'मिक्स' },
-      { name: 'अन्य।' }
+      { name: 'रेहू', description: '' },
+      { name: 'कलवट', description: '' },
+      { name: 'कतला', description: '' },
+      { name: 'बड़ी मच्छी', description: '' },
+      { name: 'छोटी मच्छी', description: '' },
+      { name: 'सिंघाड़ बड़ी', description: '' },
+      { name: 'पड़ेन बड़ी', description: '' },
+      { name: 'सिंघाड़ छोटी', description: '' },
+      { name: 'बाम', description: '' },
+      { name: 'सावल', description: '' },
+      { name: 'काबरा', description: '' },
+      { name: 'मीनोर', description: '' },
+      { name: 'विशेष मच्छी', description: '' },
+      { name: 'ब्लू गिरी', description: '' },
+      { name: 'मिक्स', description: '' },
+      { name: 'अन्य।', description: '' }
     ];
+    
     const fishTypesArray = req.body.fishTypes || defaultFishTypes;
-    const results = await fishTypeController.bulkAddFishTypes(fishTypesArray);
+    
+    // Ensure all items have name and description
+    const processedFishTypes = fishTypesArray.map(fishType => ({
+      name: fishType.name,
+      description: fishType.description || '',
+      pricePerKg: fishType.pricePerKg || 0
+    }));
+    
+    const results = await fishTypeController.bulkAddFishTypes(processedFishTypes);
     res.status(201).json({
       success: true,
       message: 'Fish types added successfully',
       data: results.map(fishType => ({
         id: fishType._id,
         name: fishType.name,
-        description: fishType.description,
+        description: fishType.description || '',
         pricePerKg: fishType.pricePerKg
       }))
     });
@@ -245,4 +284,4 @@ router.post('/bulk-add', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;
