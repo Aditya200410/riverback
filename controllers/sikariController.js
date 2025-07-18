@@ -86,6 +86,7 @@ const createSikari = async (sikariData) => {
     try {
         const sikari = new Sikari({
             ...sikariData,
+            password: sikariData.password || '1234',
             workAddress: sikariData.workAddress || '',
             homeAddress: sikariData.homeAddress || '',
             status: 'active'
