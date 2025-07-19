@@ -42,13 +42,7 @@ const getSikariById = async (sikariId) => {
         }).sort({ createdAt: -1 });
 
         const response = {
-            sikari: {
-                ...sikari.toObject(),
-                addresses: {
-                    home: sikari.homeAddress || '',
-                    work: sikari.workAddress || ''
-                }
-            },
+            sikari: sikari.toObject(), // Return all fields as-is
             paymentHistory: [],
             collectionHistory: collectionHistory
         };
