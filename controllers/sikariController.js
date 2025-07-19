@@ -18,7 +18,10 @@ const getAllSikaris = async () => {
                 madhayamName: 1,
                 boatNumber: 1,
                 position: 1,
-                profilePhoto: 1
+                profilePhoto: 1,
+                bannerPhoto: 1,
+                adharCardPhoto: 1,
+                bankPassbookPhoto: 1
             });
         
         return sikaris;
