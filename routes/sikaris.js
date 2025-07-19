@@ -183,35 +183,20 @@ router.post('/add', upload.fields([
       password: generatedPassword
     });
 
+    // Fetch all sikaris after adding
+    const sikaris = await sikariController.getAllSikaris();
+    const sikarisWithUrls = sikaris.map(sikari => ({
+      ...sikari.toObject(),
+      profilePhoto: generateFileUrl(req, sikari.profilePhoto),
+      bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
+      adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
+      bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto)
+    }));
+
     res.status(201).json({
       success: true,
       message: 'Sikari added successfully',
-      data: {
-        id: sikari._id,
-        sikariId: sikari.sikariId,
-        sikariName: sikari.sikariName,
-        mobile: sikari.mobile,
-        location: sikari.location,
-        workLocation: sikari.workLocation,
-        homeAddress: sikari.homeAddress,
-        dateOfJoining: sikari.dateOfJoining,
-        smargId: sikari.smargId,
-        adharCardNumber: sikari.adharCardNumber,
-        bankAccountNumber: sikari.bankAccountNumber,
-        ifscCode: sikari.ifscCode,
-        madhayamName: sikari.madhayamName,
-        madhayamMobileNumber: sikari.madhayamMobileNumber,
-        madhayamAddress: sikari.madhayamAddress,
-        boatNumber: sikari.boatNumber,
-        boatId: sikari.boatId,
-        boatType: sikari.boatType,
-        position: sikari.position,
-        profilePhoto: generateFileUrl(req, sikari.profilePhoto),
-        bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
-        adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
-        bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto),
-        password: generatedPassword
-      }
+      data: sikarisWithUrls
     });
   } catch (err) {
     console.error('Error adding sikari:', err);
@@ -298,16 +283,20 @@ router.put('/update/:id', upload.fields([
       });
     }
 
+    // Fetch all sikaris after update
+    const sikaris = await sikariController.getAllSikaris();
+    const sikarisWithUrls = sikaris.map(sikari => ({
+      ...sikari.toObject(),
+      profilePhoto: generateFileUrl(req, sikari.profilePhoto),
+      bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
+      adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
+      bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto)
+    }));
+
     res.json({
       success: true,
       message: 'Sikari updated successfully',
-      data: {
-        ...sikari,
-        profilePhoto: generateFileUrl(req, sikari.profilePhoto),
-        bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
-        adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
-        bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto)
-      }
+      data: sikarisWithUrls
     });
   } catch (err) {
     console.error('Error updating sikari:', err);
