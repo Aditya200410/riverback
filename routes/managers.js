@@ -48,10 +48,10 @@ router.get('/', async (req, res) => {
     // Convert file paths to full URLs
     const managersWithUrls = managers.map(manager => ({
       ...manager.toObject(),
-      profilePhoto: generateFileUrl(req, manager.profilePicture),
-      bannerPhoto: generateFileUrl(req, manager.bannerPhoto),
-      adharCardPhoto: generateFileUrl(req, manager.adharCardPhoto),
-      bankPassbookPhoto: generateFileUrl(req, manager.bankPassbookPhoto)
+      profilePhoto: manager.profilePhoto ? generateFileUrl(req, 'uploads/manager-users/' + manager.profilePhoto) : null,
+      bannerPhoto: manager.bannerPhoto ? generateFileUrl(req, 'uploads/manager-users/' + manager.bannerPhoto) : null,
+      adharCardPhoto: manager.adharCardPhoto ? generateFileUrl(req, 'uploads/manager-users/' + manager.adharCardPhoto) : null,
+      bankPassbookPhoto: manager.bankPassbookPhoto ? generateFileUrl(req, 'uploads/manager-users/' + manager.bankPassbookPhoto) : null
     }));
 
     res.status(200).json({
@@ -87,10 +87,10 @@ router.get('/:id', async (req, res) => {
     // Convert file paths to full URLs
     const managerWithUrls = {
       ...manager.toObject(),
-      profilePhoto: generateFileUrl(req, manager.profilePicture),
-      bannerPhoto: generateFileUrl(req, manager.bannerPhoto),
-      adharCardPhoto: generateFileUrl(req, manager.adharCardPhoto),
-      bankPassbookPhoto: generateFileUrl(req, manager.bankPassbookPhoto)
+      profilePhoto: manager.profilePhoto ? generateFileUrl(req, 'uploads/manager-users/' + manager.profilePhoto) : null,
+      bannerPhoto: manager.bannerPhoto ? generateFileUrl(req, 'uploads/manager-users/' + manager.bannerPhoto) : null,
+      adharCardPhoto: manager.adharCardPhoto ? generateFileUrl(req, 'uploads/manager-users/' + manager.adharCardPhoto) : null,
+      bankPassbookPhoto: manager.bankPassbookPhoto ? generateFileUrl(req, 'uploads/manager-users/' + manager.bankPassbookPhoto) : null
     };
 
     res.status(200).json({
@@ -245,7 +245,7 @@ router.post('/add', upload.fields([
       aadhar: adharCardNumber,
       password, // use plain password, will be hashed by pre-save hook
       address: address || madhayamAddress,
-      profilePicture: req.files?.profilePhoto?.[0]?.filename,
+      profilePhoto: req.files?.profilePhoto?.[0]?.filename,
       phase,
       location,
       dateOfJoining: dateOfJoining ? new Date(dateOfJoining) : undefined,
@@ -293,7 +293,7 @@ router.post('/add', upload.fields([
         email: manager.email,
         address: manager.address,
         phase: manager.phase,
-        profilePhoto: manager.profilePicture ? `${baseUrl}/uploads/manager-users/${manager.profilePicture}` : null,
+        profilePhoto: manager.profilePhoto ? `${baseUrl}/uploads/manager-users/${manager.profilePhoto}` : null,
         bannerPhoto: manager.bannerPhoto ? `${baseUrl}/uploads/manager-users/${manager.bannerPhoto}` : null,
         adharCardPhoto: manager.adharCardPhoto ? `${baseUrl}/uploads/manager-users/${manager.adharCardPhoto}` : null,
         bankPassbookPhoto: manager.bankPassbookPhoto ? `${baseUrl}/uploads/manager-users/${manager.bankPassbookPhoto}` : null
