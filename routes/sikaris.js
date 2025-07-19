@@ -47,10 +47,10 @@ router.get('/', async (req, res) => {
     // Convert file paths to full URLs
     const sikarisWithUrls = sikaris.map(sikari => ({
       ...sikari.toObject(),
-      profilePhoto: generateFileUrl(req, sikari.profilePhoto),
-      bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
-      adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
-      bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto)
+      profilePhoto: sikari.profilePhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.profilePhoto) : null,
+      bannerPhoto: sikari.bannerPhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.bannerPhoto) : null,
+      adharCardPhoto: sikari.adharCardPhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.adharCardPhoto) : null,
+      bankPassbookPhoto: sikari.bankPassbookPhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.bankPassbookPhoto) : null
     }));
 
     res.status(200).json({
@@ -85,10 +85,10 @@ router.get('/:id', async (req, res) => {
     // Convert file paths to full URLs
     const sikariWithUrls = {
       ...result.sikari.toObject(),
-      profilePhoto: generateFileUrl(req, result.sikari.profilePhoto),
-      bannerPhoto: generateFileUrl(req, result.sikari.bannerPhoto),
-      adharCardPhoto: generateFileUrl(req, result.sikari.adharCardPhoto),
-      bankPassbookPhoto: generateFileUrl(req, result.sikari.bankPassbookPhoto)
+      profilePhoto: result.sikari.profilePhoto ? generateFileUrl(req, 'uploads/sikaris/' + result.sikari.profilePhoto) : null,
+      bannerPhoto: result.sikari.bannerPhoto ? generateFileUrl(req, 'uploads/sikaris/' + result.sikari.bannerPhoto) : null,
+      adharCardPhoto: result.sikari.adharCardPhoto ? generateFileUrl(req, 'uploads/sikaris/' + result.sikari.adharCardPhoto) : null,
+      bankPassbookPhoto: result.sikari.bankPassbookPhoto ? generateFileUrl(req, 'uploads/sikaris/' + result.sikari.bankPassbookPhoto) : null
     };
 
     res.status(200).json({
@@ -187,10 +187,10 @@ router.post('/add', upload.fields([
     const sikaris = await sikariController.getAllSikaris();
     const sikarisWithUrls = sikaris.map(sikari => ({
       ...sikari.toObject(),
-      profilePhoto: generateFileUrl(req, sikari.profilePhoto),
-      bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
-      adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
-      bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto)
+      profilePhoto: sikari.profilePhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.profilePhoto) : null,
+      bannerPhoto: sikari.bannerPhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.bannerPhoto) : null,
+      adharCardPhoto: sikari.adharCardPhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.adharCardPhoto) : null,
+      bankPassbookPhoto: sikari.bankPassbookPhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.bankPassbookPhoto) : null
     }));
 
     res.status(201).json({
@@ -287,10 +287,10 @@ router.put('/update/:id', upload.fields([
     const sikaris = await sikariController.getAllSikaris();
     const sikarisWithUrls = sikaris.map(sikari => ({
       ...sikari.toObject(),
-      profilePhoto: generateFileUrl(req, sikari.profilePhoto),
-      bannerPhoto: generateFileUrl(req, sikari.bannerPhoto),
-      adharCardPhoto: generateFileUrl(req, sikari.adharCardPhoto),
-      bankPassbookPhoto: generateFileUrl(req, sikari.bankPassbookPhoto)
+      profilePhoto: sikari.profilePhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.profilePhoto) : null,
+      bannerPhoto: sikari.bannerPhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.bannerPhoto) : null,
+      adharCardPhoto: sikari.adharCardPhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.adharCardPhoto) : null,
+      bankPassbookPhoto: sikari.bankPassbookPhoto ? generateFileUrl(req, 'uploads/sikaris/' + sikari.bankPassbookPhoto) : null
     }));
 
     res.json({
